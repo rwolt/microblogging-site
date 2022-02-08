@@ -7,4 +7,13 @@ export const Container = styled.div`
   border-right: 1px solid #333;
   height: 100vh;
   margin: auto;
+  position: relative;
+
+  & > div {
+    border-bottom: 1px solid black;
+  }
+
+  & > div:last-child {
+    border-bottom: none;
+  }
 `;
