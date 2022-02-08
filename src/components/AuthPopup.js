@@ -6,8 +6,11 @@ const AuthPopup = (props) => {
   return (
     <Popup>
       <LoginForm
+        handleLogin={props.handleLogin}
+        handleRegister={props.handleRegister}
         showRegisterForm={props.showRegisterForm}
         setShowRegisterForm={props.setShowRegisterForm}
+        setShowPopup={props.setShowPopup}
       />
     </Popup>
   );

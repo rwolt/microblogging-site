@@ -4,13 +4,17 @@ import SignUpBox from "../components/SignUpBox";
 import AuthPopup from "../components/AuthPopup";
 import { Header } from "../components/styled/Header.styled";
 import { Container } from "../components/styled/Container.styled";
+import { Button } from "../components/styled/Button.styled";
 
 const Home = (props) => {
   return (
     <Container>
-      <Header>Home</Header>
+      <Header>
+        Home
+        <Button onClick={props.handleLogout}> Logout </Button>
+      </Header>
       {props.user ? (
-        <PostInputBox />
+        <PostInputBox user={props.user} />
       ) : (
         <SignUpBox
           setShowPopup={props.setShowPopup}
@@ -21,6 +25,9 @@ const Home = (props) => {
         <AuthPopup
           showRegisterForm={props.showRegisterForm}
           setShowRegisterForm={props.setShowRegisterForm}
+          handleLogin={props.handleLogin}
+          handleRegister={props.handleRegister}
+          setShowPopup={props.setShowPopup}
         />
       ) : (
         ""
