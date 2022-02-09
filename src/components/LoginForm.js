@@ -83,7 +83,12 @@ const LoginForm = (props) => {
           />
           <Button onClick={handleLogin}>Login</Button>
           <p>Don't have an account?</p>
-          <Button onClick={() => props.setShowRegisterForm(true)}>
+          <Button
+            onClick={(e) => {
+              e.preventDefault();
+              props.setShowRegisterForm(true);
+            }}
+          >
             Register
           </Button>
         </>

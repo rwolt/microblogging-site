@@ -6,12 +6,15 @@ import { ProfileImage } from "./styled/ProfileImage.styled";
 
 const PostInputBox = (props) => {
   return (
-    <Flex>
-      <ProfileImage />
-      <p>{props.user.displayName}</p>
-      <Input type="text" placeholder="What's happening?" />
-      <Button>Post</Button>
-    </Flex>
+    <div>
+      <Flex>
+        <ProfileImage />
+        <Input type="text" placeholder="What's happening?" />
+      </Flex>
+      <Flex justifyContent="flex-end">
+        <Button>Post</Button>
+      </Flex>
+    </div>
   );
 };
 export default PostInputBox;

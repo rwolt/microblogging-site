@@ -2,25 +2,20 @@ import React from "react";
 import PostInputBox from "../components/PostInputBox";
 import SignUpBox from "../components/SignUpBox";
 import AuthPopup from "../components/AuthPopup";
-import { Header } from "../components/styled/Header.styled";
+import Header from "../components/Header";
 import { Container } from "../components/styled/Container.styled";
-import { Button } from "../components/styled/Button.styled";
 
 const Home = (props) => {
   return (
     <Container>
-      <Header>
-        Home
-        <Button onClick={props.handleLogout}> Logout </Button>
-      </Header>
-      {props.user ? (
-        <PostInputBox user={props.user} />
-      ) : (
-        <SignUpBox
-          setShowPopup={props.setShowPopup}
-          setShowRegisterForm={props.setShowRegisterForm}
-        />
-      )}
+      <Header
+        pageTitle="Home"
+        setShowPopup={props.setShowPopup}
+        setShowRegisterForm={props.setShowRegisterForm}
+        handleLogout={props.handleLogout}
+        user={props.user}
+      />
+      {props.user ? <PostInputBox user={props.user} /> : ""}
       {props.showPopup ? (
         <AuthPopup
           showRegisterForm={props.showRegisterForm}
