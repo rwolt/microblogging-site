@@ -2,8 +2,10 @@ import { useState } from "react";
 import { db, storage, auth } from "./utils/firebase";
 import {
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
   updateProfile,
 } from "firebase/auth";
@@ -34,6 +36,13 @@ function App() {
     } catch (error) {
       console.error(error.message);
     }
+  };
+
+  const handleGoogleLogin = async (e) => {
+    e.preventDefault();
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+    console.log(user);
   };
 
   const handleRegister = async (email, password, displayName) => {
@@ -72,6 +81,7 @@ function App() {
                   showRegisterForm={showRegisterForm}
                   setShowRegisterForm={setShowRegisterForm}
                   handleLogin={handleLogin}
+                  handleGoogleLogin={handleGoogleLogin}
                   handleRegister={handleRegister}
                   handleLogout={handleLogout}
                 />

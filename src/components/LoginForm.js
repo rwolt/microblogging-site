@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Button } from "./styled/Button.styled";
+import { Flex } from "./styled/Flex.styled";
 import { StyledLoginForm } from "./styled/LoginForm.styled";
+import { GoogleLoginButton } from "./styled/GoogleLoginButton.styled";
 
 const LoginForm = (props) => {
   const [loginEmail, setLoginEmail] = useState("");
@@ -35,8 +37,7 @@ const LoginForm = (props) => {
     <StyledLoginForm>
       {props.showRegisterForm ? (
         <>
-          <h3>Register User</h3>
-          <label htmlFor="display-name">Display Name:</label>
+          <h2>Create your account</h2>
           <input
             name="display-name"
             placeholder="Display Name"
@@ -44,7 +45,6 @@ const LoginForm = (props) => {
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
           />
-          <label htmlFor="register-email">Email: </label>
           <input
             name="register-email"
             placeholder="Email"
@@ -52,7 +52,6 @@ const LoginForm = (props) => {
             value={registerEmail}
             onChange={(e) => setRegisterEmail(e.target.value)}
           />
-          <label htmlFor="register-password">Password:</label>
           <input
             name="register-password"
             placeholder="Password"
@@ -60,12 +59,17 @@ const LoginForm = (props) => {
             value={registerPassword}
             onChange={(e) => setRegisterPassword(e.target.value)}
           />
-          <Button onClick={handleRegister}>Register</Button>
+          <Flex justifyContent="flex-end">
+            <Button onClick={handleRegister}>Register</Button>
+          </Flex>
+          <Flex flexDirection="column">
+            <p> or </p>
+            <GoogleLoginButton onClick={props.handleGoogleLogin} />
+          </Flex>
         </>
       ) : (
         <>
-          <h3>Sign In</h3>
-          <label htmlFor="sign-in-email">Email:</label>
+          <h2>Sign In</h2>
           <input
             name="sign-in-email"
             placeholder="Email"
@@ -73,7 +77,6 @@ const LoginForm = (props) => {
             value={loginEmail}
             onChange={(e) => setLoginEmail(e.target.value)}
           />
-          <label htmlFor="sign-in-password">Password</label>
           <input
             name="sign-in-password"
             placeholder="Password"
@@ -81,16 +84,13 @@ const LoginForm = (props) => {
             value={loginPassword}
             onChange={(e) => setLoginPassword(e.target.value)}
           />
-          <Button onClick={handleLogin}>Login</Button>
-          <p>Don't have an account?</p>
-          <Button
-            onClick={(e) => {
-              e.preventDefault();
-              props.setShowRegisterForm(true);
-            }}
-          >
-            Register
-          </Button>
+          <Flex justifyContent="flex-end">
+            <Button onClick={handleLogin}>Login</Button>
+          </Flex>
+          <Flex flexDirection="column">
+            <p> or </p>
+            <GoogleLoginButton onClick={props.handleGoogleLogin} />
+          </Flex>
         </>
       )}
     </StyledLoginForm>
