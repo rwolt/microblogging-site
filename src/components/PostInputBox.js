@@ -8,7 +8,7 @@ const PostInputBox = (props) => {
   return (
     <div>
       <Flex>
-        <ProfileImage />
+        <ProfileImage src={props.user.photoURL} />
         <Input type="text" placeholder="What's happening?" />
       </Flex>
       <Flex justifyContent="flex-end">

@@ -20,7 +20,6 @@ const LoginForm = (props) => {
   };
 
   useEffect(() => {
-    clearForm();
     return () => clearForm();
   }, []);
 

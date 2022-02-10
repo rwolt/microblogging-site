@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { db, storage, auth } from "./utils/firebase";
 import {
   createUserWithEmailAndPassword,
@@ -17,15 +17,29 @@ import Home from "./Pages/Home";
 const theme = {};
 
 function App() {
-  const [user, setUser] = useState();
+  const [currentUser, setCurrentUser] = useState();
   const [showPopup, setShowPopup] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
 
-  onAuthStateChanged(auth, (currentUser) => {
-    setUser(currentUser);
-  });
+  useEffect(() => {
+    initFirebaseAuth();
+  }, []);
+
+  const initFirebaseAuth = () => onAuthStateChanged(auth, authStateObserver);
+  const getProfilePic = () => {
+    return (
+      auth.currentUser.photoURL ||
+      `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`
+    );
+  };
+
+  const getDisplayName = () => {
+    return auth.currentUser.displayName;
+  };
 
   const handleLogin = async (e, userObject) => {
+    console.log(userObject);
+    console.log(e.target);
     const { id } = e.target;
     if (id === "google-login") {
       e.preventDefault();
@@ -39,7 +53,6 @@ function App() {
           userObject.email,
           userObject.password
         );
-        console.log(user);
       } catch (error) {
         console.error(error.message);
       }
@@ -63,6 +76,16 @@ function App() {
     await signOut(auth);
   };
 
+  const authStateObserver = async (user) => {
+    if (user) {
+      setShowPopup(false);
+      await setCurrentUser({ ...user, photoURL: getProfilePic() });
+      console.log(currentUser);
+    } else {
+      setCurrentUser("");
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <>
@@ -73,7 +96,7 @@ function App() {
               path="/"
               element={
                 <Home
-                  user={user}
+                  user={currentUser}
                   showPopup={showPopup}
                   setShowPopup={setShowPopup}
                   showRegisterForm={showRegisterForm}
