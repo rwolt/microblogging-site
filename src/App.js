@@ -25,37 +25,35 @@ function App() {
     setUser(currentUser);
   });
 
-  const handleLogin = async (email, password) => {
-    try {
-      const currentUser = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      console.log(user);
-    } catch (error) {
-      console.error(error.message);
+  const handleLogin = async (e, userObject) => {
+    const { id } = e.target;
+    if (id === "google-login") {
+      e.preventDefault();
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } else if (id === "email-login") {
+      e.preventDefault();
+      try {
+        const currentUser = await signInWithEmailAndPassword(
+          auth,
+          userObject.email,
+          userObject.password
+        );
+        console.log(user);
+      } catch (error) {
+        console.error(error.message);
+      }
     }
   };
 
-  const handleGoogleLogin = async (e) => {
+  const handleRegister = async (e, userObject) => {
     e.preventDefault();
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
-    console.log(user);
-  };
-
-  const handleRegister = async (email, password, displayName) => {
     try {
       const currentUser = await createUserWithEmailAndPassword(
         auth,
-        email,
-        password
-      ).then((result) => {
-        updateProfile(auth.currentUser, {
-          displayName: displayName,
-        });
-      });
+        userObject.email,
+        userObject.password
+      );
     } catch (error) {
       console.error(error.message);
     }
@@ -81,7 +79,6 @@ function App() {
                   showRegisterForm={showRegisterForm}
                   setShowRegisterForm={setShowRegisterForm}
                   handleLogin={handleLogin}
-                  handleGoogleLogin={handleGoogleLogin}
                   handleRegister={handleRegister}
                   handleLogout={handleLogout}
                 />

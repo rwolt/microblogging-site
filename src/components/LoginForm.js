@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "./styled/Button.styled";
 import { Flex } from "./styled/Flex.styled";
 import { StyledLoginForm } from "./styled/LoginForm.styled";
@@ -11,27 +11,18 @@ const LoginForm = (props) => {
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    props.handleLogin(loginEmail, loginPassword);
-    clearForm();
-  };
-
-  const handleRegister = (e) => {
-    e.preventDefault();
-    props.handleRegister(registerEmail, registerPassword, displayName);
-    clearForm();
-  };
-
   const clearForm = () => {
     setLoginEmail("");
     setLoginPassword("");
     setRegisterEmail("");
     setRegisterPassword("");
     setDisplayName("");
-    props.setShowPopup(false);
-    props.setShowRegisterForm(false);
   };
+
+  useEffect(() => {
+    clearForm();
+    return () => clearForm();
+  }, []);
 
   return (
     <StyledLoginForm>
@@ -57,14 +48,31 @@ const LoginForm = (props) => {
             placeholder="Password"
             type="password"
             value={registerPassword}
-            onChange={(e) => setRegisterPassword(e.target.value)}
+            onChange={(e) => {
+              setRegisterPassword(e.target.value);
+            }}
           />
           <Flex justifyContent="flex-end">
-            <Button onClick={handleRegister}>Register</Button>
+            <Button
+              onClick={(e) => {
+                const userObject = {
+                  email: registerEmail,
+                  password: registerPassword,
+                  displayName: displayName,
+                };
+                props.handleRegister(e, userObject);
+              }}
+            >
+              Register
+            </Button>
           </Flex>
           <Flex flexDirection="column">
             <p> or </p>
-            <GoogleLoginButton onClick={props.handleGoogleLogin} />
+            <GoogleLoginButton
+              onClick={(e) => {
+                props.handleLogin(e);
+              }}
+            />
           </Flex>
         </>
       ) : (
@@ -85,11 +93,27 @@ const LoginForm = (props) => {
             onChange={(e) => setLoginPassword(e.target.value)}
           />
           <Flex justifyContent="flex-end">
-            <Button onClick={handleLogin}>Login</Button>
+            <Button
+              id="email-login"
+              onClick={(e) => {
+                const userObject = {
+                  email: loginEmail,
+                  password: loginPassword,
+                };
+                props.handleLogin(e, userObject);
+              }}
+            >
+              Login
+            </Button>
           </Flex>
           <Flex flexDirection="column">
             <p> or </p>
-            <GoogleLoginButton onClick={props.handleGoogleLogin} />
+            <GoogleLoginButton
+              id="google-login"
+              onClick={(e) => {
+                props.handleLogin(e);
+              }}
+            />
           </Flex>
         </>
       )}
