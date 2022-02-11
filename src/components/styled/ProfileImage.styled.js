@@ -3,7 +3,8 @@ import styled from "styled-components";
 
 export const ProfileImage = styled.img`
   border-radius: 10px;
-  width: 10%;
+  width: 60px;
   height: 60px;
+  padding: 5px;
   background-color: mediumaquamarine;
 `;

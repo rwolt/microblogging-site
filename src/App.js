@@ -1,4 +1,13 @@
 import { useEffect, useState } from "react";
+import {
+  addDoc,
+  getDocs,
+  collection,
+  serverTimestamp,
+  query,
+  orderBy,
+  limit,
+} from "firebase/firestore";
 import { db, storage, auth } from "./utils/firebase";
 import {
   createUserWithEmailAndPassword,
@@ -76,6 +85,24 @@ function App() {
     await signOut(auth);
   };
 
+  //Post a message from the post input box to the database
+  const postMessage = async (e, message) => {
+    await addDoc(collection(db, "posts"), {
+      user: currentUser.uid,
+      timestamp: serverTimestamp(),
+      message: message,
+    });
+  };
+
+  //Get posts from the database
+  const getMessages = async () => {
+    const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
+    const querySnapshot = await getDocs(q);
+    const posts = [];
+    querySnapshot.forEach((doc) => posts.push({ ...doc.data(), id: doc.id }));
+    return posts;
+  };
+
   const authStateObserver = async (user) => {
     if (user) {
       setShowPopup(false);
@@ -104,6 +131,8 @@ function App() {
                   handleLogin={handleLogin}
                   handleRegister={handleRegister}
                   handleLogout={handleLogout}
+                  postMessage={postMessage}
+                  getMessages={getMessages}
                 />
               }
             />

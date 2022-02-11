@@ -6,7 +6,7 @@ const Header = (props) => {
   return (
     <Flex justifyContent="space-between">
       <h2>{props.pageTitle}</h2>
-      <Flex justifyContent="flex-end">
+      <Flex justifyContent="flex-end" padding="0">
         {!props.user ? (
           <Button
             onClick={() => {
