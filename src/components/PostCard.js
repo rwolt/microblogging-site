@@ -6,7 +6,7 @@ import { StyledPostCard } from "./styled/StyledPostCard.styled";
 import { ProfileImage } from "./styled/ProfileImage.styled";
 import { UserInfo } from "./styled/UserInfo.styled";
 import { Flex } from "./styled/Flex.styled";
-import InteractionIcons from "./InteractionIcons";
+import InteractionBar from "./InteractionBar";
 
 const formatTimestamp = (timestamp) => {
   const dateFromTimestamp = timestamp.toDate();
@@ -35,13 +35,15 @@ const PostCard = ({ post }) => {
       >
         <UserInfo>
           <Link to="/${post.id}">{post.displayName}</Link>
-          <BsDot />
-          <p>{postDate}</p>
+          <span>
+            <BsDot />
+            <p>{postDate}</p>
+          </span>
         </UserInfo>
         <Flex justifyContent="flex-start" padding="0px">
           <p>{post.message}</p>
         </Flex>
-        <InteractionIcons />
+        <InteractionBar />
       </Flex>
     </StyledPostCard>
   );

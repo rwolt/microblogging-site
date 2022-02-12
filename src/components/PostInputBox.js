@@ -9,7 +9,7 @@ const PostInputBox = (props) => {
   const [message, setMessage] = useState("");
   return (
     <div style={{ borderBottom: "1px solid #e5e5e5" }}>
-      <Flex>
+      <Flex justifyContent="flex-start">
         <ProfileImage src={props.user.photoURL} />
         <Input
           type="text"

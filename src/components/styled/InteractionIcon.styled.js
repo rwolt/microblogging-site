@@ -6,6 +6,10 @@ export const InteractionIcon = styled.div`
   justify-content: flex-start;
   align-items: center;
 
+  &:hover {
+    color: #289d8c;
+  }
+
   & > p {
     margin: 0 0 0 5px;
   }

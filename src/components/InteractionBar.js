@@ -4,7 +4,7 @@ import { FaRegComment, FaRetweet, FaHeart, FaRegHeart } from "react-icons/fa";
 import { InteractionIcon } from "./styled/InteractionIcon.styled";
 import { StyledInteractionBar } from "./styled/StyledInteractionBar.styled";
 
-const InteractionIcons = (props) => {
+const InteractionBar = (props) => {
   return (
     <StyledInteractionBar>
       <InteractionIcon>
@@ -23,4 +23,4 @@ const InteractionIcons = (props) => {
   );
 };
 
-export default InteractionIcons;
+export default InteractionBar;

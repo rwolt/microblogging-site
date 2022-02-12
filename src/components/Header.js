@@ -3,8 +3,9 @@ import { Flex } from "./styled/Flex.styled";
 import { Button } from "./styled/Button.styled";
 
 const Header = (props) => {
+  const borderStyle = props.user ? {} : { borderBottom: "1px solid #e5e5e5" };
   return (
-    <Flex justifyContent="space-between">
+    <Flex justifyContent="space-between" style={borderStyle}>
       <h2>{props.pageTitle}</h2>
       <Flex justifyContent="flex-end" padding="0">
         {!props.user ? (

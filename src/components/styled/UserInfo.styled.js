@@ -16,9 +16,16 @@ export const UserInfo = styled.div`
     text-decoration: underline;
   }
 
-  & > p,
-  a {
+  p,
+  & > a {
     margin: 0;
     padding: 5px;
+  }
+
+  & > span {
+    display: flex;
+    margin: 0;
+    align-items: center;
+    color: #555;
   }
 `;
