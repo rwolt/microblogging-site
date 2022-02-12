@@ -7,6 +7,7 @@ import {
   query,
   orderBy,
   limit,
+  setDoc,
 } from "firebase/firestore";
 import { db, storage, auth } from "./utils/firebase";
 import {
@@ -35,11 +36,14 @@ function App() {
   }, []);
 
   const initFirebaseAuth = () => onAuthStateChanged(auth, authStateObserver);
+
   const getProfilePic = () => {
-    return (
-      auth.currentUser.photoURL ||
-      `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`
-    );
+    if (!currentUser.photoURL) {
+      updateProfile(auth.currentUser, {
+        photoURL: `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`,
+      });
+    }
+    return auth.currentUser.photoURL;
   };
 
   const getDisplayName = () => {
@@ -89,6 +93,8 @@ function App() {
   const postMessage = async (e, message) => {
     await addDoc(collection(db, "posts"), {
       user: currentUser.uid,
+      displayName: currentUser.displayName,
+      profilePicURL: currentUser.photoURL,
       timestamp: serverTimestamp(),
       message: message,
     });
