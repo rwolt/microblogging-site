@@ -38,7 +38,7 @@ function App() {
   const initFirebaseAuth = () => onAuthStateChanged(auth, authStateObserver);
 
   const getProfilePic = () => {
-    if (!currentUser.photoURL) {
+    if (!auth.currentUser.photoURL) {
       updateProfile(auth.currentUser, {
         photoURL: `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`,
       });
@@ -51,8 +51,6 @@ function App() {
   };
 
   const handleLogin = async (e, userObject) => {
-    console.log(userObject);
-    console.log(e.target);
     const { id } = e.target;
     if (id === "google-login") {
       e.preventDefault();
@@ -75,11 +73,15 @@ function App() {
   const handleRegister = async (e, userObject) => {
     e.preventDefault();
     try {
-      const currentUser = await createUserWithEmailAndPassword(
+      await createUserWithEmailAndPassword(
         auth,
         userObject.email,
         userObject.password
-      );
+      ).then(() => {
+        updateProfile(auth.currentUser, {
+          displayName: userObject.displayName,
+        });
+      });
     } catch (error) {
       console.error(error.message);
     }
@@ -105,7 +107,12 @@ function App() {
     const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
     const querySnapshot = await getDocs(q);
     const posts = [];
-    querySnapshot.forEach((doc) => posts.push({ ...doc.data(), id: doc.id }));
+    querySnapshot.forEach((doc) => {
+      posts.push({
+        ...doc.data(),
+        id: doc.id,
+      });
+    });
     return posts;
   };
 

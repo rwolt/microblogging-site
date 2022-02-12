@@ -44,7 +44,7 @@ const Home = (props) => {
         ""
       )}
       {posts.map((post) => {
-        return <PostCard message={post.message} />;
+        return <PostCard key={post.id} post={post} />;
       })}
     </Container>
   );
