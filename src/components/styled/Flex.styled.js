@@ -8,4 +8,10 @@ export const Flex = styled.div`
   align-items: ${({ alignItems }) => alignItems || "center"};
   justify-content: ${({ justifyContent }) => justifyContent || "center"};
   padding: ${({ padding }) => padding || "10px"};
+  margin: ${({ margin }) => margin || "0"};
+
+  & > p {
+    padding: 5px;
+    margin: 0px;
+  }
 `;

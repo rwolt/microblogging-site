@@ -1,7 +1,10 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { format, formatDistance } from "date-fns";
+import { BsDot } from "react-icons/bs";
 import { StyledPostCard } from "./styled/StyledPostCard.styled";
 import { ProfileImage } from "./styled/ProfileImage.styled";
+import { UserInfo } from "./styled/UserInfo.styled";
 import { Flex } from "./styled/Flex.styled";
 
 const formatTimestamp = (timestamp) => {
@@ -23,12 +26,18 @@ const PostCard = ({ post }) => {
   return (
     <StyledPostCard>
       <ProfileImage src={post.profilePicURL} />
-      <Flex flexDirection="column">
-        <Flex>
-          <p>{post.displayName}</p>
+      <Flex
+        flexDirection="column"
+        alignItems="flex-start"
+        padding="0"
+        margin=" 0 0 0 10px"
+      >
+        <UserInfo>
+          <Link to="/${post.id}">{post.displayName}</Link>
+          <BsDot />
           <p>{postDate}</p>
-        </Flex>
-        <Flex>
+        </UserInfo>
+        <Flex justifyContent="flex-start" padding="0px">
           <p>{post.message}</p>
         </Flex>
       </Flex>
