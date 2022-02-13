@@ -8,7 +8,7 @@ import { UserInfo } from "./styled/UserInfo.styled";
 import { Flex } from "./styled/Flex.styled";
 import InteractionBar from "./InteractionBar";
 
-const formatTimestamp = (timestamp) => {
+export const formatTimestamp = (timestamp) => {
   const dateFromTimestamp = timestamp.toDate();
   const now = new Date();
   //If the post is more than 24 hours old, format as DD/MM
