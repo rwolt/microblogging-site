@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import {
+  doc,
   addDoc,
+  getDoc,
   getDocs,
   collection,
   serverTimestamp,
@@ -23,6 +25,7 @@ import { ThemeProvider } from "styled-components";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import GlobalStyles from "./components/styled/Global";
 import Home from "./Pages/Home";
+import Profile from "./Pages/Profile";
 
 const theme = {};
 
@@ -37,13 +40,12 @@ function App() {
 
   const initFirebaseAuth = () => onAuthStateChanged(auth, authStateObserver);
 
-  const getProfilePic = () => {
+  const getProfilePic = async () => {
     if (!auth.currentUser.photoURL) {
-      updateProfile(auth.currentUser, {
+      await updateProfile(auth.currentUser, {
         photoURL: `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`,
       });
     }
-    return auth.currentUser.photoURL;
   };
 
   const getDisplayName = () => {
@@ -91,15 +93,49 @@ function App() {
     await signOut(auth);
   };
 
+  //Check if there is a document in the users collection for the authenticated user
+  const checkUserDoc = async () => {
+    const docRef = doc(db, "users", auth.currentUser.uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      setCurrentUser(docSnap.data());
+      //If there is no document, create a new user doc and set that doc as the current user for the view
+    } else {
+      createUserDoc(auth.currentUser.uid).then(async () => {
+        const userInfo = await getUserInfo(auth.currentUser.uid);
+        setCurrentUser(userInfo);
+      });
+    }
+  };
+
+  //Create a document in the user collection with the specified uid
+  const createUserDoc = async (uid) => {
+    await setDoc(doc(db, "users", `${uid}`), {
+      uid: uid,
+      name: auth.currentUser.displayName,
+      photoURL: auth.currentUser.photoURL,
+      dateJoined: serverTimestamp(),
+    });
+  };
+
+  //Get a user document from firestore
+  const getUserInfo = async (uid) => {
+    const userDocRef = doc(db, "users", `${uid}`);
+    const userDocSnap = await getDoc(userDocRef);
+    return userDocSnap.data();
+  };
+
   //Post a message from the post input box to the database
   const postMessage = async (e, message) => {
-    await addDoc(collection(db, "posts"), {
+    const userDoc = await addDoc(collection(db, "posts"), {
       user: currentUser.uid,
-      displayName: currentUser.displayName,
+      displayName: currentUser.name,
       profilePicURL: currentUser.photoURL,
       timestamp: serverTimestamp(),
       message: message,
     });
+    return userDoc;
   };
 
   //Get posts from the database
@@ -119,8 +155,9 @@ function App() {
   const authStateObserver = async (user) => {
     if (user) {
       setShowPopup(false);
-      await setCurrentUser({ ...user, photoURL: getProfilePic() });
-      console.log(currentUser);
+      await getProfilePic().then(() => {
+        checkUserDoc().then(() => {});
+      });
     } else {
       setCurrentUser("");
     }
@@ -147,6 +184,32 @@ function App() {
                   postMessage={postMessage}
                   getMessages={getMessages}
                 />
+              }
+            />
+            <Route
+              path="/users/:uid"
+              element={
+                <Profile
+                  user={currentUser}
+                  getUserInfo={getUserInfo}
+                  showPopup={showPopup}
+                  setShowPopup={setShowPopup}
+                  showRegisterForm={showRegisterForm}
+                  setShowRegisterForm={setShowRegisterForm}
+                  handleLogin={handleLogin}
+                  handleRegister={handleRegister}
+                  handleLogout={handleLogout}
+                  postMessage={postMessage}
+                  getMessages={getMessages}
+                />
+              }
+            />
+            <Route
+              path="*"
+              element={
+                <main style={{ padding: "1rem" }}>
+                  <p>There's nothing here!</p>
+                </main>
               }
             />
           </Routes>

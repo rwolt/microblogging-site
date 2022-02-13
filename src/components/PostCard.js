@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import { format, formatDistance } from "date-fns";
 import { BsDot } from "react-icons/bs";
 import { StyledPostCard } from "./styled/StyledPostCard.styled";
@@ -13,7 +13,7 @@ const formatTimestamp = (timestamp) => {
   const now = new Date();
   //If the post is more than 24 hours old, format as DD/MM
   if (now - dateFromTimestamp > 1000 * 3600 * 24) {
-    return format(dateFromTimestamp, "MMMdd");
+    return format(dateFromTimestamp, "MMM dd");
   } else {
     return formatDistance(dateFromTimestamp, now, {
       addSuffix: true,
@@ -23,6 +23,8 @@ const formatTimestamp = (timestamp) => {
 };
 
 const PostCard = ({ post }) => {
+  const navigate = useNavigate();
+  const { uid } = useParams();
   const postDate = formatTimestamp(post.timestamp);
   return (
     <StyledPostCard>
@@ -34,7 +36,7 @@ const PostCard = ({ post }) => {
         margin=" 0 0 0 10px"
       >
         <UserInfo>
-          <Link to="/${post.id}">{post.displayName}</Link>
+          <NavLink to={`/users/${post.user}`}> {post.displayName}</NavLink>
           <span>
             <BsDot />
             <p>{postDate}</p>
