@@ -8,6 +8,7 @@ import {
   serverTimestamp,
   query,
   orderBy,
+  where,
   limit,
   setDoc,
 } from "firebase/firestore";
@@ -152,6 +153,22 @@ function App() {
     return posts;
   };
 
+  const getProfilePosts = async (feedType, userId) => {
+    const postsRef = collection(db, "posts");
+    let q = "";
+    switch (feedType) {
+      case "posts":
+        q = query(postsRef, where("user", "==", `${userId}`));
+        break;
+    }
+    const querySnapshot = await getDocs(q);
+    const posts = [];
+    querySnapshot.forEach((doc) => {
+      posts.push({ ...doc.data(), id: doc.id });
+    });
+    return posts;
+  };
+
   const authStateObserver = async (user) => {
     if (user) {
       setShowPopup(false);
@@ -192,6 +209,7 @@ function App() {
                 <Profile
                   user={currentUser}
                   getUserInfo={getUserInfo}
+                  getProfilePosts={getProfilePosts}
                   showPopup={showPopup}
                   setShowPopup={setShowPopup}
                   showRegisterForm={showRegisterForm}

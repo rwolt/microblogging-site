@@ -31,13 +31,26 @@ const Profile = (props) => {
   const renderPageFeed = (profileFeed) => {
     switch (profileFeed) {
       case "posts":
-        return <UserPosts />;
+        return (
+          <UserPosts
+            getProfilePosts={props.getProfilePosts}
+            userId={user.uid}
+          />
+        );
       case "posts-replies":
-        return <UserPostsReplies />;
+        return (
+          <UserPostsReplies
+            posts={props.getProfilePosts(profileFeed, user.uid)}
+          />
+        );
       case "media":
-        return <UserMedia />;
+        return (
+          <UserMedia posts={props.getProfilePosts(profileFeed, user.uid)} />
+        );
       case "likes":
-        return <UserLikes />;
+        return (
+          <UserLikes posts={props.getProfilePosts(profileFeed, user.uid)} />
+        );
       default:
         return "";
     }
