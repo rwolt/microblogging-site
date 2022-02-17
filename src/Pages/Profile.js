@@ -2,19 +2,14 @@ import React, { useEffect, useState } from "react";
 import format from "date-fns/format";
 import Header from "../components/Header";
 import ProfileHeader from "../components/ProfileHeader";
-import {
-  UserPosts,
-  UserPostsReplies,
-  UserMedia,
-  UserLikes,
-} from "../components/ProfileFeeds";
+import ProfileFeed from "../components/ProfileFeed";
 import AuthPopup from "../components/AuthPopup";
 import { Container } from "../components/styled/Container.styled";
 import { useParams } from "react-router-dom";
 
 const Profile = (props) => {
   const [user, setUser] = useState("");
-  const [profileFeed, setProfileFeed] = useState("posts");
+  const [profileFeed, setProfileFeed] = useState("likes");
   const params = useParams();
   useEffect(() => {
     const getUserInfo = async (uid) => {
@@ -26,35 +21,7 @@ const Profile = (props) => {
       });
     };
     getUserInfo(params.uid);
-  }, []);
-
-  const renderPageFeed = (profileFeed) => {
-    switch (profileFeed) {
-      case "posts":
-        return (
-          <UserPosts
-            getProfilePosts={props.getProfilePosts}
-            userId={user.uid}
-          />
-        );
-      case "posts-replies":
-        return (
-          <UserPostsReplies
-            posts={props.getProfilePosts(profileFeed, user.uid)}
-          />
-        );
-      case "media":
-        return (
-          <UserMedia posts={props.getProfilePosts(profileFeed, user.uid)} />
-        );
-      case "likes":
-        return (
-          <UserLikes posts={props.getProfilePosts(profileFeed, user.uid)} />
-        );
-      default:
-        return "";
-    }
-  };
+  }, [params.uid]);
 
   return (
     <Container>
@@ -70,7 +37,11 @@ const Profile = (props) => {
         profileFeed={profileFeed}
         setProfileFeed={setProfileFeed}
       />
-      {renderPageFeed(profileFeed)}
+      <ProfileFeed
+        getProfilePosts={props.getProfilePosts}
+        profileFeed={profileFeed}
+        userId={user.uid}
+      />
       {props.showPopup ? (
         <AuthPopup
           showRegisterForm={props.showRegisterForm}

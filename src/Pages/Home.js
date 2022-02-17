@@ -5,6 +5,8 @@ import AuthPopup from "../components/AuthPopup";
 import Header from "../components/Header";
 import { Container } from "../components/styled/Container.styled";
 import PostCard from "../components/PostCard";
+import { db } from "../utils/firebase";
+import { doc } from "firebase/firestore";
 
 const Home = (props) => {
   const [posts, setPosts] = useState([]);
@@ -12,6 +14,18 @@ const Home = (props) => {
   useEffect(async () => {
     setPosts(await props.getMessages());
   }, []);
+
+  const checkLiked = (postId) => {
+    if (props.user) {
+      if (props.user.likes.includes(postId)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  };
 
   return (
     <Container>
@@ -44,7 +58,9 @@ const Home = (props) => {
         ""
       )}
       {posts.map((post) => {
-        return <PostCard key={post.id} post={post} />;
+        return (
+          <PostCard key={post.id} post={post} liked={checkLiked(post.id)} />
+        );
       })}
     </Container>
   );

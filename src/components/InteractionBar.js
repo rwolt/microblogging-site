@@ -16,8 +16,8 @@ const InteractionBar = (props) => {
         <p>999</p>
       </InteractionIcon>
       <InteractionIcon>
-        <FaRegHeart />
-        <p>999</p>
+        {props.liked ? <FaHeart /> : <FaRegHeart />}
+        <p>{props.post.likeCount}</p>
       </InteractionIcon>
     </StyledInteractionBar>
   );

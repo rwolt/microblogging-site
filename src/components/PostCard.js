@@ -22,13 +22,13 @@ export const formatTimestamp = (timestamp) => {
   }
 };
 
-const PostCard = ({ post }) => {
+const PostCard = (props) => {
   const navigate = useNavigate();
   const { uid } = useParams();
-  const postDate = formatTimestamp(post.timestamp);
+  const postDate = formatTimestamp(props.post.timestamp);
   return (
     <StyledPostCard>
-      <ProfileImage src={post.profilePicURL} />
+      <ProfileImage src={props.post.profilePicURL} />
       <Flex
         flexDirection="column"
         alignItems="flex-start"
@@ -36,16 +36,19 @@ const PostCard = ({ post }) => {
         margin=" 0 0 0 10px"
       >
         <UserInfo>
-          <NavLink to={`/users/${post.user}`}> {post.displayName}</NavLink>
+          <NavLink to={`/users/${props.post.user}`}>
+            {" "}
+            {props.post.displayName}
+          </NavLink>
           <span>
             <BsDot />
             <p>{postDate}</p>
           </span>
         </UserInfo>
         <Flex justifyContent="flex-start" padding="0px">
-          <p>{post.message}</p>
+          <p>{props.post.message}</p>
         </Flex>
-        <InteractionBar />
+        <InteractionBar post={props.post} liked={props.liked} />
       </Flex>
     </StyledPostCard>
   );

@@ -156,16 +156,31 @@ function App() {
   const getProfilePosts = async (feedType, userId) => {
     const postsRef = collection(db, "posts");
     let q = "";
+    let posts = [];
     switch (feedType) {
       case "posts":
         q = query(postsRef, where("user", "==", `${userId}`));
+        const querySnapshot = await getDocs(q);
+        posts = [];
+        querySnapshot.forEach((doc) => {
+          posts.push({ ...doc.data(), id: doc.id });
+        });
+        break;
+      case "likes":
+        posts = [];
+        let likes = [];
+        const userRef = doc(db, "users", userId);
+        const user = await getDoc(userRef).then((doc) => {
+          return doc.data();
+        });
+        user.likes.forEach(async (docId) => {
+          const docRef = doc(db, "posts", docId);
+          await getDoc(docRef).then((doc) => {
+            posts.push({ ...doc.data(), id: doc.id });
+          });
+        });
         break;
     }
-    const querySnapshot = await getDocs(q);
-    const posts = [];
-    querySnapshot.forEach((doc) => {
-      posts.push({ ...doc.data(), id: doc.id });
-    });
     return posts;
   };
 
