@@ -48,7 +48,11 @@ const PostCard = (props) => {
         <Flex justifyContent="flex-start" padding="0px">
           <p>{props.post.message}</p>
         </Flex>
-        <InteractionBar post={props.post} liked={props.liked} />
+        <InteractionBar
+          post={props.post}
+          liked={props.liked}
+          handleLike={props.handleLike}
+        />
       </Flex>
     </StyledPostCard>
   );

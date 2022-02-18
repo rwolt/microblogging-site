@@ -51,6 +51,7 @@ const Home = (props) => {
             key={post.id}
             post={post}
             liked={props.checkLiked(post.id)}
+            handleLike={props.handleLike}
           />
         );
       })}

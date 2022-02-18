@@ -3,6 +3,7 @@ import {
   doc,
   addDoc,
   getDoc,
+  updateDoc,
   getDocs,
   collection,
   serverTimestamp,
@@ -165,6 +166,31 @@ function App() {
     }
   };
 
+  const handleLike = (postId) => {
+    //Check if the post is already liked
+    const postRef = doc(db, "posts", postId);
+    const userRef = doc(db, "users", currentUser.uid);
+    if (checkLiked(postId)) {
+      //If it is, remove the post from the user doc's 'liked' map & decrease the likes count on the post doc by 1
+      const newLikes = currentUser.likes.filter((item) => item !== postId);
+      setCurrentUser({ ...currentUser, likes: newLikes });
+      updateDoc(userRef, { likes: newLikes });
+      getDoc(postRef).then((doc) => {
+        const newCount = doc.data().likeCount - 1;
+        updateDoc(postRef, { likeCount: newCount });
+      });
+    } else {
+      //Otherwise, add the postId to the user doc's 'liked' map & increase the likes count on the post doc by 1
+      const newLikes = [...currentUser.likes, postId];
+      getDoc(postRef).then((doc) => {
+        const newCount = doc.data().likeCount ? doc.data().likeCount + 1 : 1;
+        updateDoc(postRef, { likeCount: newCount });
+      });
+      setCurrentUser({ ...currentUser, likes: newLikes });
+      updateDoc(userRef, { likes: newLikes });
+    }
+  };
+
   const getProfilePosts = async (feedType, userId) => {
     const postsRef = collection(db, "posts");
     let q = "";
@@ -226,6 +252,7 @@ function App() {
                   postMessage={postMessage}
                   getMessages={getMessages}
                   checkLiked={checkLiked}
+                  handleLike={handleLike}
                 />
               }
             />
@@ -246,6 +273,7 @@ function App() {
                   postMessage={postMessage}
                   getMessages={getMessages}
                   checkLiked={checkLiked}
+                  handleLike={handleLike}
                 />
               }
             />

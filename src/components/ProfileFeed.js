@@ -15,26 +15,35 @@ const ProfileFeed = (props) => {
     return () => {
       active = false;
     };
-  }, [props.profileFeed]);
+  }, [props.profileFeed, props.userId]);
 
   const Feed = (props) => {
     return (
       <div>
-        {props.posts.map((post) => {
-          return (
-            <PostCard
-              post={post}
-              key={post.id}
-              liked={props.checkLiked(post.id)}
-            />
-          );
-        })}
+        {props.posts !== []
+          ? props.posts.map((post) => {
+              return (
+                <PostCard
+                  post={post}
+                  key={post.id}
+                  liked={props.checkLiked(post.id)}
+                  handleLike={props.handleLike}
+                />
+              );
+            })
+          : ""}
       </div>
     );
   };
 
   if (posts) {
-    return <Feed posts={posts} checkLiked={props.checkLiked} />;
+    return (
+      <Feed
+        posts={posts}
+        checkLiked={props.checkLiked}
+        handleLike={props.handleLike}
+      />
+    );
   }
 };
 export default ProfileFeed;

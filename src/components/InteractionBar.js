@@ -15,9 +15,9 @@ const InteractionBar = (props) => {
         <FaRetweet />
         <p>999</p>
       </InteractionIcon>
-      <InteractionIcon>
+      <InteractionIcon onClick={() => props.handleLike(props.post.id)}>
         {props.liked ? <FaHeart /> : <FaRegHeart />}
-        <p>{props.post.likeCount}</p>
+        <p>{props.post.likeCount > 0 ? props.post.likeCount : ""}</p>
       </InteractionIcon>
     </StyledInteractionBar>
   );

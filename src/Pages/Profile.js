@@ -42,6 +42,7 @@ const Profile = (props) => {
         profileFeed={profileFeed}
         userId={user.uid}
         checkLiked={props.checkLiked}
+        handleLike={props.handleLike}
       />
       {props.showPopup ? (
         <AuthPopup
