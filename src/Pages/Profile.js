@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom";
 
 const Profile = (props) => {
   const [user, setUser] = useState("");
-  const [profileFeed, setProfileFeed] = useState("likes");
+  const [profileFeed, setProfileFeed] = useState("posts");
   const params = useParams();
   useEffect(() => {
     const getUserInfo = async (uid) => {

@@ -182,12 +182,10 @@ function App() {
         posts = [];
         let likes = [];
         const userRef = doc(db, "users", userId);
-        const user = await getDoc(userRef).then((doc) => {
-          return doc.data();
-        });
-        user.likes.forEach(async (docId) => {
-          const docRef = doc(db, "posts", docId);
-          await getDoc(docRef).then((doc) => {
+        await getDoc(userRef).then(async (doc) => {
+          q = query(postsRef, where("__name__", "in", doc.data().likes));
+          const snapshot = await getDocs(q);
+          snapshot.forEach((doc) => {
             posts.push({ ...doc.data(), id: doc.id });
           });
         });

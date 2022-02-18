@@ -4,12 +4,18 @@ import PostCard from "./PostCard";
 const ProfileFeed = (props) => {
   const [posts, setPosts] = useState([]);
   useEffect(() => {
+    let active = true;
     const fetchData = async () => {
       const data = await props.getProfilePosts(props.profileFeed, props.userId);
-      setPosts(data);
+      if (active) {
+        setPosts(data);
+      }
     };
     fetchData();
-  }, [props]);
+    return () => {
+      active = false;
+    };
+  }, [props.profileFeed]);
 
   const Feed = (props) => {
     return (
@@ -27,6 +33,8 @@ const ProfileFeed = (props) => {
     );
   };
 
-  return <Feed posts={posts} checkLiked={props.checkLiked} />;
+  if (posts) {
+    return <Feed posts={posts} checkLiked={props.checkLiked} />;
+  }
 };
 export default ProfileFeed;
