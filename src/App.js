@@ -153,6 +153,18 @@ function App() {
     return posts;
   };
 
+  const checkLiked = (postId) => {
+    if (currentUser) {
+      if (currentUser.likes.includes(postId)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  };
+
   const getProfilePosts = async (feedType, userId) => {
     const postsRef = collection(db, "posts");
     let q = "";
@@ -215,6 +227,7 @@ function App() {
                   handleLogout={handleLogout}
                   postMessage={postMessage}
                   getMessages={getMessages}
+                  checkLiked={checkLiked}
                 />
               }
             />
@@ -234,6 +247,7 @@ function App() {
                   handleLogout={handleLogout}
                   postMessage={postMessage}
                   getMessages={getMessages}
+                  checkLiked={checkLiked}
                 />
               }
             />

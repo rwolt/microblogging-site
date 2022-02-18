@@ -41,6 +41,7 @@ const Profile = (props) => {
         getProfilePosts={props.getProfilePosts}
         profileFeed={profileFeed}
         userId={user.uid}
+        checkLiked={props.checkLiked}
       />
       {props.showPopup ? (
         <AuthPopup

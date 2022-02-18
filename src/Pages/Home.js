@@ -15,18 +15,6 @@ const Home = (props) => {
     setPosts(await props.getMessages());
   }, []);
 
-  const checkLiked = (postId) => {
-    if (props.user) {
-      if (props.user.likes.includes(postId)) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  };
-
   return (
     <Container>
       <Header
@@ -59,7 +47,11 @@ const Home = (props) => {
       )}
       {posts.map((post) => {
         return (
-          <PostCard key={post.id} post={post} liked={checkLiked(post.id)} />
+          <PostCard
+            key={post.id}
+            post={post}
+            liked={props.checkLiked(post.id)}
+          />
         );
       })}
     </Container>

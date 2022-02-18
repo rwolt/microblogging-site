@@ -15,12 +15,18 @@ const ProfileFeed = (props) => {
     return (
       <div>
         {props.posts.map((post) => {
-          return <PostCard post={post} key={post.id} />;
+          return (
+            <PostCard
+              post={post}
+              key={post.id}
+              liked={props.checkLiked(post.id)}
+            />
+          );
         })}
       </div>
     );
   };
 
-  return <Feed posts={posts} />;
+  return <Feed posts={posts} checkLiked={props.checkLiked} />;
 };
 export default ProfileFeed;
