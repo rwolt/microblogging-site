@@ -1,39 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { Flex } from "./styled/Flex.styled";
 import PostCard from "./PostCard";
 
 const ProfileFeed = (props) => {
+  const { profileFeed, user, getProfilePosts, setPosts } = props;
+
   useEffect(() => {
+    props.setProfileFeed("posts");
+  }, []);
+
+  useEffect(() => {
+    console.log("rerender effect hook");
     let active = true;
     const fetchData = async () => {
-      const data = await props.getProfilePosts(
-        props.profileFeed,
-        props.user.uid
-      );
+      const data = await getProfilePosts(profileFeed, user.uid);
       if (active) {
-        props.setPosts(data);
+        setPosts(data);
       }
     };
     fetchData();
     return () => {
       active = false;
     };
-  }, [props.profileFeed, props]);
+  }, [profileFeed, user]);
 
   const Feed = (props) => {
     return (
       <div>
-        {props.posts !== []
-          ? props.posts.map((post) => {
-              return (
-                <PostCard
-                  post={post}
-                  key={post.id}
-                  liked={props.checkLiked(post.id)}
-                  handleLike={props.handleLike}
-                />
-              );
-            })
-          : ""}
+        {props.posts.length > 0 ? (
+          props.posts.map((post) => {
+            return (
+              <PostCard
+                post={post}
+                key={post.id}
+                liked={props.checkLiked(post.id)}
+                handleLike={props.handleLike}
+              />
+            );
+          })
+        ) : (
+          <Flex>There's nothing here yet</Flex>
+        )}
       </div>
     );
   };

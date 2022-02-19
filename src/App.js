@@ -137,6 +137,7 @@ function App() {
       profilePicURL: currentUser.photoURL,
       timestamp: serverTimestamp(),
       message: message,
+      likeCount: 0,
     });
     return userDoc;
   };
@@ -156,15 +157,14 @@ function App() {
   };
 
   const checkLiked = (postId) => {
-    if (currentUser) {
-      if (currentUser.likes.includes(postId)) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
+    // if (currentUser.likes) {
+    //   if (currentUser.likes.includes(postId)) {
+    //     return true;
+    //   } else {
+    //     return false;
+    //   }
+    // }
+    return false;
   };
 
   const updateLikes = (post, newLikes, newCount) => {
@@ -183,14 +183,26 @@ function App() {
       setCurrentUser({ ...currentUser, likes: newLikes });
       //Update the firestore doc
       const newCount = post.likeCount - 1;
+      setPosts(
+        posts.map((item) =>
+          item.id == post.id ? { ...item, likeCount: newCount } : item
+        )
+      );
       updateLikes(post, newLikes, newCount);
-    } else {
+    } else if (!checkLiked(post.id)) {
       //Otherwise, add the postId to the user doc's 'liked' map & increase the likes count on the post doc by 1
       const newLikes = [...currentUser.likes, post.id];
       setCurrentUser({ ...currentUser, likes: newLikes });
       //Update the firestore doc
       const newCount = post.likeCount + 1;
+      setPosts(
+        posts.map((item) =>
+          item.id == post.id ? { ...item, likeCount: newCount } : item
+        )
+      );
       updateLikes(post, newLikes, newCount);
+    } else {
+      return;
     }
   };
 
@@ -210,14 +222,16 @@ function App() {
       case "likes":
         posts = [];
         let likes = [];
-        const userRef = doc(db, "users", userId);
-        await getDoc(userRef).then(async (doc) => {
-          q = query(postsRef, where("__name__", "in", doc.data().likes));
-          const snapshot = await getDocs(q);
-          snapshot.forEach((doc) => {
-            posts.push({ ...doc.data(), id: doc.id });
+        if (currentUser.likes) {
+          const userRef = doc(db, "users", userId);
+          await getDoc(userRef).then(async (doc) => {
+            q = query(postsRef, where("__name__", "in", doc.data().likes));
+            const snapshot = await getDocs(q);
+            snapshot.forEach((doc) => {
+              posts.push({ ...doc.data(), id: doc.id });
+            });
           });
-        });
+        }
         break;
     }
     return posts;
