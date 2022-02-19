@@ -119,6 +119,7 @@ function App() {
       name: auth.currentUser.displayName,
       photoURL: auth.currentUser.photoURL,
       dateJoined: serverTimestamp(),
+      likes: [],
     });
   };
 
@@ -157,13 +158,11 @@ function App() {
   };
 
   const checkLiked = (postId) => {
-    // if (currentUser.likes) {
-    //   if (currentUser.likes.includes(postId)) {
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // }
+    if (currentUser && currentUser.likes.includes(postId)) {
+      return true;
+    } else {
+      return false;
+    }
     return false;
   };
 
@@ -222,7 +221,7 @@ function App() {
       case "likes":
         posts = [];
         let likes = [];
-        if (currentUser.likes) {
+        if (currentUser && currentUser.likes.length > 0) {
           const userRef = doc(db, "users", userId);
           await getDoc(userRef).then(async (doc) => {
             q = query(postsRef, where("__name__", "in", doc.data().likes));
