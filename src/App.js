@@ -33,6 +33,7 @@ const theme = {};
 
 function App() {
   const [currentUser, setCurrentUser] = useState();
+  const [posts, setPosts] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
 
@@ -166,28 +167,30 @@ function App() {
     }
   };
 
-  const handleLike = (postId) => {
-    //Check if the post is already liked
-    const postRef = doc(db, "posts", postId);
+  const updateLikes = (post, newLikes, newCount) => {
+    const postRef = doc(db, "posts", post.id);
     const userRef = doc(db, "users", currentUser.uid);
-    if (checkLiked(postId)) {
-      //If it is, remove the post from the user doc's 'liked' map & decrease the likes count on the post doc by 1
-      const newLikes = currentUser.likes.filter((item) => item !== postId);
+
+    updateDoc(userRef, { likes: newLikes });
+    updateDoc(postRef, { likeCount: newCount });
+  };
+
+  const handleLike = (post) => {
+    //Check if the post is already liked
+    if (checkLiked(post.id)) {
+      //If it is, remove the post from the user doc's 'liked' map
+      const newLikes = currentUser.likes.filter((item) => item !== post.id);
       setCurrentUser({ ...currentUser, likes: newLikes });
-      updateDoc(userRef, { likes: newLikes });
-      getDoc(postRef).then((doc) => {
-        const newCount = doc.data().likeCount - 1;
-        updateDoc(postRef, { likeCount: newCount });
-      });
+      //Update the firestore doc
+      const newCount = post.likeCount - 1;
+      updateLikes(post, newLikes, newCount);
     } else {
       //Otherwise, add the postId to the user doc's 'liked' map & increase the likes count on the post doc by 1
-      const newLikes = [...currentUser.likes, postId];
-      getDoc(postRef).then((doc) => {
-        const newCount = doc.data().likeCount ? doc.data().likeCount + 1 : 1;
-        updateDoc(postRef, { likeCount: newCount });
-      });
+      const newLikes = [...currentUser.likes, post.id];
       setCurrentUser({ ...currentUser, likes: newLikes });
-      updateDoc(userRef, { likes: newLikes });
+      //Update the firestore doc
+      const newCount = post.likeCount + 1;
+      updateLikes(post, newLikes, newCount);
     }
   };
 
@@ -242,6 +245,8 @@ function App() {
               element={
                 <Home
                   user={currentUser}
+                  posts={posts}
+                  setPosts={setPosts}
                   showPopup={showPopup}
                   setShowPopup={setShowPopup}
                   showRegisterForm={showRegisterForm}
@@ -261,6 +266,8 @@ function App() {
               element={
                 <Profile
                   user={currentUser}
+                  posts={posts}
+                  setPosts={setPosts}
                   getUserInfo={getUserInfo}
                   getProfilePosts={getProfilePosts}
                   showPopup={showPopup}

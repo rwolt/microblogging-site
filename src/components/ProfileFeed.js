@@ -2,20 +2,22 @@ import React, { useEffect, useState } from "react";
 import PostCard from "./PostCard";
 
 const ProfileFeed = (props) => {
-  const [posts, setPosts] = useState([]);
   useEffect(() => {
     let active = true;
     const fetchData = async () => {
-      const data = await props.getProfilePosts(props.profileFeed, props.userId);
+      const data = await props.getProfilePosts(
+        props.profileFeed,
+        props.user.uid
+      );
       if (active) {
-        setPosts(data);
+        props.setPosts(data);
       }
     };
     fetchData();
     return () => {
       active = false;
     };
-  }, [props.profileFeed, props.userId]);
+  }, [props.profileFeed, props]);
 
   const Feed = (props) => {
     return (
@@ -36,10 +38,10 @@ const ProfileFeed = (props) => {
     );
   };
 
-  if (posts) {
+  if (props.posts) {
     return (
       <Feed
-        posts={posts}
+        posts={props.posts}
         checkLiked={props.checkLiked}
         handleLike={props.handleLike}
       />

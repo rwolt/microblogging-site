@@ -9,10 +9,8 @@ import { db } from "../utils/firebase";
 import { doc } from "firebase/firestore";
 
 const Home = (props) => {
-  const [posts, setPosts] = useState([]);
-
   useEffect(async () => {
-    setPosts(await props.getMessages());
+    props.setPosts(await props.getMessages());
   }, []);
 
   return (
@@ -29,7 +27,7 @@ const Home = (props) => {
           user={props.user}
           postMessage={props.postMessage}
           getMessages={props.getMessages}
-          setPosts={setPosts}
+          setPosts={props.setPosts}
         />
       ) : (
         ""
@@ -45,7 +43,7 @@ const Home = (props) => {
       ) : (
         ""
       )}
-      {posts.map((post) => {
+      {props.posts.map((post) => {
         return (
           <PostCard
             key={post.id}

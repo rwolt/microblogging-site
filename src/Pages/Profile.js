@@ -40,7 +40,9 @@ const Profile = (props) => {
       <ProfileFeed
         getProfilePosts={props.getProfilePosts}
         profileFeed={profileFeed}
-        userId={user.uid}
+        user={user}
+        posts={props.posts}
+        setPosts={props.setPosts}
         checkLiked={props.checkLiked}
         handleLike={props.handleLike}
       />
