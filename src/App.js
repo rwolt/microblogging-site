@@ -120,6 +120,7 @@ function App() {
       photoURL: auth.currentUser.photoURL,
       dateJoined: serverTimestamp(),
       likes: [],
+      replies: [],
     });
   };
 
@@ -143,6 +144,47 @@ function App() {
     return userDoc;
   };
 
+  const handleReply = (e, post, message) => {
+    const { id } = e.currentTarget;
+    //If the post is not already retweeted, post a retweet
+    postReply(id, post);
+    //Otherwise remove the retweet
+  };
+
+  const postReply = async (type, post, message) => {
+    //If the reply is a retweet, create a doc with type retweet and reference the original post
+    if (type === "retweet") {
+      const origDocRef = doc(db, "posts", post.id);
+
+      const docRef = await addDoc(collection(db, "replies"), {
+        user: currentUser.uid,
+        displayName: currentUser.name,
+        replyType: "retweet",
+        data: post,
+        retweetCount: 0,
+        timestamp: serverTimestamp(),
+      });
+      //Add the id of the tweet to the currentUser state
+      const newReplies = [...currentUser.replies, post.id];
+      setCurrentUser({ ...currentUser, replies: newReplies });
+      //Add the id of the reply to the user's replies map
+      const userRef = doc(db, "users", currentUser.uid);
+      updateDoc(userRef, { replies: newReplies });
+
+      //If the reply is a comment, create a doc with type comment and reference the original post with a message
+    } else if (type === "reply") {
+      const docRef = await addDoc(collection(db, "replies"), {
+        user: currentUser.uid,
+        replyType: "comment",
+        origPostId: post.id,
+        origPostUser: post.user,
+        origPostDisplayName: post.displayName,
+        message: message,
+        timestamp: serverTimestamp(),
+      });
+    }
+  };
+
   //Get posts from the database
   const getMessages = async () => {
     const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
@@ -163,7 +205,6 @@ function App() {
     } else {
       return false;
     }
-    return false;
   };
 
   const updateLikes = (post, newLikes, newCount) => {
@@ -188,7 +229,7 @@ function App() {
         )
       );
       updateLikes(post, newLikes, newCount);
-    } else if (!checkLiked(post.id)) {
+    } else if (currentUser && !checkLiked(post.id)) {
       //Otherwise, add the postId to the user doc's 'liked' map & increase the likes count on the post doc by 1
       const newLikes = [...currentUser.likes, post.id];
       setCurrentUser({ ...currentUser, likes: newLikes });
@@ -207,12 +248,15 @@ function App() {
 
   const getProfilePosts = async (feedType, userId) => {
     const postsRef = collection(db, "posts");
+    const repliesRef = collection(db, "replies");
     let q = "";
+    let querySnapshot = "";
+    let userRef = "";
     let posts = [];
     switch (feedType) {
       case "posts":
         q = query(postsRef, where("user", "==", `${userId}`));
-        const querySnapshot = await getDocs(q);
+        querySnapshot = await getDocs(q);
         posts = [];
         querySnapshot.forEach((doc) => {
           posts.push({ ...doc.data(), id: doc.id });
@@ -221,17 +265,29 @@ function App() {
       case "likes":
         posts = [];
         let likes = [];
-        if (currentUser && currentUser.likes.length > 0) {
-          const userRef = doc(db, "users", userId);
-          await getDoc(userRef).then(async (doc) => {
-            q = query(postsRef, where("__name__", "in", doc.data().likes));
-            const snapshot = await getDocs(q);
-            snapshot.forEach((doc) => {
-              posts.push({ ...doc.data(), id: doc.id });
-            });
+        userRef = doc(db, "users", userId);
+        await getDoc(userRef).then(async (doc) => {
+          q = query(postsRef, where("__name__", "in", doc.data().likes));
+          const snapshot = await getDocs(q);
+          snapshot.forEach((doc) => {
+            posts.push({ ...doc.data(), id: doc.id });
           });
-        }
+        });
         break;
+      case "posts-replies":
+        posts = [];
+        userRef = doc(db, "users", userId);
+        await getDoc(userRef).then(async (doc) => {
+          q = query(repliesRef, where("data.id", "in", doc.data().replies));
+          const snapshot = await getDocs(q);
+          snapshot.forEach((doc) => {
+            posts.push({ ...doc.data(), id: doc.id });
+          });
+        });
+        querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          posts.push({ ...doc.data(), id: doc.id });
+        });
     }
     return posts;
   };
@@ -271,6 +327,7 @@ function App() {
                   getMessages={getMessages}
                   checkLiked={checkLiked}
                   handleLike={handleLike}
+                  handleReply={handleReply}
                 />
               }
             />
@@ -294,6 +351,7 @@ function App() {
                   getMessages={getMessages}
                   checkLiked={checkLiked}
                   handleLike={handleLike}
+                  handleReply={handleReply}
                 />
               }
             />

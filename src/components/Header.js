@@ -6,7 +6,7 @@ const Header = (props) => {
   const borderStyle = props.user ? {} : { borderBottom: "1px solid #e5e5e5" };
   return (
     <Flex justifyContent="space-between" style={borderStyle}>
-      <h2 style={{ width: "30%" }}>{props.pageTitle}</h2>
+      <h2 style={{ width: "50%" }}>{props.pageTitle}</h2>
       <Flex justifyContent="flex-end" padding="0">
         {!props.user ? (
           <Button

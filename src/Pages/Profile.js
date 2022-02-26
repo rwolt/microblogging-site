@@ -46,6 +46,7 @@ const Profile = (props) => {
         setPosts={props.setPosts}
         checkLiked={props.checkLiked}
         handleLike={props.handleLike}
+        handleReply={props.handleReply}
       />
       {props.showPopup ? (
         <AuthPopup

@@ -48,8 +48,15 @@ const Home = (props) => {
           <PostCard
             key={post.id}
             post={post}
+            profilePicURL={post.profilePicURL}
+            user={post.user}
+            displayName={post.displayName}
+            timestamp={post.timestamp}
+            message={post.message}
+            likeCount={post.likeCount}
             liked={props.checkLiked(post.id)}
             handleLike={props.handleLike}
+            handleReply={props.handleReply}
           />
         );
       })}

@@ -7,17 +7,20 @@ import { StyledInteractionBar } from "./styled/StyledInteractionBar.styled";
 const InteractionBar = (props) => {
   return (
     <StyledInteractionBar>
-      <InteractionIcon>
+      <InteractionIcon id="comment">
         <FaRegComment />
         <p>999</p>
       </InteractionIcon>
-      <InteractionIcon>
+      <InteractionIcon
+        id="retweet"
+        onClick={(e) => props.handleReply(e, props.post)}
+      >
         <FaRetweet />
-        <p>999</p>
+        <p>{props.retweetCount}</p>
       </InteractionIcon>
       <InteractionIcon onClick={() => props.handleLike(props.post)}>
         {props.liked ? <FaHeart /> : <FaRegHeart />}
-        <p>{props.post.likeCount > 0 ? props.post.likeCount : ""}</p>
+        <p>{props.likeCount > 0 ? props.likeCount : ""}</p>
       </InteractionIcon>
     </StyledInteractionBar>
   );
