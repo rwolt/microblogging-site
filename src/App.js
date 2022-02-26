@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   doc,
   addDoc,
+  deleteDoc,
   getDoc,
   updateDoc,
   getDocs,
@@ -140,15 +141,41 @@ function App() {
       timestamp: serverTimestamp(),
       message: message,
       likeCount: 0,
+      retweetCount: 0,
     });
     return userDoc;
   };
 
-  const handleReply = (e, post, message) => {
+  const handleReply = async (e, post, message) => {
     const { id } = e.currentTarget;
+    let postRef = "";
     //If the post is not already retweeted, post a retweet
-    postReply(id, post);
-    //Otherwise remove the retweet
+    if (!currentUser.replies.includes(post.id)) {
+      console.log("Not yet Retweeted");
+      postReply(id, post);
+      //Update the original doc retweet count
+      postRef = doc(db, "posts", post.id);
+      await getDoc(postRef).then((doc) => {
+        const newRetweetCount = doc.data().retweetCount - 1;
+        updateDoc(postRef, { retweetCount: newRetweetCount });
+      });
+    } else {
+      console.log("Already retweeted");
+      //Otherwise remove the retweet doc and update the local state
+      const q = query(
+        collection(db, "replies"),
+        where("data.id", "==", post.id)
+      );
+      await getDoc(q).then((doc) => {
+        const id = doc.data().id;
+        console.log(id);
+        deleteDoc(doc(db, "replies", id));
+      });
+      setCurrentUser({
+        ...currentUser,
+        replies: currentUser.replies.filter((post) => post.id !== post.id),
+      });
+    }
   };
 
   const postReply = async (type, post, message) => {
@@ -161,15 +188,16 @@ function App() {
         displayName: currentUser.name,
         replyType: "retweet",
         data: post,
-        retweetCount: 0,
         timestamp: serverTimestamp(),
       });
+
       //Add the id of the tweet to the currentUser state
       const newReplies = [...currentUser.replies, post.id];
       setCurrentUser({ ...currentUser, replies: newReplies });
       //Add the id of the reply to the user's replies map
       const userRef = doc(db, "users", currentUser.uid);
       updateDoc(userRef, { replies: newReplies });
+      //Update the retweet count for the reply
 
       //If the reply is a comment, create a doc with type comment and reference the original post with a message
     } else if (type === "reply") {
@@ -283,10 +311,6 @@ function App() {
           snapshot.forEach((doc) => {
             posts.push({ ...doc.data(), id: doc.id });
           });
-        });
-        querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-          posts.push({ ...doc.data(), id: doc.id });
         });
     }
     return posts;
