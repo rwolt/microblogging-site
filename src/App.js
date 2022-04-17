@@ -167,25 +167,30 @@ function App() {
         deleteDoc(doc(db, "replies", item.id));
       });
 
-      // });
       //Reduce the retweet count by 1
-      // postRef = doc(db, "posts", post.id);
-      // await getDoc(postRef).then((doc) => {
-      //   const retweetCount = doc.data().retweetCount;
-      //   const newCount = retweetCount - 1;
-      //   updateDoc(postRef, { retweetCount: newCount });
-      // setPosts(
-      //   posts.map((item) =>
-      //     item.id == post.id ? { ...item, retweetCount: newCount } : item
-      //   )
-      // );
-      // });
+      postRef = doc(db, "posts", post.id);
+      await getDoc(postRef).then((doc) => {
+        const retweetCount = doc.data().retweetCount;
+        console.log(retweetCount);
+        const newCount = retweetCount - 1;
+        updateDoc(postRef, { retweetCount: newCount });
+        setPosts(
+          posts.map((item) =>
+            item.id == post.id ? { ...item, retweetCount: newCount } : item
+          )
+        );
+      });
 
-      //   setCurrentUser({
-      //     ...currentUser,
-      //     replies: currentUser.replies.filter((post) => post.id !== post.id),
-      //   });
-      // }
+      const newReplies = currentUser.replies.filter(
+        (post) => post.id !== post.id
+      );
+      setCurrentUser({
+        ...currentUser,
+        replies: newReplies,
+      });
+      updateDoc(doc(db, "users", currentUser.uid), {
+        replies: newReplies,
+      });
     }
   };
 
