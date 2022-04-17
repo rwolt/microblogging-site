@@ -156,27 +156,36 @@ function App() {
       //Update the original doc retweet count
     } else {
       console.log("Already retweeted");
+      // console.log(post.id);
       //Otherwise remove the retweet doc and update the local state
       const q = query(
         collection(db, "replies"),
-        where("data.id", "==", post.id)
+        where("origPostId", "==", post.id)
       );
-      await getDoc(q).then((doc) => {
-        const id = doc.data().id;
-        console.log(id);
-        deleteDoc(doc(db, "replies", id));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((item) => {
+        deleteDoc(doc(db, "replies", item.id));
       });
+
+      // });
       //Reduce the retweet count by 1
-      postRef = doc(db, "posts", post.id);
-      await getDoc(postRef).then((doc) => {
-        const retweetCount = doc.data().retweetCount;
-        const newCount = retweetCount - 1;
-        updateDoc(postRef, { retweetCount: newCount });
-      });
-      setCurrentUser({
-        ...currentUser,
-        replies: currentUser.replies.filter((post) => post.id !== post.id),
-      });
+      // postRef = doc(db, "posts", post.id);
+      // await getDoc(postRef).then((doc) => {
+      //   const retweetCount = doc.data().retweetCount;
+      //   const newCount = retweetCount - 1;
+      //   updateDoc(postRef, { retweetCount: newCount });
+      // setPosts(
+      //   posts.map((item) =>
+      //     item.id == post.id ? { ...item, retweetCount: newCount } : item
+      //   )
+      // );
+      // });
+
+      //   setCurrentUser({
+      //     ...currentUser,
+      //     replies: currentUser.replies.filter((post) => post.id !== post.id),
+      //   });
+      // }
     }
   };
 
@@ -189,7 +198,7 @@ function App() {
         user: currentUser.uid,
         displayName: currentUser.name,
         replyType: "retweet",
-        data: post,
+        origPostId: post.id,
         timestamp: serverTimestamp(),
       });
 
@@ -204,17 +213,12 @@ function App() {
         (doc) => doc.data().retweetCount
       );
       const newCount = retweetCount + 1;
-      updateDoc(origDocRef, { reweetCount: newCount });
+      updateDoc(origDocRef, { retweetCount: newCount });
       setPosts(
         posts.map((item) =>
           item.id == post.id ? { ...item, retweetCount: newCount } : item
         )
       );
-      // setPosts(
-      //   posts.map((currentPost) =>
-      //     currentPost.id == post.id ? { ...newDoc } : currentPost
-      //   )
-      // );
       //If the reply is a comment, create a doc with type comment and reference the original post with a message
     } else if (type === "reply") {
       const docRef = await addDoc(collection(db, "replies"), {
@@ -299,7 +303,11 @@ function App() {
     let posts = [];
     switch (feedType) {
       case "posts":
-        q = query(postsRef, where("user", "==", `${userId}`));
+        q = query(
+          postsRef,
+          where("user", "==", `${userId}`),
+          orderBy("timestamp", "desc")
+        );
         querySnapshot = await getDocs(q);
         posts = [];
         querySnapshot.forEach((doc) => {
