@@ -154,11 +154,6 @@ function App() {
       console.log("Not yet Retweeted");
       postReply(id, post);
       //Update the original doc retweet count
-      postRef = doc(db, "posts", post.id);
-      await getDoc(postRef).then((doc) => {
-        const newRetweetCount = doc.data().retweetCount - 1;
-        updateDoc(postRef, { retweetCount: newRetweetCount });
-      });
     } else {
       console.log("Already retweeted");
       //Otherwise remove the retweet doc and update the local state
@@ -170,6 +165,13 @@ function App() {
         const id = doc.data().id;
         console.log(id);
         deleteDoc(doc(db, "replies", id));
+      });
+      //Reduce the retweet count by 1
+      postRef = doc(db, "posts", post.id);
+      await getDoc(postRef).then((doc) => {
+        const retweetCount = doc.data().retweetCount;
+        const newCount = retweetCount - 1;
+        updateDoc(postRef, { retweetCount: newCount });
       });
       setCurrentUser({
         ...currentUser,
@@ -198,7 +200,21 @@ function App() {
       const userRef = doc(db, "users", currentUser.uid);
       updateDoc(userRef, { replies: newReplies });
       //Update the retweet count for the reply
-
+      const retweetCount = await getDoc(origDocRef).then(
+        (doc) => doc.data().retweetCount
+      );
+      const newCount = retweetCount + 1;
+      updateDoc(origDocRef, { reweetCount: newCount });
+      setPosts(
+        posts.map((item) =>
+          item.id == post.id ? { ...item, retweetCount: newCount } : item
+        )
+      );
+      // setPosts(
+      //   posts.map((currentPost) =>
+      //     currentPost.id == post.id ? { ...newDoc } : currentPost
+      //   )
+      // );
       //If the reply is a comment, create a doc with type comment and reference the original post with a message
     } else if (type === "reply") {
       const docRef = await addDoc(collection(db, "replies"), {
