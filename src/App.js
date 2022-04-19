@@ -160,7 +160,7 @@ function App() {
       //Otherwise remove the retweet doc and update the local state
       const q = query(
         collection(db, "replies"),
-        where("origPostId", "==", post.id)
+        where("data.id", "==", post.id)
       );
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((item) => {
@@ -203,8 +203,8 @@ function App() {
         user: currentUser.uid,
         displayName: currentUser.name,
         replyType: "retweet",
-        origPostId: post.id,
         timestamp: serverTimestamp(),
+        data: post,
       });
 
       //Add the id of the tweet to the currentUser state
@@ -338,6 +338,7 @@ function App() {
           q = query(repliesRef, where("data.id", "in", doc.data().replies));
           const snapshot = await getDocs(q);
           snapshot.forEach((doc) => {
+            console.log(doc.data());
             posts.push({ ...doc.data(), id: doc.id });
           });
         });

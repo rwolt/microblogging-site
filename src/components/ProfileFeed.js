@@ -35,8 +35,7 @@ const ProfileFeed = (props) => {
                   retweetDisplayName={post.displayName}
                   post={post}
                   key={post.id}
-                  data={post.data}
-                  user={post.data.user}
+                  user={post.user}
                   profilePicURL={post.data.profilePicURL}
                   displayName={post.data.displayName}
                   timestamp={post.data.timestamp}

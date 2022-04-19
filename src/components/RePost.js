@@ -11,8 +11,8 @@ const RePost = (props) => {
         {props.retweetDisplayName} reposted
       </Flex>
       <PostCard
-        post={props.data}
-        key={props.data.id}
+        post={props.post}
+        key={props.post.data.id}
         user={props.user}
         profilePicURL={props.profilePicURL}
         displayName={props.displayName}
