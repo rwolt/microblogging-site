@@ -8,7 +8,7 @@ const ProfileFeed = (props) => {
 
   useEffect(() => {
     props.setProfileFeed("posts");
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     let active = true;
