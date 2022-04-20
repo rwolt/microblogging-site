@@ -3,26 +3,31 @@ import { FaRetweet } from "react-icons/fa";
 import { Flex } from "./styled/Flex.styled";
 import PostCard from "./PostCard";
 
-const RePost = (props) => {
+const RePost = ({
+  post,
+  retweetDisplayName,
+  liked,
+  handleLike,
+  handleReply,
+}) => {
   return (
     <div>
       <Flex alignItems="center" justifyContent="flex-start">
         <FaRetweet />
-        {props.retweetDisplayName} reposted
+        {retweetDisplayName} reposted
       </Flex>
       <PostCard
-        post={props.post}
-        key={props.post.data.id}
-        user={props.user}
-        profilePicURL={props.profilePicURL}
-        displayName={props.displayName}
-        timestamp={props.timestamp}
-        message={props.message}
-        likeCount={props.likeCount}
-        retweetCount={props.post.retweetCount}
-        liked={props.liked}
-        handleLike={props.handleLike}
-        handleReply={props.handleReply}
+        key={post.id}
+        post={post}
+        profilePicURL={post.profilePicURL}
+        user={post.user}
+        displayName={post.displayName}
+        timestamp={post.timestamp}
+        message={post.message}
+        liked={liked}
+        likeCount={post.likeCount}
+        handleLike={handleLike}
+        handleReply={handleReply}
       />
     </div>
   );

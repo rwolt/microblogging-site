@@ -29,19 +29,29 @@ const ProfileFeed = (props) => {
       <div>
         {props.posts.length > 0 ? (
           props.posts.map((post) => {
-            if (post.replyType === "retweet") {
+            if (props.profileFeed === "posts-replies") {
               return (
                 <RePost
-                  retweetDisplayName={post.displayName}
+                  retweetDisplayName={user.name}
+                  // post={post}
+                  // key={post.id}
+                  // user={post.user}
+                  // profilePicURL={post.data.profilePicURL}
+                  // displayName={post.data.displayName}
+                  // timestamp={post.data.timestamp}
+                  // message={post.data.message}
+                  // likeCount={post.data.likeCount}
+                  // liked={props.checkLiked(post.data.id)}
+                  // handleLike={props.handleLike}
+                  // handleReply={props.handleReply}
                   post={post}
-                  key={post.id}
+                  profilePicURL={post.profilePicURL}
                   user={post.user}
-                  profilePicURL={post.data.profilePicURL}
-                  displayName={post.data.displayName}
-                  timestamp={post.data.timestamp}
-                  message={post.data.message}
-                  likeCount={post.data.likeCount}
-                  liked={props.checkLiked(post.data.id)}
+                  displayName={post.displayName}
+                  timestamp={post.timestamp}
+                  message={post.message}
+                  liked={props.checkLiked(post.id)}
+                  likeCount={post.likeCount}
                   handleLike={props.handleLike}
                   handleReply={props.handleReply}
                 />
@@ -75,6 +85,7 @@ const ProfileFeed = (props) => {
     return (
       <Feed
         posts={props.posts}
+        profileFeed={props.profileFeed}
         checkLiked={props.checkLiked}
         handleLike={props.handleLike}
         handleReply={props.handleReply}

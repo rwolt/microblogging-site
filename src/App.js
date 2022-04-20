@@ -335,7 +335,7 @@ function App() {
         posts = [];
         userRef = doc(db, "users", userId);
         await getDoc(userRef).then(async (doc) => {
-          q = query(repliesRef, where("data.id", "in", doc.data().replies));
+          q = query(postsRef, where("__name__", "in", doc.data().replies));
           const snapshot = await getDocs(q);
           snapshot.forEach((doc) => {
             console.log(doc.data());
