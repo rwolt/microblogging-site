@@ -29,6 +29,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import GlobalStyles from "./components/styled/Global";
 import Home from "./Pages/Home";
 import Profile from "./Pages/Profile";
+import Tweet from "./Pages/Tweet";
 
 const theme = {};
 
@@ -156,7 +157,6 @@ function App() {
       //Update the original doc retweet count
     } else {
       console.log("Already retweeted");
-      // console.log(post.id);
       //Otherwise remove the retweet doc and update the local state
       const q = query(
         collection(db, "replies"),
@@ -413,6 +413,7 @@ function App() {
                 />
               }
             />
+            <Route path="/posts/:postId" element={<Tweet />} />
             <Route
               path="*"
               element={

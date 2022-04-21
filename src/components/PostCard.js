@@ -42,11 +42,13 @@ const PostCard = ({
     <StyledPostCard>
       <ProfileImage src={profilePicURL} />
       <Flex
+        onClick={(e) => {
+          navigate(`/posts/${post.id}`);
+        }}
         flexDirection="column"
         alignItems="flex-start"
         padding="0"
-        margin=" 0 0 0 10px"
-      >
+        margin=" 0 0 0 10px">
         <UserInfo>
           <NavLink to={`/users/${user}`}> {displayName}</NavLink>
           <span>

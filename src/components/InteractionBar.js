@@ -13,12 +13,18 @@ const InteractionBar = (props) => {
       </InteractionIcon>
       <InteractionIcon
         id="retweet"
-        onClick={(e) => props.handleReply(e, props.post)}
-      >
+        onClick={(e) => {
+          e.stopPropagation();
+          props.handleReply(e, props.post);
+        }}>
         <FaRetweet />
         <p>{props.post.retweetCount}</p>
       </InteractionIcon>
-      <InteractionIcon onClick={() => props.handleLike(props.post)}>
+      <InteractionIcon
+        onClick={(e) => {
+          e.stopPropagation();
+          props.handleLike(props.post);
+        }}>
         {props.liked ? <FaHeart /> : <FaRegHeart />}
         <p>{props.likeCount > 0 ? props.likeCount : ""}</p>
       </InteractionIcon>
