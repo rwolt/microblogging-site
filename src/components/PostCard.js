@@ -40,7 +40,13 @@ const PostCard = ({
   const postDate = formatTimestamp(timestamp);
   return (
     <StyledPostCard>
-      <ProfileImage src={profilePicURL} />
+      <ProfileImage
+        src={profilePicURL}
+        onClick={(e) => {
+          e.stopPropagation();
+          navigate(`/users/${user}`);
+        }}
+      />
       <Flex
         onClick={(e) => {
           navigate(`/posts/${post.id}`);
@@ -50,7 +56,14 @@ const PostCard = ({
         padding="0"
         margin=" 0 0 0 10px">
         <UserInfo>
-          <NavLink to={`/users/${user}`}> {displayName}</NavLink>
+          <a
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/users/${user}`);
+            }}>
+            {displayName}
+          </a>
+          {/* <NavLink to={`/users/${user}`}> {displayName}</NavLink> */}
           <span>
             <BsDot />
             <p>{postDate}</p>
