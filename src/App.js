@@ -324,23 +324,27 @@ function App() {
         let likes = [];
         userRef = doc(db, "users", userId);
         await getDoc(userRef).then(async (doc) => {
-          q = query(postsRef, where("__name__", "in", doc.data().likes));
-          const snapshot = await getDocs(q);
-          snapshot.forEach((doc) => {
-            posts.push({ ...doc.data(), id: doc.id });
-          });
+          if (doc.data().likes.length > 0) {
+            q = query(postsRef, where("__name__", "in", doc.data().likes));
+            const snapshot = await getDocs(q);
+            snapshot.forEach((doc) => {
+              posts.push({ ...doc.data(), id: doc.id });
+            });
+          }
         });
         break;
       case "posts-replies":
         posts = [];
         userRef = doc(db, "users", userId);
         await getDoc(userRef).then(async (doc) => {
-          q = query(postsRef, where("__name__", "in", doc.data().replies));
-          const snapshot = await getDocs(q);
-          snapshot.forEach((doc) => {
-            console.log(doc.data());
-            posts.push({ ...doc.data(), id: doc.id });
-          });
+          if (doc.data().replies.length > 0) {
+            q = query(postsRef, where("__name__", "in", doc.data().replies));
+            const snapshot = await getDocs(q);
+            snapshot.forEach((doc) => {
+              console.log(doc.data());
+              posts.push({ ...doc.data(), id: doc.id });
+            });
+          }
         });
     }
     return posts;
