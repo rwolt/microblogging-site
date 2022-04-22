@@ -413,7 +413,16 @@ function App() {
                 />
               }
             />
-            <Route path="/posts/:postId" element={<Tweet />} />
+            <Route
+              path="/posts/:postId"
+              element={
+                <Tweet
+                  handleLike={handleLike}
+                  handleReply={handleReply}
+                  checkLiked={checkLiked}
+                />
+              }
+            />
             <Route
               path="*"
               element={
