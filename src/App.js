@@ -252,6 +252,12 @@ function App() {
     return posts;
   };
 
+  const getPost = async (id) => {
+    const docRef = doc(db, "posts", id);
+    const post = await getDoc(docRef).then((doc) => doc.data());
+    return post;
+  };
+
   const checkLiked = (postId) => {
     if (currentUser && currentUser.likes.includes(postId)) {
       return true;
@@ -417,9 +423,15 @@ function App() {
               path="/posts/:postId"
               element={
                 <Tweet
+                  user={currentUser}
+                  posts={posts}
+                  setPosts={setPosts}
+                  handleLogin={handleLogin}
+                  handleLogout={handleLogout}
                   handleLike={handleLike}
                   handleReply={handleReply}
                   checkLiked={checkLiked}
+                  getPost={getPost}
                 />
               }
             />

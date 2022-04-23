@@ -1,5 +1,11 @@
 import React from "react";
-import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  useNavigate,
+  useParams,
+  useLocation,
+} from "react-router-dom";
 import { format, formatDistance } from "date-fns";
 import { BsDot } from "react-icons/bs";
 import { StyledPostCard } from "./styled/StyledPostCard.styled";
