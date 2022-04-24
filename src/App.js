@@ -428,6 +428,12 @@ function App() {
                   setPosts={setPosts}
                   handleLogin={handleLogin}
                   handleLogout={handleLogout}
+                  showPopup={showPopup}
+                  setShowPopup={setShowPopup}
+                  showRegisterForm={showRegisterForm}
+                  setShowRegisterForm={setShowRegisterForm}
+                  handleRegister={handleRegister}
+                  postMessage={postMessage}
                   handleLike={handleLike}
                   handleReply={handleReply}
                   checkLiked={checkLiked}
