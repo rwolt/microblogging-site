@@ -6,6 +6,7 @@ import { db } from "../utils/firebase";
 import { useParams } from "react-router-dom";
 import PostCard from "../components/PostCard";
 import ParentTweet from "../components/ParentTweet";
+import CommentInputBox from "../components/CommentInputBox";
 
 const Tweet = (props) => {
   const params = useParams();
@@ -47,25 +48,10 @@ const Tweet = (props) => {
                   handleReply={props.handleReply}
                 />
               );
-            } else {
-              return (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  profilePicURL={post.profilePicURL}
-                  user={post.user}
-                  displayName={post.displayName}
-                  timestamp={post.timestamp}
-                  message={post.message}
-                  liked={props.checkLiked(post.id)}
-                  likeCount={post.likeCount}
-                  handleLike={props.handleLike}
-                  handleReply={props.handleReply}
-                />
-              );
             }
           })
         : ""}
+      <CommentInputBox user={props.user} />
     </Container>
   );
 };
