@@ -9,14 +9,27 @@ import ParentTweet from "../components/ParentTweet";
 import CommentInputBox from "../components/CommentInputBox";
 
 const Tweet = (props) => {
+  const [comments, setComments] = useState([]);
   const params = useParams();
 
   useEffect(async () => {
-    const docRef = doc(db, "posts", params.postId);
+    let docRef = "";
+    //If the post is a reply
+    if (params.replyType) {
+      docRef = doc(db, "replies", params.postId);
+    } else {
+      //If the post is a post
+      docRef = doc(db, "posts", params.postId);
+    }
     const postDoc = await getDoc(docRef).then((doc) => {
       return { ...doc.data(), id: doc.id };
     });
     props.setPosts([{ ...postDoc, type: "parent" }]);
+  }, [params.postId]);
+
+  useEffect(async () => {
+    const replies = await props.getComments(params.postId);
+    setComments(replies);
   }, [params.postId]);
 
   return (
@@ -39,6 +52,7 @@ const Tweet = (props) => {
                   user={post.user}
                   displayName={post.displayName}
                   timestamp={post.timestamp}
+                  replyType={post.replyType}
                   message={post.message}
                   liked={props.checkLiked(post.id)}
                   retweeted={props.checkRetweeted(post.id)}
@@ -51,7 +65,31 @@ const Tweet = (props) => {
             }
           })
         : ""}
-      <CommentInputBox user={props.user} />
+      <CommentInputBox
+        user={props.user}
+        handleReply={props.handleReply}
+        post={props.posts[0]}
+      />
+      {comments.map((item) => {
+        return (
+          <PostCard
+            key={item.id}
+            post={item}
+            profilePicURL={item.profilePicURL}
+            user={item.user}
+            displayName={item.displayName}
+            timestamp={item.timestamp}
+            replyType={item.replyType}
+            message={item.message}
+            liked={props.checkLiked(item.id)}
+            retweeted={props.checkRetweeted(item.id)}
+            likeCount={item.likeCount}
+            retweetCount={item.retweetCount}
+            handleLike={props.handleLike}
+            handleReply={props.handleReply}
+          />
+        );
+      })}
     </Container>
   );
 };

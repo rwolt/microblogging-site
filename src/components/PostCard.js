@@ -30,6 +30,7 @@ export const formatTimestamp = (timestamp) => {
 
 const PostCard = ({
   timestamp,
+  replyType,
   profilePicURL,
   user,
   displayName,
@@ -56,7 +57,12 @@ const PostCard = ({
       />
       <Flex
         onClick={(e) => {
-          navigate(`/posts/${post.id}`);
+          console.log(replyType);
+          if (replyType) {
+            navigate(`/posts/${post.id}/${replyType}`);
+          } else {
+            navigate(`/posts/${post.id}`);
+          }
         }}
         flexDirection="column"
         alignItems="flex-start"

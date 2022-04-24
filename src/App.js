@@ -151,12 +151,12 @@ function App() {
     const { id } = e.currentTarget;
     let postRef = "";
     //If the post is not already retweeted, post a retweet
-    if (!currentUser.replies.includes(post.id)) {
-      console.log("Not yet Retweeted");
+    if (id === "retweet" && !currentUser.replies.includes(post.id)) {
       postReply(id, post);
-      //Update the original doc retweet count
+      //If the reply is a comment, post a new comment
+    } else if (id === "comment") {
+      postReply(id, post, message);
     } else {
-      console.log("Already retweeted");
       //Otherwise remove the retweet doc and update the local state
       const q = query(
         collection(db, "replies"),
@@ -225,9 +225,14 @@ function App() {
         )
       );
       //If the reply is a comment, create a doc with type comment and reference the original post with a message
-    } else if (type === "reply") {
+    } else if (type === "comment") {
       const docRef = await addDoc(collection(db, "replies"), {
         user: currentUser.uid,
+        displayName: currentUser.name,
+        profilePicURL: currentUser.photoURL,
+        likeCount: 0,
+        retweetCount: 0,
+        commentCount: 0,
         replyType: "comment",
         origPostId: post.id,
         origPostUser: post.user,
@@ -250,6 +255,21 @@ function App() {
       });
     });
     return posts;
+  };
+
+  const getComments = async (id) => {
+    const q = query(
+      collection(db, "replies"),
+      where("replyType", "==", "comment"),
+      where("origPostId", "==", id),
+      orderBy("timestamp", "desc")
+    );
+    const querySnapshot = await getDocs(q);
+    const comments = [];
+    querySnapshot.forEach((doc) => {
+      comments.push({ ...doc.data(), id: doc.id });
+    });
+    return comments;
   };
 
   const getPost = async (id) => {
@@ -449,6 +469,31 @@ function App() {
                   checkLiked={checkLiked}
                   checkRetweeted={checkRetweeted}
                   getPost={getPost}
+                  getComments={getComments}
+                />
+              }
+            />
+            <Route
+              path="/posts/:postId/:replyType"
+              element={
+                <Tweet
+                  user={currentUser}
+                  posts={posts}
+                  setPosts={setPosts}
+                  handleLogin={handleLogin}
+                  handleLogout={handleLogout}
+                  showPopup={showPopup}
+                  setShowPopup={setShowPopup}
+                  showRegisterForm={showRegisterForm}
+                  setShowRegisterForm={setShowRegisterForm}
+                  handleRegister={handleRegister}
+                  postMessage={postMessage}
+                  handleLike={handleLike}
+                  handleReply={handleReply}
+                  checkLiked={checkLiked}
+                  checkRetweeted={checkRetweeted}
+                  getPost={getPost}
+                  getComments={getComments}
                 />
               }
             />

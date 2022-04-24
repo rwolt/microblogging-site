@@ -18,12 +18,12 @@ const CommentInputBox = (props) => {
           placeholder="Tweet your reply"
         />
         <Button
-        //   onClick={async (e) => {
-        //     await props.postMessage(e, message);
-        //     props.setPosts(await props.getMessages());
-        //     setMessage("");
-        //   }}>
-        >
+          id="comment"
+          onClick={async (e) => {
+            await props.handleReply(e, props.post, message);
+            // props.setPosts(await props.getMessages());
+            setMessage("");
+          }}>
           Reply
         </Button>
       </Flex>
