@@ -2,8 +2,10 @@ import styled from "styled-components";
 
 export const StyledTweetStats = styled.div`
   display: flex;
-  padding: 5px;
-  margin-left: 14px;
+  padding: 10px 0 10px 19px;
+  margin-top: 1ch;
+  border-top: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e5e5e5;
 
   .counter {
     font-weight: 800;
@@ -13,5 +15,6 @@ export const StyledTweetStats = styled.div`
 
   span {
     margin-right: 3ch;
+    font-size: 1.1rem;
   }
 `;

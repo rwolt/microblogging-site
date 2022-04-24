@@ -1,11 +1,12 @@
+import React from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { format } from "date-fns";
+import TweetStats from "./TweetStats";
+import BigInteractionBar from "./BigInteractionBar";
 import { StyledParentTweet } from "./styled/StyledParentTweet.styled";
 import { UserInfo } from "./styled/UserInfo.styled";
 import { Flex } from "./styled/Flex.styled";
-import React from "react";
 import { ProfileImage } from "./styled/ProfileImage.styled";
-import TweetStats from "./TweetStats";
-import { Navigate, useNavigate } from "react-router-dom";
-import { format } from "date-fns";
 import { BsDot } from "react-icons/bs";
 const ParentTweet = ({
   timestamp,
@@ -50,6 +51,12 @@ const ParentTweet = ({
         </span>
       </Flex>
       <TweetStats retweetCount={retweetCount} likeCount={likeCount} />
+      <BigInteractionBar
+        handleLike={handleLike}
+        handleReply={handleReply}
+        liked={liked}
+        post={post}
+      />
     </StyledParentTweet>
   );
 };
