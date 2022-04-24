@@ -13,4 +13,12 @@ export const InteractionIcon = styled.div`
   & > p {
     margin: 0 0 0 5px;
   }
+
+  &#retweet {
+    color: ${({ retweeted }) => (retweeted ? "#289d8c" : "#000")};
+  }
+
+  &#like {
+    color: ${({ liked }) => (liked ? "#289d8c" : "#000")};
+  }
 `;

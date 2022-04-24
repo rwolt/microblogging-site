@@ -12,6 +12,7 @@ const InteractionBar = (props) => {
         <p>999</p>
       </InteractionIcon>
       <InteractionIcon
+        retweeted={props.retweeted}
         id="retweet"
         onClick={(e) => {
           e.stopPropagation();
@@ -21,6 +22,8 @@ const InteractionBar = (props) => {
         <p>{props.post.retweetCount}</p>
       </InteractionIcon>
       <InteractionIcon
+        liked={props.liked}
+        id="like"
         onClick={(e) => {
           e.stopPropagation();
           props.handleLike(props.post);

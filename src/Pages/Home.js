@@ -55,6 +55,7 @@ const Home = (props) => {
             message={post.message}
             likeCount={post.likeCount}
             liked={props.checkLiked(post.id)}
+            retweeted={props.checkRetweeted(post.id)}
             handleLike={props.handleLike}
             handleReply={props.handleReply}
           />

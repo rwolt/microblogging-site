@@ -266,6 +266,14 @@ function App() {
     }
   };
 
+  const checkRetweeted = (postId) => {
+    if (currentUser && currentUser.replies.includes(postId)) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   const updateLikes = (post, newLikes, newCount) => {
     const postRef = doc(db, "posts", post.id);
     const userRef = doc(db, "users", currentUser.uid);
@@ -390,6 +398,7 @@ function App() {
                   postMessage={postMessage}
                   getMessages={getMessages}
                   checkLiked={checkLiked}
+                  checkRetweeted={checkRetweeted}
                   handleLike={handleLike}
                   handleReply={handleReply}
                 />
@@ -414,6 +423,7 @@ function App() {
                   postMessage={postMessage}
                   getMessages={getMessages}
                   checkLiked={checkLiked}
+                  checkRetweeted={checkRetweeted}
                   handleLike={handleLike}
                   handleReply={handleReply}
                 />
@@ -437,6 +447,7 @@ function App() {
                   handleLike={handleLike}
                   handleReply={handleReply}
                   checkLiked={checkLiked}
+                  checkRetweeted={checkRetweeted}
                   getPost={getPost}
                 />
               }

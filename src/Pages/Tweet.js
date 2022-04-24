@@ -40,6 +40,7 @@ const Tweet = (props) => {
                   timestamp={post.timestamp}
                   message={post.message}
                   liked={props.checkLiked(post.id)}
+                  retweeted={props.checkRetweeted(post.id)}
                   likeCount={post.likeCount}
                   retweetCount={post.retweetCount}
                   handleLike={props.handleLike}

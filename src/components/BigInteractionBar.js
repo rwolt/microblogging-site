@@ -15,7 +15,11 @@ const BigInteractionBar = (props) => {
           e.stopPropagation();
           props.handleReply(e, props.post);
         }}>
-        <FaRetweet className="big-icon" />
+        {props.retweeted ? (
+          <FaRetweet className="big-icon" style={{ color: "#289d8c" }} />
+        ) : (
+          <FaRetweet className="big-icon" />
+        )}
       </BigInteractionIcon>
       <BigInteractionIcon
         className="big-icon"

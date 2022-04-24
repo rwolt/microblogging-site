@@ -16,6 +16,7 @@ const ParentTweet = ({
   message,
   post,
   liked,
+  retweeted,
   likeCount,
   retweetCount,
   handleLike,
@@ -55,6 +56,7 @@ const ParentTweet = ({
         handleLike={handleLike}
         handleReply={handleReply}
         liked={liked}
+        retweeted={retweeted}
         post={post}
       />
     </StyledParentTweet>

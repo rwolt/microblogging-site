@@ -51,6 +51,7 @@ const ProfileFeed = (props) => {
                   timestamp={post.timestamp}
                   message={post.message}
                   liked={props.checkLiked(post.id)}
+                  retweeted={props.checkRetweeted(post.id)}
                   likeCount={post.likeCount}
                   handleLike={props.handleLike}
                   handleReply={props.handleReply}
@@ -67,6 +68,7 @@ const ProfileFeed = (props) => {
                   timestamp={post.timestamp}
                   message={post.message}
                   liked={props.checkLiked(post.id)}
+                  retweeted={props.checkRetweeted(post.id)}
                   likeCount={post.likeCount}
                   handleLike={props.handleLike}
                   handleReply={props.handleReply}
@@ -87,6 +89,7 @@ const ProfileFeed = (props) => {
         posts={props.posts}
         profileFeed={props.profileFeed}
         checkLiked={props.checkLiked}
+        checkRetweeted={props.checkRetweeted}
         handleLike={props.handleLike}
         handleReply={props.handleReply}
       />

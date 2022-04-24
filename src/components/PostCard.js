@@ -36,6 +36,7 @@ const PostCard = ({
   message,
   post,
   liked,
+  retweeted,
   likeCount,
   retweetCount,
   handleLike,
@@ -81,6 +82,7 @@ const PostCard = ({
         <InteractionBar
           post={post}
           liked={liked}
+          retweeted={retweeted}
           likeCount={likeCount}
           retweetCount={retweetCount}
           handleLike={handleLike}
