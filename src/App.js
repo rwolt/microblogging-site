@@ -326,11 +326,21 @@ function App() {
       setCurrentUser({ ...currentUser, likes: newLikes });
       //Update the firestore doc
       const newCount = post.likeCount - 1;
-      setPosts(
-        posts.map((item) =>
-          item.id == post.id ? { ...item, likeCount: newCount } : item
-        )
-      );
+      if (post.replyType === "comment" && post.type !== "parent") {
+        setComments(
+          comments.map((item) =>
+            item.id == post.id ? { ...item, likeCount: newCount } : item
+          )
+        );
+      } else if (post.type === "parent") {
+        setParentTweet({ ...parentTweet, likeCount: newCount });
+      } else {
+        setPosts(
+          posts.map((item) =>
+            item.id == post.id ? { ...item, likeCount: newCount } : item
+          )
+        );
+      }
       updateLikes(post, newLikes, newCount);
     } else if (currentUser && !checkLiked(post.id)) {
       //Otherwise, add the postId to the user doc's 'liked' map & increase the likes count on the post doc by 1
@@ -338,11 +348,21 @@ function App() {
       setCurrentUser({ ...currentUser, likes: newLikes });
       //Update the firestore doc
       const newCount = post.likeCount + 1;
-      setPosts(
-        posts.map((item) =>
-          item.id == post.id ? { ...item, likeCount: newCount } : item
-        )
-      );
+      if (post.replyType === "comment" && post.type !== "parent") {
+        setComments(
+          comments.map((item) =>
+            item.id == post.id ? { ...item, likeCount: newCount } : item
+          )
+        );
+      } else if (post.type === "parent") {
+        setParentTweet({ ...parentTweet, likeCount: newCount });
+      } else {
+        setPosts(
+          posts.map((item) =>
+            item.id == post.id ? { ...item, likeCount: newCount } : item
+          )
+        );
+      }
       updateLikes(post, newLikes, newCount);
     } else {
       return;
