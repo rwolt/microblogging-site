@@ -180,11 +180,21 @@ function App() {
         console.log(retweetCount);
         const newCount = retweetCount - 1;
         updateDoc(postRef, { retweetCount: newCount });
-        setPosts(
-          posts.map((item) =>
-            item.id == post.id ? { ...item, retweetCount: newCount } : item
-          )
-        );
+        if (post.replyType === "comment" && post.type !== "parent") {
+          setComments(
+            comments.map((item) =>
+              item.id == post.id ? { ...item, retweetCount: newCount } : item
+            )
+          );
+        } else if (post.type === "parent") {
+          setParentTweet({ ...parentTweet, retweetCount: newCount });
+        } else {
+          setPosts(
+            posts.map((item) =>
+              item.id == post.id ? { ...item, retweetCount: newCount } : item
+            )
+          );
+        }
       });
 
       const newReplies = currentUser.retweets.filter(
@@ -231,11 +241,21 @@ function App() {
       );
       const newCount = retweetCount + 1;
       updateDoc(origDocRef, { retweetCount: newCount });
-      setPosts(
-        posts.map((item) =>
-          item.id == post.id ? { ...item, retweetCount: newCount } : item
-        )
-      );
+      if (post.replyType === "comment" && post.type !== "parent") {
+        setComments(
+          comments.map((item) =>
+            item.id == post.id ? { ...item, retweetCount: newCount } : item
+          )
+        );
+      } else if (post.type === "parent") {
+        setParentTweet({ ...parentTweet, retweetCount: newCount });
+      } else {
+        setPosts(
+          posts.map((item) =>
+            item.id == post.id ? { ...item, retweetCount: newCount } : item
+          )
+        );
+      }
     } else if (type === "comment") {
       const docRef = await addDoc(collection(db, "replies"), {
         user: currentUser.uid,
