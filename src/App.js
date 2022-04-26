@@ -36,6 +36,8 @@ const theme = {};
 function App() {
   const [currentUser, setCurrentUser] = useState();
   const [posts, setPosts] = useState([]);
+  const [parentTweet, setParentTweet] = useState({});
+  const [comments, setComments] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
 
@@ -122,7 +124,7 @@ function App() {
       photoURL: auth.currentUser.photoURL,
       dateJoined: serverTimestamp(),
       likes: [],
-      replies: [],
+      retweets: [],
     });
   };
 
@@ -151,7 +153,7 @@ function App() {
     const { id } = e.currentTarget;
     let postRef = "";
     //If the post is not already retweeted, post a retweet
-    if (id === "retweet" && !currentUser.replies.includes(post.id)) {
+    if (id === "retweet" && !currentUser.retweets.includes(post.id)) {
       postReply(id, post);
       //If the reply is a comment, post a new comment
     } else if (id === "comment") {
@@ -168,7 +170,11 @@ function App() {
       });
 
       //Reduce the retweet count by 1
-      postRef = doc(db, "posts", post.id);
+      if (post.replyType) {
+        postRef = doc(db, "replies", post.id);
+      } else {
+        postRef = doc(db, "posts", post.id);
+      }
       await getDoc(postRef).then((doc) => {
         const retweetCount = doc.data().retweetCount;
         console.log(retweetCount);
@@ -181,15 +187,15 @@ function App() {
         );
       });
 
-      const newReplies = currentUser.replies.filter(
+      const newReplies = currentUser.retweets.filter(
         (post) => post.id !== post.id
       );
       setCurrentUser({
         ...currentUser,
-        replies: newReplies,
+        retweets: newReplies,
       });
       updateDoc(doc(db, "users", currentUser.uid), {
-        replies: newReplies,
+        retweets: newReplies,
       });
     }
   };
@@ -197,7 +203,14 @@ function App() {
   const postReply = async (type, post, message) => {
     //If the reply is a retweet, create a doc with type retweet and reference the original post
     if (type === "retweet") {
-      const origDocRef = doc(db, "posts", post.id);
+      let origDocRef = "";
+      if (post.replyType) {
+        //If retweeting a reply
+        origDocRef = doc(db, "replies", post.id);
+      } else {
+        //If retweeting a post
+        origDocRef = doc(db, "posts", post.id);
+      }
 
       const docRef = await addDoc(collection(db, "replies"), {
         user: currentUser.uid,
@@ -206,13 +219,12 @@ function App() {
         timestamp: serverTimestamp(),
         data: post,
       });
-
       //Add the id of the tweet to the currentUser state
-      const newReplies = [...currentUser.replies, post.id];
-      setCurrentUser({ ...currentUser, replies: newReplies });
+      const newReplies = [...currentUser.retweets, post.id];
+      setCurrentUser({ ...currentUser, retweets: newReplies });
       //Add the id of the reply to the user's replies map
       const userRef = doc(db, "users", currentUser.uid);
-      updateDoc(userRef, { replies: newReplies });
+      updateDoc(userRef, { retweets: newReplies });
       //Update the retweet count for the reply
       const retweetCount = await getDoc(origDocRef).then(
         (doc) => doc.data().retweetCount
@@ -224,7 +236,6 @@ function App() {
           item.id == post.id ? { ...item, retweetCount: newCount } : item
         )
       );
-      //If the reply is a comment, create a doc with type comment and reference the original post with a message
     } else if (type === "comment") {
       const docRef = await addDoc(collection(db, "replies"), {
         user: currentUser.uid,
@@ -287,7 +298,7 @@ function App() {
   };
 
   const checkRetweeted = (postId) => {
-    if (currentUser && currentUser.replies.includes(postId)) {
+    if (currentUser && currentUser.retweets.includes(postId)) {
       return true;
     } else {
       return false;
@@ -295,7 +306,12 @@ function App() {
   };
 
   const updateLikes = (post, newLikes, newCount) => {
-    const postRef = doc(db, "posts", post.id);
+    let postRef = "";
+    if (post.replyType) {
+      postRef = doc(db, "replies", post.id);
+    } else {
+      postRef = doc(db, "posts", post.id);
+    }
     const userRef = doc(db, "users", currentUser.uid);
 
     updateDoc(userRef, { likes: newLikes });
@@ -371,8 +387,8 @@ function App() {
         posts = [];
         userRef = doc(db, "users", userId);
         await getDoc(userRef).then(async (doc) => {
-          if (doc.data().replies.length > 0) {
-            q = query(postsRef, where("__name__", "in", doc.data().replies));
+          if (doc.data().retweets.length > 0) {
+            q = query(postsRef, where("__name__", "in", doc.data().retweets));
             const snapshot = await getDocs(q);
             snapshot.forEach((doc) => {
               console.log(doc.data());
@@ -470,6 +486,10 @@ function App() {
                   checkRetweeted={checkRetweeted}
                   getPost={getPost}
                   getComments={getComments}
+                  comments={comments}
+                  setComments={setComments}
+                  parentTweet={parentTweet}
+                  setParentTweet={setParentTweet}
                 />
               }
             />
@@ -494,6 +514,10 @@ function App() {
                   checkRetweeted={checkRetweeted}
                   getPost={getPost}
                   getComments={getComments}
+                  comments={comments}
+                  setComments={setComments}
+                  parentTweet={parentTweet}
+                  setParentTweet={setParentTweet}
                 />
               }
             />

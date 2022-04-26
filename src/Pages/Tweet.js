@@ -9,8 +9,8 @@ import ParentTweet from "../components/ParentTweet";
 import CommentInputBox from "../components/CommentInputBox";
 
 const Tweet = (props) => {
-  const [comments, setComments] = useState([]);
   const params = useParams();
+  const { parentTweet } = props;
 
   useEffect(async () => {
     let docRef = "";
@@ -24,12 +24,13 @@ const Tweet = (props) => {
     const postDoc = await getDoc(docRef).then((doc) => {
       return { ...doc.data(), id: doc.id };
     });
-    props.setPosts([{ ...postDoc, type: "parent" }]);
+    props.setParentTweet({ ...postDoc, type: "parent" });
   }, [params.postId]);
 
   useEffect(async () => {
     const replies = await props.getComments(params.postId);
-    setComments(replies);
+    console.log(replies);
+    props.setComments(replies);
   }, [params.postId]);
 
   return (
@@ -41,36 +42,32 @@ const Tweet = (props) => {
         handleLogout={props.handleLogout}
         user={props.user}
       />
-      {props.posts.length > 0
-        ? props.posts.map((post) => {
-            if (post.type === "parent") {
-              return (
-                <ParentTweet
-                  key={post.id}
-                  post={post}
-                  profilePicURL={post.profilePicURL}
-                  user={post.user}
-                  displayName={post.displayName}
-                  timestamp={post.timestamp}
-                  replyType={post.replyType}
-                  message={post.message}
-                  liked={props.checkLiked(post.id)}
-                  retweeted={props.checkRetweeted(post.id)}
-                  likeCount={post.likeCount}
-                  retweetCount={post.retweetCount}
-                  handleLike={props.handleLike}
-                  handleReply={props.handleReply}
-                />
-              );
-            }
-          })
-        : ""}
+      {props.parentTweet.id == params.postId ? (
+        <ParentTweet
+          key={parentTweet.id}
+          post={parentTweet}
+          profilePicURL={parentTweet.profilePicURL}
+          user={parentTweet.user}
+          displayName={parentTweet.displayName}
+          timestamp={parentTweet.timestamp}
+          replyType={parentTweet.replyType}
+          message={parentTweet.message}
+          liked={props.checkLiked(parentTweet.id)}
+          retweeted={props.checkRetweeted(parentTweet.id)}
+          likeCount={parentTweet.likeCount}
+          retweetCount={parentTweet.retweetCount}
+          handleLike={props.handleLike}
+          handleReply={props.handleReply}
+        />
+      ) : (
+        ""
+      )}
       <CommentInputBox
         user={props.user}
         handleReply={props.handleReply}
         post={props.posts[0]}
       />
-      {comments.map((item) => {
+      {props.comments.map((item) => {
         return (
           <PostCard
             key={item.id}
