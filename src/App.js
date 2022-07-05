@@ -61,11 +61,13 @@ function App() {
 
   const handleLogin = async (e, userObject) => {
     const { id } = e.target;
+    //If the Sign in with Google button is clicked, show a google sign-in popup
     if (id === "google-login") {
       e.preventDefault();
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
     } else if (id === "email-login") {
+      //If the login button is clicked, try to authenticate using email and password from the form
       e.preventDefault();
       try {
         const currentUser = await signInWithEmailAndPassword(
@@ -119,7 +121,7 @@ function App() {
   //Create a document in the user collection with the specified uid
   const createUserDoc = async (uid) => {
     await setDoc(doc(db, "users", `${uid}`), {
-      uid: uid,
+      // uid: uid,
       name: auth.currentUser.displayName,
       photoURL: auth.currentUser.photoURL,
       dateJoined: serverTimestamp(),
@@ -444,7 +446,7 @@ function App() {
     if (user) {
       setShowPopup(false);
       await getProfilePic().then(() => {
-        checkUserDoc().then(() => {});
+        checkUserDoc();
       });
     } else {
       setCurrentUser("");
