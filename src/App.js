@@ -402,7 +402,8 @@ function App() {
         q = query(
           postsRef,
           where("user", "==", `${userId}`),
-          orderBy("timestamp", "desc")
+          orderBy("timestamp", "desc"),
+          limit(10)
         );
         querySnapshot = await getDocs(q);
         posts = [];
