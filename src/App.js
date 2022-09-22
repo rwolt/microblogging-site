@@ -121,7 +121,7 @@ function App() {
   //Create a document in the user collection with the specified uid
   const createUserDoc = async (uid) => {
     await setDoc(doc(db, "users", `${uid}`), {
-      // uid: uid,
+      uid: uid,
       name: auth.currentUser.displayName,
       photoURL: auth.currentUser.photoURL,
       dateJoined: serverTimestamp(),
@@ -179,13 +179,12 @@ function App() {
       }
       await getDoc(postRef).then((doc) => {
         const retweetCount = doc.data().retweetCount;
-        console.log(retweetCount);
         const newCount = retweetCount - 1;
         updateDoc(postRef, { retweetCount: newCount });
         if (post.replyType === "comment" && post.type !== "parent") {
           setComments(
             comments.map((item) =>
-              item.id == post.id ? { ...item, retweetCount: newCount } : item
+              item.id === post.id ? { ...item, retweetCount: newCount } : item
             )
           );
         } else if (post.type === "parent") {
@@ -193,7 +192,7 @@ function App() {
         } else {
           setPosts(
             posts.map((item) =>
-              item.id == post.id ? { ...item, retweetCount: newCount } : item
+              item.id === post.id ? { ...item, retweetCount: newCount } : item
             )
           );
         }
@@ -246,7 +245,7 @@ function App() {
       if (post.replyType === "comment" && post.type !== "parent") {
         setComments(
           comments.map((item) =>
-            item.id == post.id ? { ...item, retweetCount: newCount } : item
+            item.id === post.id ? { ...item, retweetCount: newCount } : item
           )
         );
       } else if (post.type === "parent") {
@@ -254,7 +253,7 @@ function App() {
       } else {
         setPosts(
           posts.map((item) =>
-            item.id == post.id ? { ...item, retweetCount: newCount } : item
+            item.id === post.id ? { ...item, retweetCount: newCount } : item
           )
         );
       }
@@ -351,7 +350,7 @@ function App() {
       if (post.replyType === "comment" && post.type !== "parent") {
         setComments(
           comments.map((item) =>
-            item.id == post.id ? { ...item, likeCount: newCount } : item
+            item.id === post.id ? { ...item, likeCount: newCount } : item
           )
         );
       } else if (post.type === "parent") {
@@ -359,7 +358,7 @@ function App() {
       } else {
         setPosts(
           posts.map((item) =>
-            item.id == post.id ? { ...item, likeCount: newCount } : item
+            item.id === post.id ? { ...item, likeCount: newCount } : item
           )
         );
       }
@@ -373,7 +372,7 @@ function App() {
       if (post.replyType === "comment" && post.type !== "parent") {
         setComments(
           comments.map((item) =>
-            item.id == post.id ? { ...item, likeCount: newCount } : item
+            item.id === post.id ? { ...item, likeCount: newCount } : item
           )
         );
       } else if (post.type === "parent") {
@@ -381,7 +380,7 @@ function App() {
       } else {
         setPosts(
           posts.map((item) =>
-            item.id == post.id ? { ...item, likeCount: newCount } : item
+            item.id === post.id ? { ...item, likeCount: newCount } : item
           )
         );
       }

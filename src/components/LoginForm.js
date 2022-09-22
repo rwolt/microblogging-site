@@ -94,6 +94,7 @@ const LoginForm = (props) => {
           <Flex justifyContent="flex-end">
             <Button
               id="email-login"
+              //Create an object with login information and pass to the login event handler
               onClick={(e) => {
                 const userObject = {
                   email: loginEmail,
