@@ -12,4 +12,8 @@ export const ProfileImage = styled.img`
   margin: ${({ margin }) => margin || "0"};
   left: 50px;
   bottom: 50px;
+
+  :hover {
+    cursor: pointer;
+  }
 `;
