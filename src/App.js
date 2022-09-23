@@ -272,6 +272,10 @@ function App() {
         message: message,
         timestamp: serverTimestamp(),
       });
+      // Add the new comment to the UI
+      await getDoc(docRef).then((doc) => {
+        setComments([...comments, { ...doc.data(), id: docRef.id }]);
+      });
     }
   };
 
@@ -417,6 +421,7 @@ function App() {
         userRef = doc(db, "users", userId);
         await getDoc(userRef).then(async (doc) => {
           if (doc.data().likes.length > 0) {
+            // Order likes by date liked instead?
             q = query(postsRef, where("__name__", "in", doc.data().likes));
             const snapshot = await getDocs(q);
             snapshot.forEach((doc) => {
