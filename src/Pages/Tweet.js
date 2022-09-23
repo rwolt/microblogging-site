@@ -65,7 +65,7 @@ const Tweet = (props) => {
       <CommentInputBox
         user={props.user}
         handleReply={props.handleReply}
-        post={props.posts[0]}
+        post={parentTweet}
       />
       {props.comments.map((item) => {
         return (

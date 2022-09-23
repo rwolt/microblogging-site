@@ -274,7 +274,7 @@ function App() {
       });
       // Add the new comment to the UI
       await getDoc(docRef).then((doc) => {
-        setComments([...comments, { ...doc.data(), id: docRef.id }]);
+        setComments([{ ...doc.data(), id: docRef.id }, ...comments]);
       });
     }
   };
