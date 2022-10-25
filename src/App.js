@@ -139,7 +139,7 @@ function App() {
 
   //Post a message from the post input box to the database
   const postMessage = async (e, message) => {
-    const postDoc = await addDoc(collection(db, "posts"), {
+    const messageDoc = await addDoc(collection(db, "posts"), {
       user: currentUser.uid,
       displayName: currentUser.name,
       profilePicURL: currentUser.photoURL,
@@ -148,7 +148,7 @@ function App() {
       likeCount: 0,
       retweetCount: 0,
     });
-    return postDoc;
+    return messageDoc;
   };
 
   const handleReply = async (e, post, message) => {
@@ -398,22 +398,17 @@ function App() {
     const postsRef = collection(db, "posts");
     const repliesRef = collection(db, "replies");
     let q = "";
-    let querySnapshot = "";
     let userRef = "";
     let posts = [];
     switch (feedType) {
       case "posts":
+        posts = []
         q = query(
           postsRef,
           where("user", "==", `${userId}`),
           orderBy("timestamp", "desc"),
           limit(10)
         );
-        querySnapshot = await getDocs(q);
-        posts = [];
-        querySnapshot.forEach((doc) => {
-          posts.push({ ...doc.data(), id: doc.id });
-        });
         break;
       case "likes":
         posts = [];
@@ -423,10 +418,8 @@ function App() {
           if (doc.data().likes.length > 0) {
             // Order likes by date liked instead?
             q = query(postsRef, where("__name__", "in", doc.data().likes));
-            const snapshot = await getDocs(q);
-            snapshot.forEach((doc) => {
-              posts.push({ ...doc.data(), id: doc.id });
-            });
+          } else {
+            q = '';
           }
         });
         break;
@@ -436,14 +429,19 @@ function App() {
         await getDoc(userRef).then(async (doc) => {
           if (doc.data().retweets.length > 0) {
             q = query(postsRef, where("__name__", "in", doc.data().retweets));
-            const snapshot = await getDocs(q);
-            snapshot.forEach((doc) => {
-              console.log(doc.data());
-              posts.push({ ...doc.data(), id: doc.id });
-            });
+          } else {
+            q = '';
           }
         });
     }
+    
+    if (q !== '') {
+      const snapshot = await getDocs(q);
+      snapshot.forEach((doc) => {
+              posts.push({ ...doc.data(), id: doc.id });
+            });
+    }
+
     return posts;
   };
 
