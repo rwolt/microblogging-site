@@ -139,7 +139,7 @@ function App() {
 
   //Post a message from the post input box to the database
   const postMessage = async (e, message) => {
-    const userDoc = await addDoc(collection(db, "posts"), {
+    const postDoc = await addDoc(collection(db, "posts"), {
       user: currentUser.uid,
       displayName: currentUser.name,
       profilePicURL: currentUser.photoURL,
@@ -148,7 +148,7 @@ function App() {
       likeCount: 0,
       retweetCount: 0,
     });
-    return userDoc;
+    return postDoc;
   };
 
   const handleReply = async (e, post, message) => {
