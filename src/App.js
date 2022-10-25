@@ -40,6 +40,7 @@ function App() {
   const [comments, setComments] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
 
   useEffect(() => {
     initFirebaseAuth();
@@ -400,9 +401,9 @@ function App() {
     let q = "";
     let userRef = "";
     let posts = [];
+    setPosts([]);
     switch (feedType) {
       case "posts":
-        setPosts([]);
         q = query(
           postsRef,
           where("user", "==", `${userId}`),
@@ -411,8 +412,6 @@ function App() {
         );
         break;
       case "likes":
-        setPosts([]);
-        let likes = [];
         userRef = doc(db, "users", userId);
         await getDoc(userRef).then(async (doc) => {
           if (doc.data().likes.length > 0) {
@@ -424,7 +423,6 @@ function App() {
         });
         break;
       case "posts-replies":
-        setPosts([]);
         userRef = doc(db, "users", userId);
         await getDoc(userRef).then(async (doc) => {
           if (doc.data().retweets.length > 0) {
@@ -435,13 +433,14 @@ function App() {
         });
     }
     
+    // posts = [];
     if (q !== '') {
       const snapshot = await getDocs(q);
       snapshot.forEach((doc) => {
               posts.push({ ...doc.data(), id: doc.id });
             });
     }
-
+    setLoadingMessage('');
     return posts;
   };
 
@@ -507,6 +506,8 @@ function App() {
                   checkRetweeted={checkRetweeted}
                   handleLike={handleLike}
                   handleReply={handleReply}
+                  loadingMessage={loadingMessage}
+                  setLoadingMessage={setLoadingMessage}
                 />
               }
             />

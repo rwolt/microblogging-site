@@ -33,6 +33,7 @@ const ProfileHeader = (props) => {
       <ProfileBar
         profileFeed={props.profileFeed}
         setProfileFeed={props.setProfileFeed}
+        setLoadingMessage={props.setLoadingMessage}
       />
     </StyledProfileHeader>
   );
