@@ -402,7 +402,7 @@ function App() {
     let posts = [];
     switch (feedType) {
       case "posts":
-        posts = []
+        setPosts([]);
         q = query(
           postsRef,
           where("user", "==", `${userId}`),
@@ -411,7 +411,7 @@ function App() {
         );
         break;
       case "likes":
-        posts = [];
+        setPosts([]);
         let likes = [];
         userRef = doc(db, "users", userId);
         await getDoc(userRef).then(async (doc) => {
@@ -424,7 +424,7 @@ function App() {
         });
         break;
       case "posts-replies":
-        posts = [];
+        setPosts([]);
         userRef = doc(db, "users", userId);
         await getDoc(userRef).then(async (doc) => {
           if (doc.data().retweets.length > 0) {
