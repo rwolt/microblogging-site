@@ -9,6 +9,8 @@ This is a proof-of-concept for a social networking site that allows users to pos
 - Firebase Firestore
 - Firebase Cloud Storage
 - Styled Components
+- date-fns
+- gravatars
 
 ## Features
 
