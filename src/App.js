@@ -162,14 +162,17 @@ function App() {
           timestamp: serverTimestamp(),
           data: post,
         });
-        // Update retweet count, retweets
+        // Calculate new retweets
         let newRetweets = [];
-        let newRetweetCount = "";
         await getDoc(messageDoc).then((doc) => {
           newRetweets = [...currentUser.retweets, { ...doc.data() }];
+        });
+        // Calculate new retweet count
+        let newRetweetCount = undefined;
+        await getDoc(doc(db, "posts", post.id)).then((doc) => {
           newRetweetCount = doc.data().retweetCount + 1;
         });
-        console.log({ newRetweets, newRetweetCount });
+        // Update retweets and retweet count on the server
         updateUserInteractions(
           messageDoc.id,
           "retweets",
@@ -196,12 +199,12 @@ function App() {
         await getDoc(messageDoc).then((doc) =>
           setComments([{ ...doc.data(), id: doc.id }, ...comments])
         );
-        // Update comment count on orig post
+        // Calculate new comment count
         let newCommentCount;
         await getDoc(doc(db, "posts", post.id)).then((doc) => {
           newCommentCount = doc.data().commentCount + 1;
-          console.log(newCommentCount);
         });
+        // Update Comments on the server
         updateUserInteractions(post.id, "comment", newCommentCount);
         break;
     }

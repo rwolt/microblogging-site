@@ -57,7 +57,6 @@ const PostCard = ({
       />
       <Flex
         onClick={(e) => {
-          console.log(replyType);
           if (replyType) {
             navigate(`/posts/${post.id}/${replyType}`);
           } else {

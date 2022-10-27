@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import PostCard from "../components/PostCard";
 import ParentTweet from "../components/ParentTweet";
 import CommentInputBox from "../components/CommentInputBox";
+import AuthPopup from "../components/AuthPopup";
 
 const Tweet = (props) => {
   const params = useParams();
@@ -56,12 +57,27 @@ const Tweet = (props) => {
       ) : (
         ""
       )}
-      <CommentInputBox
-        user={props.user}
-        handleReply={props.handleReply}
-        post={parentTweet}
-        postMessage={props.postMessage}
-      />
+      {props.user ? (
+        <CommentInputBox
+          user={props.user}
+          handleReply={props.handleReply}
+          post={parentTweet}
+          postMessage={props.postMessage}
+        />
+      ) : (
+        ""
+      )}
+      {props.showPopup ? (
+        <AuthPopup
+          showRegisterForm={props.showRegisterForm}
+          setShowRegisterForm={props.setShowRegisterForm}
+          handleLogin={props.handleLogin}
+          handleRegister={props.handleRegister}
+          setShowPopup={props.setShowPopup}
+        />
+      ) : (
+        ""
+      )}
       {props.comments.map((item) => {
         return (
           <PostCard
