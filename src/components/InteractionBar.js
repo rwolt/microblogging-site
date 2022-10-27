@@ -17,7 +17,8 @@ const InteractionBar = (props) => {
         onClick={(e) => {
           e.stopPropagation();
           props.handleReply(e, props.post);
-        }}>
+        }}
+      >
         <FaRetweet />
         <p>{props.post.retweetCount}</p>
       </InteractionIcon>
@@ -27,7 +28,8 @@ const InteractionBar = (props) => {
         onClick={(e) => {
           e.stopPropagation();
           props.handleLike(props.post);
-        }}>
+        }}
+      >
         {props.liked ? <FaHeart /> : <FaRegHeart />}
         <p>{props.likeCount > 0 ? props.likeCount : ""}</p>
       </InteractionIcon>

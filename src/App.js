@@ -40,7 +40,7 @@ function App() {
   const [comments, setComments] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState('');
+  const [loadingMessage, setLoadingMessage] = useState("");
 
   useEffect(() => {
     initFirebaseAuth();
@@ -199,6 +199,7 @@ function App() {
         }
       });
 
+      // Redundant to do this here for comments (not stored in retweet array, doc already deleted from server)
       const newReplies = currentUser.retweets.filter(
         (post) => post.id !== post.id
       );
@@ -309,12 +310,6 @@ function App() {
     return comments;
   };
 
-  const getPost = async (id) => {
-    const docRef = doc(db, "posts", id);
-    const post = await getDoc(docRef).then((doc) => doc.data());
-    return post;
-  };
-
   const checkLiked = (postId) => {
     if (currentUser && currentUser.likes.includes(postId)) {
       return true;
@@ -418,7 +413,7 @@ function App() {
             // Order likes by date liked instead?
             q = query(postsRef, where("__name__", "in", doc.data().likes));
           } else {
-            q = '';
+            q = "";
           }
         });
         break;
@@ -428,19 +423,19 @@ function App() {
           if (doc.data().retweets.length > 0) {
             q = query(postsRef, where("__name__", "in", doc.data().retweets));
           } else {
-            q = '';
+            q = "";
           }
         });
     }
-    
+
     // posts = [];
-    if (q !== '') {
+    if (q !== "") {
       const snapshot = await getDocs(q);
       snapshot.forEach((doc) => {
-              posts.push({ ...doc.data(), id: doc.id });
-            });
+        posts.push({ ...doc.data(), id: doc.id });
+      });
     }
-    setLoadingMessage('');
+    setLoadingMessage("");
     return posts;
   };
 
@@ -530,7 +525,6 @@ function App() {
                   handleReply={handleReply}
                   checkLiked={checkLiked}
                   checkRetweeted={checkRetweeted}
-                  getPost={getPost}
                   getComments={getComments}
                   comments={comments}
                   setComments={setComments}
@@ -558,7 +552,6 @@ function App() {
                   handleReply={handleReply}
                   checkLiked={checkLiked}
                   checkRetweeted={checkRetweeted}
-                  getPost={getPost}
                   getComments={getComments}
                   comments={comments}
                   setComments={setComments}

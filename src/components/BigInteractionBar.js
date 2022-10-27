@@ -14,7 +14,8 @@ const BigInteractionBar = (props) => {
         onClick={(e) => {
           e.stopPropagation();
           props.handleReply(e, props.post);
-        }}>
+        }}
+      >
         {props.retweeted ? (
           <FaRetweet className="big-icon" style={{ color: "#289d8c" }} />
         ) : (
@@ -26,7 +27,8 @@ const BigInteractionBar = (props) => {
         onClick={(e) => {
           e.stopPropagation();
           props.handleLike(props.post);
-        }}>
+        }}
+      >
         {props.liked ? (
           <FaHeart className="big-icon liked" />
         ) : (
