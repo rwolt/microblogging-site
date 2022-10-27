@@ -139,16 +139,46 @@ function App() {
   };
 
   //Post a message from the post input box to the database
-  const postMessage = async (e, message) => {
-    const messageDoc = await addDoc(collection(db, "posts"), {
-      user: currentUser.uid,
-      displayName: currentUser.name,
-      profilePicURL: currentUser.photoURL,
-      timestamp: serverTimestamp(),
-      message: message,
-      likeCount: 0,
-      retweetCount: 0,
-    });
+  const postMessage = async (e, message, replyType, post) => {
+    let messageDoc = "";
+    switch (replyType) {
+      case "post":
+        messageDoc = await addDoc(collection(db, "posts"), {
+          user: currentUser.uid,
+          displayName: currentUser.name,
+          profilePicURL: currentUser.photoURL,
+          timestamp: serverTimestamp(),
+          message: message,
+          likeCount: 0,
+          retweetCount: 0,
+        });
+        break;
+      case "retweet":
+        messageDoc = await addDoc(collection(db, "replies"), {
+          user: currentUser.uid,
+          displayName: currentUser.name,
+          replyType: "retweet",
+          timestamp: serverTimestamp(),
+          data: post,
+        });
+        break;
+      case "comment":
+        messageDoc = await addDoc(collection(db, "replies"), {
+          user: currentUser.uid,
+          displayName: currentUser.name,
+          profilePicURL: currentUser.photoURL,
+          likeCount: 0,
+          retweetCount: 0,
+          commentCount: 0,
+          replyType: "comment",
+          origPostId: post.id,
+          origPostUser: post.user,
+          origPostDisplayName: post.displayName,
+          message: message,
+          timestamp: serverTimestamp(),
+        });
+        break;
+    }
     return messageDoc;
   };
 
@@ -188,7 +218,8 @@ function App() {
               item.id === post.id ? { ...item, retweetCount: newCount } : item
             )
           );
-        } else if (post.type === "parent") {
+        }
+        if (post.type === "parent") {
           setParentTweet({ ...parentTweet, retweetCount: newCount });
         } else {
           setPosts(

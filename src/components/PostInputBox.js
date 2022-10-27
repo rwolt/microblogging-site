@@ -29,7 +29,7 @@ const PostInputBox = (props) => {
       <Flex justifyContent="flex-end">
         <Button
           onClick={async (e) => {
-            await props.postMessage(e, message);
+            await props.postMessage(e, message, "post");
             props.setPosts(await props.getMessages());
             setMessage("");
           }}
