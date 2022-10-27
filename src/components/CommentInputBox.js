@@ -20,10 +20,11 @@ const CommentInputBox = (props) => {
         <Button
           id="comment"
           onClick={async (e) => {
-            await props.handleReply(e, props.post, message);
+            await props.postMessage(e, message, "comment", props.post);
             // props.setPosts(await props.getMessages());
             setMessage("");
-          }}>
+          }}
+        >
           Reply
         </Button>
       </Flex>

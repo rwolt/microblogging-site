@@ -154,7 +154,7 @@ function App() {
         });
         break;
       case "retweet":
-        messageDoc = await addDoc(collection(db, "replies"), {
+        messageDoc = await addDoc(collection(db, "posts"), {
           user: currentUser.uid,
           displayName: currentUser.name,
           replyType: "retweet",
@@ -163,7 +163,7 @@ function App() {
         });
         break;
       case "comment":
-        messageDoc = await addDoc(collection(db, "replies"), {
+        messageDoc = await addDoc(collection(db, "posts"), {
           user: currentUser.uid,
           displayName: currentUser.name,
           profilePicURL: currentUser.photoURL,
@@ -177,6 +177,10 @@ function App() {
           message: message,
           timestamp: serverTimestamp(),
         });
+        await getDoc(messageDoc).then((doc) =>
+          setComments([{ ...doc.data(), id: doc.id }, ...comments])
+        );
+
         break;
     }
     return messageDoc;
@@ -328,7 +332,7 @@ function App() {
 
   const getComments = async (id) => {
     const q = query(
-      collection(db, "replies"),
+      collection(db, "posts"),
       where("replyType", "==", "comment"),
       where("origPostId", "==", id),
       orderBy("timestamp", "desc")

@@ -12,24 +12,18 @@ const Tweet = (props) => {
   const params = useParams();
   const { parentTweet } = props;
 
+  // Set the parent tweet
   useEffect(async () => {
-    let docRef = "";
-    //If the post is a reply
-    if (params.replyType) {
-      docRef = doc(db, "replies", params.postId);
-    } else {
-      //If the post is a post
-      docRef = doc(db, "posts", params.postId);
-    }
+    const docRef = doc(db, "posts", params.postId);
     const postDoc = await getDoc(docRef).then((doc) => {
       return { ...doc.data(), id: doc.id };
     });
     props.setParentTweet({ ...postDoc, type: "parent" });
   }, [params.postId]);
 
+  //Fetch the comments
   useEffect(async () => {
     const replies = await props.getComments(params.postId);
-    console.log(replies);
     props.setComments(replies);
   }, [params.postId]);
 
@@ -66,6 +60,7 @@ const Tweet = (props) => {
         user={props.user}
         handleReply={props.handleReply}
         post={parentTweet}
+        postMessage={props.postMessage}
       />
       {props.comments.map((item) => {
         return (
