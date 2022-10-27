@@ -13,7 +13,7 @@ const BigInteractionBar = (props) => {
         id="retweet"
         onClick={(e) => {
           e.stopPropagation();
-          props.handleReply(e, props.post);
+          props.postMessage(e, null, "retweet", props.post);
         }}
       >
         {props.retweeted ? (

@@ -16,7 +16,7 @@ const InteractionBar = (props) => {
         id="retweet"
         onClick={(e) => {
           e.stopPropagation();
-          props.handleReply(e, props.post);
+          props.postMessage(e, null, "retweet", props.post);
         }}
       >
         <FaRetweet />

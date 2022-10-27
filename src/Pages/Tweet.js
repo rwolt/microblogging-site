@@ -51,7 +51,7 @@ const Tweet = (props) => {
           likeCount={parentTweet.likeCount}
           retweetCount={parentTweet.retweetCount}
           handleLike={props.handleLike}
-          handleReply={props.handleReply}
+          postMessage={props.postMessage}
         />
       ) : (
         ""
@@ -78,7 +78,7 @@ const Tweet = (props) => {
             likeCount={item.likeCount}
             retweetCount={item.retweetCount}
             handleLike={props.handleLike}
-            handleReply={props.handleReply}
+            postMessage={props.postMessage}
           />
         );
       })}

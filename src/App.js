@@ -151,6 +151,7 @@ function App() {
           message: message,
           likeCount: 0,
           retweetCount: 0,
+          commentCount: 0,
         });
         break;
       case "retweet":
@@ -161,6 +162,20 @@ function App() {
           timestamp: serverTimestamp(),
           data: post,
         });
+        // Update retweet count, retweets
+        let newRetweets = [];
+        let newRetweetCount = "";
+        await getDoc(messageDoc).then((doc) => {
+          newRetweets = [...currentUser.retweets, { ...doc.data() }];
+          newRetweetCount = doc.data().retweetCount + 1;
+        });
+        console.log({ newRetweets, newRetweetCount });
+        updateUserInteractions(
+          messageDoc.id,
+          "retweets",
+          newRetweets,
+          newRetweetCount
+        );
         break;
       case "comment":
         messageDoc = await addDoc(collection(db, "posts"), {
@@ -177,10 +192,17 @@ function App() {
           message: message,
           timestamp: serverTimestamp(),
         });
+        // Update comments in UI
         await getDoc(messageDoc).then((doc) =>
           setComments([{ ...doc.data(), id: doc.id }, ...comments])
         );
-
+        // Update comment count on orig post
+        let newCommentCount;
+        await getDoc(doc(db, "posts", post.id)).then((doc) => {
+          newCommentCount = doc.data().commentCount + 1;
+          console.log(newCommentCount);
+        });
+        updateUserInteractions(post.id, "comment", newCommentCount);
         break;
     }
     return messageDoc;
@@ -361,17 +383,25 @@ function App() {
     }
   };
 
-  const updateLikes = (post, newLikes, newCount) => {
-    let postRef = "";
-    if (post.replyType) {
-      postRef = doc(db, "replies", post.id);
-    } else {
-      postRef = doc(db, "posts", post.id);
-    }
+  const updateUserInteractions = (postId, type, newCount, newArray) => {
+    const postRef = doc(db, "posts", postId);
     const userRef = doc(db, "users", currentUser.uid);
 
-    updateDoc(userRef, { likes: newLikes });
-    updateDoc(postRef, { likeCount: newCount });
+    // Update the documents on firestore
+
+    switch (type) {
+      case "like":
+        updateDoc(userRef, { likes: newArray });
+        updateDoc(postRef, { likeCount: newCount });
+        break;
+      case "retweet":
+        updateDoc(userRef, { retweets: newArray });
+        updateDoc(postRef, { retweetCount: newCount });
+        break;
+      case "comment":
+        updateDoc(postRef, { commentCount: newCount });
+        break;
+    }
   };
 
   const handleLike = (post) => {
@@ -397,7 +427,7 @@ function App() {
           )
         );
       }
-      updateLikes(post, newLikes, newCount);
+      updateUserInteractions(post, "like", newLikes, newCount);
     } else if (currentUser && !checkLiked(post.id)) {
       //Otherwise, add the postId to the user doc's 'liked' map & increase the likes count on the post doc by 1
       const newLikes = [...currentUser.likes, post.id];
@@ -419,7 +449,7 @@ function App() {
           )
         );
       }
-      updateLikes(post, newLikes, newCount);
+      updateUserInteractions(post, "like", newLikes, newCount);
     } else {
       return;
     }

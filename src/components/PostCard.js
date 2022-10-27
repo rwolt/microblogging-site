@@ -41,7 +41,7 @@ const PostCard = ({
   likeCount,
   retweetCount,
   handleLike,
-  handleReply,
+  postMessage,
 }) => {
   const navigate = useNavigate();
   const { uid } = useParams();
@@ -67,13 +67,15 @@ const PostCard = ({
         flexDirection="column"
         alignItems="flex-start"
         padding="0"
-        margin=" 0 0 0 10px">
+        margin=" 0 0 0 10px"
+      >
         <UserInfo>
           <a
             onClick={(e) => {
               e.stopPropagation();
               navigate(`/users/${user}`);
-            }}>
+            }}
+          >
             {displayName}
           </a>
           {/* <NavLink to={`/users/${user}`}> {displayName}</NavLink> */}
@@ -92,7 +94,7 @@ const PostCard = ({
           likeCount={likeCount}
           retweetCount={retweetCount}
           handleLike={handleLike}
-          handleReply={handleReply}
+          postMessage={postMessage}
         />
       </Flex>
     </StyledPostCard>

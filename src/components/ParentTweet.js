@@ -20,7 +20,7 @@ const ParentTweet = ({
   likeCount,
   retweetCount,
   handleLike,
-  handleReply,
+  postMessage,
 }) => {
   const navigate = useNavigate();
   return (
@@ -38,7 +38,8 @@ const ParentTweet = ({
             onClick={(e) => {
               e.stopPropagation();
               navigate(`/users/${user}`);
-            }}>
+            }}
+          >
             {displayName}
           </a>
         </UserInfo>
@@ -54,7 +55,7 @@ const ParentTweet = ({
       <TweetStats retweetCount={retweetCount} likeCount={likeCount} />
       <BigInteractionBar
         handleLike={handleLike}
-        handleReply={handleReply}
+        postMessage={postMessage}
         liked={liked}
         retweeted={retweeted}
         post={post}
