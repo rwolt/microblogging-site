@@ -155,6 +155,7 @@ function App() {
         });
         break;
       case "retweet":
+        // Create a new doc for the retweet
         messageDoc = await addDoc(collection(db, "posts"), {
           user: currentUser.uid,
           displayName: currentUser.name,
@@ -162,22 +163,24 @@ function App() {
           timestamp: serverTimestamp(),
           data: post,
         });
+
         // Calculate new retweets
-        let newRetweets = [];
-        await getDoc(messageDoc).then((doc) => {
-          newRetweets = [...currentUser.retweets, { ...doc.data() }];
-        });
-        // Calculate new retweet count
-        let newRetweetCount = undefined;
+        let newRetweets = [...currentUser.retweets, messageDoc.id];
+        // await getDoc(post).then((doc) => {
+        //   newRetweets = [...currentUser.retweets, doc.id];
+        // });
+
+        // Calculate new retweet count from the original post
+        let newRetweetCount;
         await getDoc(doc(db, "posts", post.id)).then((doc) => {
           newRetweetCount = doc.data().retweetCount + 1;
         });
         // Update retweets and retweet count on the server
         updateUserInteractions(
-          messageDoc.id,
-          "retweets",
-          newRetweets,
-          newRetweetCount
+          post.id,
+          "retweet",
+          newRetweetCount,
+          newRetweets
         );
         break;
       case "comment":
@@ -430,7 +433,7 @@ function App() {
           )
         );
       }
-      updateUserInteractions(post, "like", newLikes, newCount);
+      updateUserInteractions(post, "like", newCount, newLikes);
     } else if (currentUser && !checkLiked(post.id)) {
       //Otherwise, add the postId to the user doc's 'liked' map & increase the likes count on the post doc by 1
       const newLikes = [...currentUser.likes, post.id];
@@ -452,7 +455,7 @@ function App() {
           )
         );
       }
-      updateUserInteractions(post, "like", newLikes, newCount);
+      updateUserInteractions(post, "like", newCount, newLikes);
     } else {
       return;
     }
