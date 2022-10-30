@@ -139,9 +139,9 @@ function App() {
   };
 
   //Post a message from the post input box to the database
-  const postMessage = async (e, message, replyType, post) => {
+  const postMessage = async (e, message, type, post) => {
     let messageDoc = "";
-    switch (replyType) {
+    switch (type) {
       case "post":
         messageDoc = await addDoc(collection(db, "posts"), {
           user: currentUser.uid,
@@ -152,6 +152,7 @@ function App() {
           likeCount: 0,
           retweetCount: 0,
           commentCount: 0,
+          type: "post",
         });
         break;
       case "retweet":
@@ -159,22 +160,21 @@ function App() {
         messageDoc = await addDoc(collection(db, "posts"), {
           user: currentUser.uid,
           displayName: currentUser.name,
-          replyType: "retweet",
+          type: "retweet",
           timestamp: serverTimestamp(),
           data: post,
         });
 
-        // Calculate new retweets
+        // Update retweets in UI
         let newRetweets = [...currentUser.retweets, messageDoc.id];
-        // await getDoc(post).then((doc) => {
-        //   newRetweets = [...currentUser.retweets, doc.id];
-        // });
+        setCurrentUser({ ...currentUser, retweets: newRetweets });
 
         // Calculate new retweet count from the original post
         let newRetweetCount;
         await getDoc(doc(db, "posts", post.id)).then((doc) => {
           newRetweetCount = doc.data().retweetCount + 1;
         });
+
         // Update retweets and retweet count on the server
         updateUserInteractions(
           post.id,
@@ -191,7 +191,7 @@ function App() {
           likeCount: 0,
           retweetCount: 0,
           commentCount: 0,
-          replyType: "comment",
+          type: "comment",
           origPostId: post.id,
           origPostUser: post.user,
           origPostDisplayName: post.displayName,
@@ -346,22 +346,51 @@ function App() {
 
   //Get posts from the database
   const getMessages = async () => {
-    const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
-    const querySnapshot = await getDocs(q);
-    const posts = [];
-    querySnapshot.forEach((doc) => {
+    const postQuery = query(
+      collection(db, "posts"),
+      where("type", "==", "post"),
+      orderBy("timestamp", "desc"),
+      limit(10)
+    );
+    const retweetQuery = query(
+      collection(db, "posts"),
+      where("type", "==", "retweet"),
+      orderBy("timestamp", "desc"),
+      limit(10)
+    );
+
+    const messageSnapshot = await getDocs(postQuery);
+    const retweetSnapshot = await getDocs(retweetQuery);
+
+    // Combine the two snapshots and sort by timestamp
+
+    let posts = [];
+
+    messageSnapshot.forEach((doc) => {
       posts.push({
         ...doc.data(),
         id: doc.id,
       });
     });
+
+    retweetSnapshot.forEach((doc) => {
+      posts.push({
+        ...doc.data(),
+        id: doc.id,
+      });
+    });
+
+    posts = posts.sort((a, b) => {
+      return b.timestamp.seconds - a.timestamp.seconds;
+    });
+
     return posts;
   };
 
   const getComments = async (id) => {
     const q = query(
       collection(db, "posts"),
-      where("replyType", "==", "comment"),
+      where("type", "==", "comment"),
       where("origPostId", "==", id),
       orderBy("timestamp", "desc")
     );
@@ -577,35 +606,9 @@ function App() {
                 />
               }
             />
+
             <Route
               path="/posts/:postId"
-              element={
-                <Tweet
-                  user={currentUser}
-                  posts={posts}
-                  setPosts={setPosts}
-                  handleLogin={handleLogin}
-                  handleLogout={handleLogout}
-                  showPopup={showPopup}
-                  setShowPopup={setShowPopup}
-                  showRegisterForm={showRegisterForm}
-                  setShowRegisterForm={setShowRegisterForm}
-                  handleRegister={handleRegister}
-                  postMessage={postMessage}
-                  handleLike={handleLike}
-                  handleReply={handleReply}
-                  checkLiked={checkLiked}
-                  checkRetweeted={checkRetweeted}
-                  getComments={getComments}
-                  comments={comments}
-                  setComments={setComments}
-                  parentTweet={parentTweet}
-                  setParentTweet={setParentTweet}
-                />
-              }
-            />
-            <Route
-              path="/posts/:postId/:replyType"
               element={
                 <Tweet
                   user={currentUser}

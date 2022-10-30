@@ -57,11 +57,7 @@ const PostCard = ({
       />
       <Flex
         onClick={(e) => {
-          if (replyType) {
-            navigate(`/posts/${post.id}/${replyType}`);
-          } else {
-            navigate(`/posts/${post.id}`);
-          }
+          navigate(`/posts/${post.id}`);
         }}
         flexDirection="column"
         alignItems="flex-start"
