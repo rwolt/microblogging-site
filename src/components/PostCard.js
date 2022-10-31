@@ -13,6 +13,7 @@ import { ProfileImage } from "./styled/ProfileImage.styled";
 import { UserInfo } from "./styled/UserInfo.styled";
 import { Flex } from "./styled/Flex.styled";
 import InteractionBar from "./InteractionBar";
+import { AiFillPropertySafety } from "react-icons/ai";
 
 export const formatTimestamp = (timestamp) => {
   const dateFromTimestamp = timestamp.toDate();
@@ -40,8 +41,11 @@ const PostCard = ({
   retweeted,
   likeCount,
   retweetCount,
+  commentCount,
   handleLike,
   postMessage,
+  setPosts,
+  getMessages,
 }) => {
   const navigate = useNavigate();
   const { uid } = useParams();
@@ -88,8 +92,11 @@ const PostCard = ({
           retweeted={retweeted}
           likeCount={likeCount}
           retweetCount={retweetCount}
+          commentCount={commentCount}
           handleLike={handleLike}
           postMessage={postMessage}
+          setPosts={setPosts}
+          getMessages={getMessages}
         />
       </Flex>
     </StyledPostCard>

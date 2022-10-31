@@ -9,14 +9,15 @@ const InteractionBar = (props) => {
     <StyledInteractionBar>
       <InteractionIcon id="comment">
         <FaRegComment />
-        <p>999</p>
+        <p>{props.commentCount}</p>
       </InteractionIcon>
       <InteractionIcon
         retweeted={props.retweeted}
         id="retweet"
-        onClick={(e) => {
+        onClick={async (e) => {
           e.stopPropagation();
-          props.postMessage(e, null, "retweet", props.post);
+          await props.postMessage(e, null, "retweet", props.post);
+          props.setPosts(await props.getMessages());
         }}
       >
         <FaRetweet />

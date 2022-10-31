@@ -50,23 +50,43 @@ const Home = (props) => {
         ""
       )}
       {props.posts.map((post) => {
-        return (
-          <PostCard
-            key={post.id}
-            post={post}
-            profilePicURL={post.profilePicURL}
-            user={post.user}
-            displayName={post.displayName}
-            timestamp={post.timestamp}
-            message={post.message}
-            likeCount={post.likeCount}
-            liked={props.checkLiked(post.id)}
-            retweeted={props.checkRetweeted(post.id)}
-            handleLike={props.handleLike}
-            handleReply={props.handleReply}
-            postMessage={props.postMessage}
-          />
-        );
+        if (post.type === "retweet") {
+          return (
+            <RePost
+              key={post.id}
+              retweetDisplayName={post.displayName}
+              post={post.data}
+              liked={props.checkLiked(post.id)}
+              retweeted={props.checkRetweeted(post.id)}
+              handleLike={props.handleLike}
+              handleReply={props.handleReply}
+              postMessage={props.postMessage}
+              getMessages={props.getMessages}
+            />
+          );
+        } else {
+          return (
+            <PostCard
+              key={post.id}
+              post={post}
+              profilePicURL={post.profilePicURL}
+              user={post.user}
+              displayName={post.displayName}
+              timestamp={post.timestamp}
+              message={post.message}
+              likeCount={post.likeCount}
+              retweetCount={post.retweetCount}
+              commentCount={post.commentCount}
+              liked={props.checkLiked(post.id)}
+              retweeted={props.checkRetweeted(post.id)}
+              handleLike={props.handleLike}
+              handleReply={props.handleReply}
+              postMessage={props.postMessage}
+              getMessages={props.getMessages}
+              setPosts={props.setPosts}
+            />
+          );
+        }
       })}
     </Container>
   );

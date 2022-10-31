@@ -51,6 +51,7 @@ const Tweet = (props) => {
           retweeted={props.checkRetweeted(parentTweet.id)}
           likeCount={parentTweet.likeCount}
           retweetCount={parentTweet.retweetCount}
+          commentCount={parentTweet.commentCount}
           handleLike={props.handleLike}
           postMessage={props.postMessage}
         />

@@ -19,6 +19,7 @@ const ParentTweet = ({
   retweeted,
   likeCount,
   retweetCount,
+  commentCount,
   handleLike,
   postMessage,
 }) => {
@@ -52,7 +53,11 @@ const ParentTweet = ({
           {format(timestamp.toDate(), "MMM do yyyy")}
         </span>
       </Flex>
-      <TweetStats retweetCount={retweetCount} likeCount={likeCount} />
+      <TweetStats
+        commentCount={commentCount}
+        retweetCount={retweetCount}
+        likeCount={likeCount}
+      />
       <BigInteractionBar
         handleLike={handleLike}
         postMessage={postMessage}
