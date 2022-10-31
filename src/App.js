@@ -359,27 +359,29 @@ function App() {
       limit(10)
     );
 
-    const messageSnapshot = await getDocs(postQuery);
-    const retweetSnapshot = await getDocs(retweetQuery);
+    let posts = [];
+
+    const messageSnapshot = await getDocs(postQuery).then((snapshot) => {
+      snapshot.forEach((doc) => {
+        posts.push({
+          ...doc.data(),
+          id: doc.id,
+        });
+      });
+    });
+
+    const retweetSnapshot = await getDocs(retweetQuery).then((snapshot) => {
+      snapshot.forEach((doc) => {
+        posts.push({
+          ...doc.data(),
+          id: doc.id,
+        });
+      });
+    });
 
     // Combine the two snapshots and sort by timestamp
 
-    let posts = [];
-
-    messageSnapshot.forEach((doc) => {
-      posts.push({
-        ...doc.data(),
-        id: doc.id,
-      });
-    });
-
-    retweetSnapshot.forEach((doc) => {
-      posts.push({
-        ...doc.data(),
-        id: doc.id,
-      });
-    });
-
+    // Promise.all([messageSnapshot, retweetSnapshot]).then(() => {
     posts = posts.sort((a, b) => {
       return b.timestamp.seconds - a.timestamp.seconds;
     });

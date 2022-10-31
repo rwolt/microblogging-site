@@ -7,10 +7,16 @@ import { Container } from "../components/styled/Container.styled";
 import PostCard from "../components/PostCard";
 import { db } from "../utils/firebase";
 import { doc } from "firebase/firestore";
+import RePost from "../components/RePost";
 
 const Home = (props) => {
-  useEffect(async () => {
-    props.setPosts(await props.getMessages());
+  const [feed, setFeed] = useState([]);
+  useEffect(() => {
+    const getMessages = async () => {
+      const messages = await props.getMessages();
+      props.setPosts(messages);
+    };
+    getMessages().catch((err) => console.error(err));
   }, []);
 
   return (
@@ -58,6 +64,7 @@ const Home = (props) => {
             retweeted={props.checkRetweeted(post.id)}
             handleLike={props.handleLike}
             handleReply={props.handleReply}
+            postMessage={props.postMessage}
           />
         );
       })}
