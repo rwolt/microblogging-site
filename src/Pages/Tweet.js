@@ -20,37 +20,33 @@ import { OAuthCredential } from "firebase/auth";
 
 const Tweet = (props) => {
   const params = useParams();
-  const { parentTweet } = props;
+
+  const fetchTweetView = async () => {
+    const mainTweetRef = doc(db, "posts", params.postId);
+    const commentsQuery = query(
+      collection(db, "posts"),
+      where("type", "==", "comment"),
+      where("origPostId", "==", params.postId),
+      orderBy("timestamp", "desc")
+    );
+
+    const posts = [];
+
+    const commentsSnapshot = await getDocs(commentsQuery);
+    await getDoc(mainTweetRef)
+      .then((doc) => posts.push({ ...doc.data(), id: doc.id }))
+      .then(() => {
+        commentsSnapshot.forEach((doc) => {
+          posts.push({ ...doc.data(), id: doc.id });
+        });
+      });
+
+    props.setPosts(posts);
+  };
 
   // Set the parent tweet
   useEffect(() => {
-    // Define async function
-
-    const fetchTweetView = async () => {
-      const mainTweetRef = doc(db, "posts", params.postId);
-      const commentsQuery = query(
-        collection(db, "posts"),
-        where("type", "==", "comment"),
-        where("origPostId", "==", params.postId),
-        orderBy("timestamp", "desc")
-      );
-
-      const posts = [];
-
-      const commentsSnapshot = await getDocs(commentsQuery);
-      await getDoc(mainTweetRef)
-        .then((doc) => posts.push({ ...doc.data(), id: doc.id }))
-        .then(() => {
-          commentsSnapshot.forEach((doc) => {
-            posts.push({ ...doc.data(), id: doc.id });
-          });
-        });
-
-      props.setPosts(posts);
-    };
-
     // Fetch posts for the view
-
     fetchTweetView();
   }, [params.postId]);
 
@@ -97,8 +93,10 @@ const Tweet = (props) => {
         <CommentInputBox
           user={props.user}
           handleReply={props.handleReply}
-          post={parentTweet}
+          post={props.posts[0]}
           postMessage={props.postMessage}
+          getMessages={props.getMessages}
+          fetchTweetView={fetchTweetView}
         />
       ) : (
         ""

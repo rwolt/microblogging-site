@@ -628,6 +628,7 @@ function App() {
                   handleReply={handleReply}
                   checkLiked={checkLiked}
                   checkRetweeted={checkRetweeted}
+                  getMessages={getMessages}
                   getComments={getComments}
                   comments={comments}
                   setComments={setComments}

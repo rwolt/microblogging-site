@@ -10,7 +10,6 @@ import { doc } from "firebase/firestore";
 import RePost from "../components/RePost";
 
 const Home = (props) => {
-  const [feed, setFeed] = useState([]);
   useEffect(() => {
     const getMessages = async () => {
       const messages = await props.getMessages();
