@@ -1,25 +1,57 @@
 import { React, useState, useEffect } from "react";
 import { Container } from "../components/styled/Container.styled";
 import Header from "../components/Header";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  doc,
+  collection,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+} from "firebase/firestore";
 import { db } from "../utils/firebase";
 import { useParams } from "react-router-dom";
 import PostCard from "../components/PostCard";
 import ParentTweet from "../components/ParentTweet";
 import CommentInputBox from "../components/CommentInputBox";
 import AuthPopup from "../components/AuthPopup";
+import { OAuthCredential } from "firebase/auth";
 
 const Tweet = (props) => {
   const params = useParams();
   const { parentTweet } = props;
 
   // Set the parent tweet
-  useEffect(async () => {
-    const docRef = doc(db, "posts", params.postId);
-    const postDoc = await getDoc(docRef).then((doc) => {
-      return { ...doc.data(), id: doc.id };
-    });
-    props.setParentTweet({ ...postDoc, type: "parent" });
+  useEffect(() => {
+    // Define async function
+
+    const fetchTweetView = async () => {
+      const mainTweetRef = doc(db, "posts", params.postId);
+      const commentsQuery = query(
+        collection(db, "posts"),
+        where("type", "==", "comment"),
+        where("origPostId", "==", params.postId),
+        orderBy("timestamp", "desc")
+      );
+
+      const posts = [];
+
+      const commentsSnapshot = await getDocs(commentsQuery);
+      await getDoc(mainTweetRef)
+        .then((doc) => posts.push({ ...doc.data(), id: doc.id }))
+        .then(() => {
+          commentsSnapshot.forEach((doc) => {
+            posts.push({ ...doc.data(), id: doc.id });
+          });
+        });
+
+      props.setPosts(posts);
+    };
+
+    // Fetch posts for the view
+
+    fetchTweetView();
   }, [params.postId]);
 
   //Fetch the comments
@@ -37,27 +69,30 @@ const Tweet = (props) => {
         handleLogout={props.handleLogout}
         user={props.user}
       />
-      {props.parentTweet.id == params.postId ? (
-        <ParentTweet
-          key={parentTweet.id}
-          post={parentTweet}
-          profilePicURL={parentTweet.profilePicURL}
-          user={parentTweet.user}
-          displayName={parentTweet.displayName}
-          timestamp={parentTweet.timestamp}
-          replyType={parentTweet.replyType}
-          message={parentTweet.message}
-          liked={props.checkLiked(parentTweet.id)}
-          retweeted={props.checkRetweeted(parentTweet.id)}
-          likeCount={parentTweet.likeCount}
-          retweetCount={parentTweet.retweetCount}
-          commentCount={parentTweet.commentCount}
-          handleLike={props.handleLike}
-          postMessage={props.postMessage}
-        />
-      ) : (
-        ""
-      )}
+      {props.posts.map((item, i) => {
+        if (i === 0) {
+          return (
+            <ParentTweet
+              key={item.id}
+              post={item}
+              profilePicURL={item.profilePicURL}
+              user={item.user}
+              displayName={item.displayName}
+              timestamp={item.timestamp}
+              replyType={item.replyType}
+              message={item.message}
+              liked={props.checkLiked(item.id)}
+              retweeted={props.checkRetweeted(item.id)}
+              likeCount={item.likeCount}
+              retweetCount={item.retweetCount}
+              commentCount={item.commentCount}
+              handleLike={props.handleLike}
+              postMessage={props.postMessage}
+            />
+          );
+        }
+      })}
+
       {props.user ? (
         <CommentInputBox
           user={props.user}
@@ -79,25 +114,27 @@ const Tweet = (props) => {
       ) : (
         ""
       )}
-      {props.comments.map((item) => {
-        return (
-          <PostCard
-            key={item.id}
-            post={item}
-            profilePicURL={item.profilePicURL}
-            user={item.user}
-            displayName={item.displayName}
-            timestamp={item.timestamp}
-            replyType={item.replyType}
-            message={item.message}
-            liked={props.checkLiked(item.id)}
-            retweeted={props.checkRetweeted(item.id)}
-            likeCount={item.likeCount}
-            retweetCount={item.retweetCount}
-            handleLike={props.handleLike}
-            postMessage={props.postMessage}
-          />
-        );
+      {props.posts.map((item, i) => {
+        if (i > 0) {
+          return (
+            <PostCard
+              key={item.id}
+              post={item}
+              profilePicURL={item.profilePicURL}
+              user={item.user}
+              displayName={item.displayName}
+              timestamp={item.timestamp}
+              replyType={item.replyType}
+              message={item.message}
+              liked={props.checkLiked(item.id)}
+              retweeted={props.checkRetweeted(item.id)}
+              likeCount={item.likeCount}
+              retweetCount={item.retweetCount}
+              handleLike={props.handleLike}
+              postMessage={props.postMessage}
+            />
+          );
+        }
       })}
     </Container>
   );

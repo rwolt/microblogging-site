@@ -21,7 +21,7 @@ const InteractionBar = (props) => {
         }}
       >
         <FaRetweet />
-        <p>{props.post.retweetCount}</p>
+        <p>{props.post.retweetCount > 0 ? props.retweetCount : ""}</p>
       </InteractionIcon>
       <InteractionIcon
         liked={props.liked}
