@@ -181,7 +181,7 @@ function App() {
         });
 
         // Update retweets in UI
-        let newRetweets = [...currentUser.retweets, messageDoc.id];
+        let newRetweets = [...currentUser.retweets, post.id];
         setCurrentUser({ ...currentUser, retweets: newRetweets });
 
         // Calculate new retweet count from the original post
@@ -341,33 +341,32 @@ function App() {
   };
 
   const handleLike = (post) => {
+    let newCount, newLikes;
     //Check if the post is already liked
     if (checkLiked(post.id)) {
       //If it is, remove the post from the user doc's 'liked' map
-      const newLikes = currentUser.likes.filter((item) => item !== post.id);
+      newLikes = currentUser.likes.filter((item) => item !== post.id);
       setCurrentUser({ ...currentUser, likes: newLikes });
       //Update the firestore doc
-      const newCount = post.likeCount - 1;
+      newCount = post.likeCount - 1;
       setPosts(
         posts.map((item) =>
           item.id === post.id ? { ...item, likeCount: newCount } : item
         )
       );
-      updateUserInteractions(post.id, "like", newCount, newLikes);
     } else if (currentUser && !checkLiked(post.id)) {
       //Otherwise, add the postId to the user doc's 'liked' map & increase the likes count on the post doc by 1
-      const newLikes = [...currentUser.likes, post.id];
+      newLikes = [...currentUser.likes, post.id];
       setCurrentUser({ ...currentUser, likes: newLikes });
       //Update the firestore doc
-      const newCount = post.likeCount + 1;
+      newCount = post.likeCount + 1;
       setPosts(
         posts.map((item) =>
           item.id === post.id ? { ...item, likeCount: newCount } : item
         )
       );
-
-      updateUserInteractions(post.id, "like", newCount, newLikes);
     }
+    updateUserInteractions(post.id, "like", newCount, newLikes);
   };
 
   const authStateObserver = async (user) => {

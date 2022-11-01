@@ -55,8 +55,8 @@ const Home = (props) => {
               key={post.id}
               retweetDisplayName={post.displayName}
               post={post.data}
-              liked={props.checkLiked(post.id)}
-              retweeted={props.checkRetweeted(post.id)}
+              liked={props.checkLiked(post.data.id)}
+              retweeted={props.checkRetweeted(post.data.id)}
               handleLike={props.handleLike}
               handleReply={props.handleReply}
               postMessage={props.postMessage}
