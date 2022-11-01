@@ -77,8 +77,8 @@ const ProfileFeed = (props) => {
             }
           })
         ) : (
-          <Flex>{props.loadingMessage || "There's nothing here yet"}</Flex>            
-        )} 
+          <Flex>{"There's nothing here yet"}</Flex>
+        )}
       </div>
     );
   };

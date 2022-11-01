@@ -50,12 +50,6 @@ const Tweet = (props) => {
     fetchTweetView();
   }, [params.postId]);
 
-  //Fetch the comments
-  useEffect(async () => {
-    const replies = await props.getComments(params.postId);
-    props.setComments(replies);
-  }, [params.postId]);
-
   return (
     <Container>
       <Header

@@ -36,8 +36,6 @@ const Profile = (props) => {
         user={user}
         profileFeed={profileFeed}
         setProfileFeed={setProfileFeed}
-        loadingMessage={props.loadingMessage}
-        setLoadingMessage={props.setLoadingMessage}
       />
       <ProfileFeed
         getProfilePosts={props.getProfilePosts}
@@ -50,7 +48,6 @@ const Profile = (props) => {
         checkRetweeted={props.checkRetweeted}
         handleLike={props.handleLike}
         handleReply={props.handleReply}
-        // loadingMessage={props.loadingMessage}
       />
       {props.showPopup ? (
         <AuthPopup
