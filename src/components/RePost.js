@@ -18,7 +18,6 @@ const RePost = ({
         {retweetDisplayName} reposted
       </Flex>
       <PostCard
-        key={post.id}
         post={post}
         profilePicURL={post.profilePicURL}
         user={post.user}

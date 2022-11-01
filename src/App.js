@@ -36,7 +36,6 @@ const theme = {};
 function App() {
   const [currentUser, setCurrentUser] = useState();
   const [posts, setPosts] = useState([]);
-  const [parentTweet, setParentTweet] = useState({});
   const [showPopup, setShowPopup] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
 
@@ -45,14 +44,6 @@ function App() {
   }, []);
 
   const initFirebaseAuth = () => onAuthStateChanged(auth, authStateObserver);
-
-  const getProfilePic = async () => {
-    if (!auth.currentUser.photoURL) {
-      await updateProfile(auth.currentUser, {
-        photoURL: `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`,
-      });
-    }
-  };
 
   const handleLogin = async (e, userObject) => {
     const { id } = e.target;
@@ -125,14 +116,44 @@ function App() {
     });
   };
 
-  //Get a user document from firestore
+  const getProfilePic = async () => {
+    if (!auth.currentUser.photoURL) {
+      await updateProfile(auth.currentUser, {
+        photoURL: `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`,
+      });
+    }
+  };
+
+  // Get a user document from firestore
   const getUserInfo = async (uid) => {
     const userDocRef = doc(db, "users", `${uid}`);
     const userDocSnap = await getDoc(userDocRef);
     return userDocSnap.data();
   };
 
-  //Post a message from the post input box to the database
+  // Update documents with new counts on firestore
+
+  const updateUserInteractions = (postId, type, newCount, newArray) => {
+    const postRef = doc(db, "posts", postId);
+    const userRef = doc(db, "users", currentUser.uid);
+
+    switch (type) {
+      case "like":
+        updateDoc(userRef, { likes: newArray });
+        updateDoc(postRef, { likeCount: newCount });
+        break;
+      case "retweet":
+        updateDoc(userRef, { retweets: newArray });
+        updateDoc(postRef, { retweetCount: newCount });
+        break;
+      case "comment":
+        updateDoc(postRef, { commentCount: newCount });
+        break;
+    }
+  };
+
+  // Post a tweet, comment, or retweet to firestore
+
   const postMessage = async (e, message, type, post) => {
     let messageDoc = "";
     switch (type) {
@@ -209,137 +230,24 @@ function App() {
     return messageDoc;
   };
 
-  // const handleReply = async (e, post, message) => {
-  //   const { id } = e.currentTarget;
-  //   let postRef = "";
-  //   //If the post is not already retweeted, post a retweet
-  //   if (id === "retweet" && !currentUser.retweets.includes(post.id)) {
-  //     postReply(id, post);
-  //     //If the reply is a comment, post a new comment
-  //   } else if (id === "comment") {
-  //     postReply(id, post, message);
-  //   } else {
-  //     //Otherwise remove the retweet doc and update the local state
-  //     const q = query(
-  //       collection(db, "replies"),
-  //       where("data.id", "==", post.id)
-  //     );
-  //     const querySnapshot = await getDocs(q);
-  //     querySnapshot.forEach((item) => {
-  //       deleteDoc(doc(db, "replies", item.id));
-  //     });
+  const checkLiked = (postId) => {
+    if (currentUser && currentUser.likes.includes(postId)) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
-  //     //Reduce the retweet count by 1
-  //     if (post.replyType) {
-  //       postRef = doc(db, "replies", post.id);
-  //     } else {
-  //       postRef = doc(db, "posts", post.id);
-  //     }
-  //     await getDoc(postRef).then((doc) => {
-  //       const retweetCount = doc.data().retweetCount;
-  //       const newCount = retweetCount - 1;
-  //       updateDoc(postRef, { retweetCount: newCount });
-  //       if (post.replyType === "comment" && post.type !== "parent") {
-  //         setComments(
-  //           comments.map((item) =>
-  //             item.id === post.id ? { ...item, retweetCount: newCount } : item
-  //           )
-  //         );
-  //       }
-  //       if (post.type === "parent") {
-  //         setParentTweet({ ...parentTweet, retweetCount: newCount });
-  //       } else {
-  //         setPosts(
-  //           posts.map((item) =>
-  //             item.id === post.id ? { ...item, retweetCount: newCount } : item
-  //           )
-  //         );
-  //       }
-  //     });
+  const checkRetweeted = (postId) => {
+    if (currentUser && currentUser.retweets.includes(postId)) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
-  //     // Redundant to do this here for comments (not stored in retweet array, doc already deleted from server)
-  //     const newReplies = currentUser.retweets.filter(
-  //       (post) => post.id !== post.id
-  //     );
-  //     setCurrentUser({
-  //       ...currentUser,
-  //       retweets: newReplies,
-  //     });
-  //     updateDoc(doc(db, "users", currentUser.uid), {
-  //       retweets: newReplies,
-  //     });
-  //   }
-  // };
+  // Get posts for the Home view
 
-  // const postReply = async (type, post, message) => {
-  //   //If the reply is a retweet, create a doc with type retweet and reference the original post
-  //   if (type === "retweet") {
-  //     let origDocRef = "";
-  //     if (post.replyType) {
-  //       //If retweeting a reply
-  //       origDocRef = doc(db, "replies", post.id);
-  //     } else {
-  //       //If retweeting a post
-  //       origDocRef = doc(db, "posts", post.id);
-  //     }
-
-  //     const docRef = await addDoc(collection(db, "replies"), {
-  //       user: currentUser.uid,
-  //       displayName: currentUser.name,
-  //       replyType: "retweet",
-  //       timestamp: serverTimestamp(),
-  //       data: post,
-  //     });
-  //     //Add the id of the tweet to the currentUser state
-  //     const newReplies = [...currentUser.retweets, post.id];
-  //     setCurrentUser({ ...currentUser, retweets: newReplies });
-  //     //Add the id of the reply to the user's replies map
-  //     const userRef = doc(db, "users", currentUser.uid);
-  //     updateDoc(userRef, { retweets: newReplies });
-  //     //Update the retweet count for the reply
-  //     const retweetCount = await getDoc(origDocRef).then(
-  //       (doc) => doc.data().retweetCount
-  //     );
-  //     const newCount = retweetCount + 1;
-  //     updateDoc(origDocRef, { retweetCount: newCount });
-  //     if (post.replyType === "comment" && post.type !== "parent") {
-  //       setComments(
-  //         comments.map((item) =>
-  //           item.id === post.id ? { ...item, retweetCount: newCount } : item
-  //         )
-  //       );
-  //     } else if (post.type === "parent") {
-  //       setParentTweet({ ...parentTweet, retweetCount: newCount });
-  //     } else {
-  //       setPosts(
-  //         posts.map((item) =>
-  //           item.id === post.id ? { ...item, retweetCount: newCount } : item
-  //         )
-  //       );
-  //     }
-  //   } else if (type === "comment") {
-  //     const docRef = await addDoc(collection(db, "replies"), {
-  //       user: currentUser.uid,
-  //       displayName: currentUser.name,
-  //       profilePicURL: currentUser.photoURL,
-  //       likeCount: 0,
-  //       retweetCount: 0,
-  //       commentCount: 0,
-  //       replyType: "comment",
-  //       origPostId: post.id,
-  //       origPostUser: post.user,
-  //       origPostDisplayName: post.displayName,
-  //       message: message,
-  //       timestamp: serverTimestamp(),
-  //     });
-  //     // Add the new comment to the UI
-  //     await getDoc(docRef).then((doc) => {
-  //       setComments([{ ...doc.data(), id: docRef.id }, ...comments]);
-  //     });
-  //   }
-  // };
-
-  //Get posts from the database
   const getMessages = async () => {
     const postQuery = query(
       collection(db, "posts"),
@@ -376,7 +284,6 @@ function App() {
 
     // Combine the two snapshots and sort by timestamp
 
-    // Promise.all([messageSnapshot, retweetSnapshot]).then(() => {
     posts = posts.sort((a, b) => {
       return b.timestamp.seconds - a.timestamp.seconds;
     });
@@ -384,93 +291,7 @@ function App() {
     return posts;
   };
 
-  const checkLiked = (postId) => {
-    if (currentUser && currentUser.likes.includes(postId)) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  const checkRetweeted = (postId) => {
-    if (currentUser && currentUser.retweets.includes(postId)) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  const updateUserInteractions = (postId, type, newCount, newArray) => {
-    const postRef = doc(db, "posts", postId);
-    const userRef = doc(db, "users", currentUser.uid);
-
-    // Update the documents on firestore
-
-    switch (type) {
-      case "like":
-        updateDoc(userRef, { likes: newArray });
-        updateDoc(postRef, { likeCount: newCount });
-        break;
-      case "retweet":
-        updateDoc(userRef, { retweets: newArray });
-        updateDoc(postRef, { retweetCount: newCount });
-        break;
-      case "comment":
-        updateDoc(postRef, { commentCount: newCount });
-        break;
-    }
-  };
-
-  // const handleLike = (post) => {
-  //   //Check if the post is already liked
-  //   if (checkLiked(post.id)) {
-  //     //If it is, remove the post from the user doc's 'liked' map
-  //     const newLikes = currentUser.likes.filter((item) => item !== post.id);
-  //     setCurrentUser({ ...currentUser, likes: newLikes });
-  //     //Update the firestore doc
-  //     const newCount = post.likeCount - 1;
-  //     if (post.replyType === "comment" && post.type !== "parent") {
-  //       setComments(
-  //         comments.map((item) =>
-  //           item.id === post.id ? { ...item, likeCount: newCount } : item
-  //         )
-  //       );
-  //     } else if (post.type === "parent") {
-  //       setParentTweet({ ...parentTweet, likeCount: newCount });
-  //     } else {
-  //       setPosts(
-  //         posts.map((item) =>
-  //           item.id === post.id ? { ...item, likeCount: newCount } : item
-  //         )
-  //       );
-  //     }
-  //     updateUserInteractions(post, "like", newCount, newLikes);
-  //   } else if (currentUser && !checkLiked(post.id)) {
-  //     //Otherwise, add the postId to the user doc's 'liked' map & increase the likes count on the post doc by 1
-  //     const newLikes = [...currentUser.likes, post.id];
-  //     setCurrentUser({ ...currentUser, likes: newLikes });
-  //     //Update the firestore doc
-  //     const newCount = post.likeCount + 1;
-  //     if (post.replyType === "comment" && post.type !== "parent") {
-  //       setComments(
-  //         comments.map((item) =>
-  //           item.id === post.id ? { ...item, likeCount: newCount } : item
-  //         )
-  //       );
-  //     } else if (post.type === "parent") {
-  //       setParentTweet({ ...parentTweet, likeCount: newCount });
-  //     } else {
-  //       setPosts(
-  //         posts.map((item) =>
-  //           item.id === post.id ? { ...item, likeCount: newCount } : item
-  //         )
-  //       );
-  //     }
-  //     updateUserInteractions(post, "like", newCount, newLikes);
-  //   } else {
-  //     return;
-  //   }
-  // };
+  // Get posts for the Profile View
 
   const getProfilePosts = async (feedType, userId) => {
     const postsRef = collection(db, "posts");
@@ -510,7 +331,6 @@ function App() {
         });
     }
 
-    // posts = [];
     if (q !== "") {
       const snapshot = await getDocs(q);
       snapshot.forEach((doc) => {
@@ -518,6 +338,36 @@ function App() {
       });
     }
     return posts;
+  };
+
+  const handleLike = (post) => {
+    //Check if the post is already liked
+    if (checkLiked(post.id)) {
+      //If it is, remove the post from the user doc's 'liked' map
+      const newLikes = currentUser.likes.filter((item) => item !== post.id);
+      setCurrentUser({ ...currentUser, likes: newLikes });
+      //Update the firestore doc
+      const newCount = post.likeCount - 1;
+      setPosts(
+        posts.map((item) =>
+          item.id === post.id ? { ...item, likeCount: newCount } : item
+        )
+      );
+      updateUserInteractions(post.id, "like", newCount, newLikes);
+    } else if (currentUser && !checkLiked(post.id)) {
+      //Otherwise, add the postId to the user doc's 'liked' map & increase the likes count on the post doc by 1
+      const newLikes = [...currentUser.likes, post.id];
+      setCurrentUser({ ...currentUser, likes: newLikes });
+      //Update the firestore doc
+      const newCount = post.likeCount + 1;
+      setPosts(
+        posts.map((item) =>
+          item.id === post.id ? { ...item, likeCount: newCount } : item
+        )
+      );
+
+      updateUserInteractions(post.id, "like", newCount, newLikes);
+    }
   };
 
   const authStateObserver = async (user) => {
@@ -553,6 +403,7 @@ function App() {
                   handleLogout={handleLogout}
                   postMessage={postMessage}
                   getMessages={getMessages}
+                  handleLike={handleLike}
                   checkLiked={checkLiked}
                   checkRetweeted={checkRetweeted}
                 />
@@ -600,8 +451,6 @@ function App() {
                   checkLiked={checkLiked}
                   checkRetweeted={checkRetweeted}
                   getMessages={getMessages}
-                  parentTweet={parentTweet}
-                  setParentTweet={setParentTweet}
                 />
               }
             />

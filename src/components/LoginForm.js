@@ -24,6 +24,7 @@ const LoginForm = (props) => {
   }, []);
 
   return (
+    // Show login form or registration form
     <StyledLoginForm>
       {props.showRegisterForm ? (
         <>

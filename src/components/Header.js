@@ -29,7 +29,8 @@ const Header = (props) => {
             onClick={() => {
               props.setShowPopup(true);
               props.setShowRegisterForm(true);
-            }}>
+            }}
+          >
             Register
           </Button>
         ) : (
@@ -43,7 +44,8 @@ const Header = (props) => {
                   props.setShowPopup(true);
                   props.setShowRegisterForm(false);
                 }
-          }>
+          }
+        >
           {props.user ? "Logout" : "Login"}
         </Button>
       </Flex>

@@ -13,7 +13,6 @@ const Profile = (props) => {
   const params = useParams();
   useEffect(() => {
     const getUserInfo = async (uid) => {
-      // console.log(props.getUserInfo(params.uid));
       const userDoc = await props.getUserInfo(uid);
       setUser({
         ...userDoc,
