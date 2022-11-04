@@ -1,6 +1,7 @@
 import React from "react";
 import { FaRetweet } from "react-icons/fa";
 import { Flex } from "./styled/Flex.styled";
+import { v4 as uuidv4 } from "uuid";
 import PostCard from "./PostCard";
 
 const RePost = ({
@@ -18,7 +19,7 @@ const RePost = ({
         {retweetDisplayName} reposted
       </Flex>
       <PostCard
-        id={post.id}
+        // id={post.id}
         post={post}
         profilePicURL={post.profilePicURL}
         user={post.user}

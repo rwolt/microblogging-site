@@ -177,7 +177,7 @@ function App() {
           displayName: currentUser.name,
           type: "retweet",
           timestamp: serverTimestamp(),
-          data: post,
+          origPostId: post.id,
         });
 
         // Update retweets in UI
@@ -247,9 +247,8 @@ function App() {
   };
 
   // Get posts for the Home view
-
-  const getMessages = async () => {
-    const postQuery = query(
+  const getHomeFeed = async () => {
+    const tweetQuery = query(
       collection(db, "posts"),
       where("type", "==", "post"),
       orderBy("timestamp", "desc"),
@@ -261,37 +260,58 @@ function App() {
       orderBy("timestamp", "desc"),
       limit(10)
     );
+    const getTweets = new Promise(async (resolve, reject) => {
+      const posts = [];
+      const snapshot = await getDocs(tweetQuery);
+      snapshot.docs.forEach((doc) => posts.push({ ...doc.data(), id: doc.id }));
+      resolve(posts);
+    });
 
-    let posts = [];
+    const getRetweets = new Promise(async (resolve, reject) => {
+      const posts = [];
+      const snapshot = await getDocs(retweetQuery);
+      snapshot.docs.forEach((doc) => posts.push({ ...doc.data(), id: doc.id }));
+      resolve(posts);
+    });
 
-    const messageSnapshot = await getDocs(postQuery).then((snapshot) => {
-      snapshot.forEach((doc) => {
-        posts.push({
-          ...doc.data(),
-          id: doc.id,
-        });
+    const fetchOriginalDoc = (retweet) => {
+      return new Promise(async (resolve, reject) => {
+        const original = await getDoc(doc(db, "posts", retweet.origPostId));
+        resolve(original.data());
       });
-    });
+    };
 
-    const retweetSnapshot = await getDocs(retweetQuery).then((snapshot) => {
-      snapshot.forEach((doc) => {
-        posts.push({
-          ...doc.data(),
-          id: doc.id,
-        });
+    const fetchOriginalDocs = (retweets) => {
+      return new Promise(async (resolve, reject) => {
+        const posts = [];
+        console.log(retweets.length);
+        let i = 0;
+        while (i < retweets.length) {
+          await fetchOriginalDoc(retweets[i]).then((doc) => {
+            console.log(doc);
+            posts.push({ ...retweets[i], origDoc: doc });
+          });
+          i++;
+        }
+        resolve(posts);
       });
+    };
+
+    const getUpdatedRetweets = new Promise(async (resolve, reject) => {
+      const updated = await getRetweets.then((retweets) =>
+        fetchOriginalDocs(retweets)
+      );
+      resolve(updated);
     });
 
-    // Combine the two snapshots and sort by timestamp
+    const sorted = await Promise.all([getTweets, getUpdatedRetweets]).then(
+      ([posts, retweets]) => {
+        return [...posts, ...retweets];
+      }
+    );
 
-    posts = posts.sort((a, b) => {
-      return b.timestamp.seconds - a.timestamp.seconds;
-    });
-
-    return posts;
+    return sorted;
   };
-
-  // Get posts for the Profile View
 
   const getProfilePosts = async (feedType, userId) => {
     const postsRef = collection(db, "posts");
@@ -305,6 +325,7 @@ function App() {
         q = query(
           postsRef,
           where("user", "==", `${userId}`),
+          where("type", "==", "post"),
           orderBy("timestamp", "desc"),
           limit(10)
         );
@@ -401,7 +422,7 @@ function App() {
                   handleRegister={handleRegister}
                   handleLogout={handleLogout}
                   postMessage={postMessage}
-                  getMessages={getMessages}
+                  getHomeFeed={getHomeFeed}
                   handleLike={handleLike}
                   checkLiked={checkLiked}
                   checkRetweeted={checkRetweeted}
@@ -425,7 +446,7 @@ function App() {
                   handleRegister={handleRegister}
                   handleLogout={handleLogout}
                   postMessage={postMessage}
-                  getMessages={getMessages}
+                  getHomeFeed={getHomeFeed}
                   checkLiked={checkLiked}
                   checkRetweeted={checkRetweeted}
                 />
@@ -449,7 +470,7 @@ function App() {
                   postMessage={postMessage}
                   checkLiked={checkLiked}
                   checkRetweeted={checkRetweeted}
-                  getMessages={getMessages}
+                  getHomeFeed={getHomeFeed}
                 />
               }
             />

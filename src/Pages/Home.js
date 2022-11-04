@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
 import PostInputBox from "../components/PostInputBox";
-import SignUpBox from "../components/SignUpBox";
 import AuthPopup from "../components/AuthPopup";
 import Header from "../components/Header";
 import { Container } from "../components/styled/Container.styled";
 import PostCard from "../components/PostCard";
-import { db } from "../utils/firebase";
-import { doc } from "firebase/firestore";
+import { v4 as uuidv4 } from "uuid";
 import RePost from "../components/RePost";
 
 const Home = (props) => {
   useEffect(() => {
     const getMessages = async () => {
-      const messages = await props.getMessages();
+      const messages = await props.getHomeFeed();
       props.setPosts(messages);
     };
     getMessages().catch((err) => console.error(err));
@@ -48,15 +46,17 @@ const Home = (props) => {
       ) : (
         ""
       )}
-      {props.posts.map((post) => {
+
+      {/* {props.posts.map((post) => {
         if (post.type === "retweet") {
           return (
             <RePost
-              key={post.id}
+              key={uuidv4()}
+              id={post.id}
               retweetDisplayName={post.displayName}
-              post={post.data}
-              liked={props.checkLiked(post.data.id)}
-              retweeted={props.checkRetweeted(post.data.id)}
+              post={post.origDoc}
+              liked={props.checkLiked(post.origPostId)}
+              retweeted={props.checkRetweeted(post.origPostId)}
               handleLike={props.handleLike}
               handleReply={props.handleReply}
               postMessage={props.postMessage}
@@ -66,7 +66,8 @@ const Home = (props) => {
         } else {
           return (
             <PostCard
-              key={post.id}
+              key={uuidv4()}
+              id={post.id}
               post={post}
               profilePicURL={post.profilePicURL}
               user={post.user}
@@ -86,7 +87,7 @@ const Home = (props) => {
             />
           );
         }
-      })}
+      })} */}
     </Container>
   );
 };
