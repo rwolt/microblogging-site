@@ -29,7 +29,7 @@ const Home = (props) => {
         <PostInputBox
           user={props.user}
           postMessage={props.postMessage}
-          getMessages={props.getMessages}
+          getHomeFeed={props.getHomeFeed}
           setPosts={props.setPosts}
         />
       ) : (
@@ -47,7 +47,7 @@ const Home = (props) => {
         ""
       )}
 
-      {/* {props.posts.map((post) => {
+      {props.posts.map((post) => {
         if (post.type === "retweet") {
           return (
             <RePost
@@ -87,7 +87,7 @@ const Home = (props) => {
             />
           );
         }
-      })} */}
+      })}
     </Container>
   );
 };

@@ -12,7 +12,7 @@ import {
   orderBy,
   where,
   limit,
-  setDoc,
+  setDoc, 
 } from "firebase/firestore";
 import { db, storage, auth } from "./utils/firebase";
 import {
@@ -43,17 +43,19 @@ function App() {
     initFirebaseAuth();
   }, []);
 
+  // Call authStateObserver on auth state change
   const initFirebaseAuth = () => onAuthStateChanged(auth, authStateObserver);
 
+  // Login
   const handleLogin = async (e, userObject) => {
     const { id } = e.target;
-    //If the Sign in with Google button is clicked, show a google sign-in popup
+    // If the Sign in with Google button is clicked, show a google sign-in popup
     if (id === "google-login") {
       e.preventDefault();
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
     } else if (id === "email-login") {
-      //If the login button is clicked, try to authenticate using email and password from the form
+      // If the login button is clicked, try to authenticate using email and password from the form
       e.preventDefault();
       try {
         const currentUser = await signInWithEmailAndPassword(
@@ -67,8 +69,16 @@ function App() {
     }
   };
 
+  // Logout
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
+  
+
+  // Register new user
   const handleRegister = async (e, userObject) => {
     e.preventDefault();
+  // If a new account is created, the user is signed in automatically
     try {
       await createUserWithEmailAndPassword(
         auth,
@@ -83,28 +93,8 @@ function App() {
       console.error(error.message);
     }
   };
-
-  const handleLogout = async () => {
-    await signOut(auth);
-  };
-
-  //Check if there is a document in the users collection for the authenticated user
-  const checkUserDoc = async () => {
-    const docRef = doc(db, "users", auth.currentUser.uid);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      setCurrentUser(docSnap.data());
-      //If there is no document, create a new user doc and set that doc as the current user for the view
-    } else {
-      createUserDoc(auth.currentUser.uid).then(async () => {
-        const userInfo = await getUserInfo(auth.currentUser.uid);
-        setCurrentUser(userInfo);
-      });
-    }
-  };
-
-  //Create a document in the user collection with the specified uid
+  
+  // Create a document in the user collection with the specified uid
   const createUserDoc = async (uid) => {
     await setDoc(doc(db, "users", `${uid}`), {
       uid: uid,
@@ -116,6 +106,7 @@ function App() {
     });
   };
 
+  // Assign the user a gravatar if no profile pictures is defined
   const getProfilePic = async () => {
     if (!auth.currentUser.photoURL) {
       await updateProfile(auth.currentUser, {
@@ -130,9 +121,25 @@ function App() {
     const userDocSnap = await getDoc(userDocRef);
     return userDocSnap.data();
   };
+  
+
+  // Check if there is a document in the users collection for the authenticated user
+  const checkUserDoc = async () => {
+    const docRef = doc(db, "users", auth.currentUser.uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      setCurrentUser(docSnap.data());
+      // If there is no document, create a new user doc and set that doc as the current user for the view
+    } else {
+      createUserDoc(auth.currentUser.uid).then(async () => {
+        const userInfo = await getUserInfo(auth.currentUser.uid);
+        setCurrentUser(userInfo);
+      });
+    }
+  };
 
   // Update documents with new counts on firestore
-
   const updateUserInteractions = (postId, type, newCount, newArray) => {
     const postRef = doc(db, "posts", postId);
     const userRef = doc(db, "users", currentUser.uid);
@@ -153,7 +160,6 @@ function App() {
   };
 
   // Post a tweet, comment, or retweet to firestore
-
   const postMessage = async (e, message, type, post) => {
     let messageDoc = "";
     switch (type) {
@@ -171,7 +177,7 @@ function App() {
         });
         break;
       case "retweet":
-        // Create a new doc for the retweet
+        // Create a new doc for the retweet, with id of original post
         messageDoc = await addDoc(collection(db, "posts"), {
           user: currentUser.uid,
           displayName: currentUser.name,
@@ -180,7 +186,7 @@ function App() {
           origPostId: post.id,
         });
 
-        // Update retweets in UI
+        // Update retweets array in local state
         let newRetweets = [...currentUser.retweets, post.id];
         setCurrentUser({ ...currentUser, retweets: newRetweets });
 
@@ -284,7 +290,6 @@ function App() {
     const fetchOriginalDocs = (retweets) => {
       return new Promise(async (resolve, reject) => {
         const posts = [];
-        console.log(retweets.length);
         let i = 0;
         while (i < retweets.length) {
           await fetchOriginalDoc(retweets[i]).then((doc) => {
@@ -368,7 +373,7 @@ function App() {
       //If it is, remove the post from the user doc's 'liked' map
       newLikes = currentUser.likes.filter((item) => item !== post.id);
       setCurrentUser({ ...currentUser, likes: newLikes });
-      //Update the firestore doc
+      // Update the count in local state
       newCount = post.likeCount - 1;
       setPosts(
         posts.map((item) =>
@@ -376,10 +381,10 @@ function App() {
         )
       );
     } else if (currentUser && !checkLiked(post.id)) {
-      //Otherwise, add the postId to the user doc's 'liked' map & increase the likes count on the post doc by 1
+      // Otherwise, add the postId to the user doc's 'liked' map & increase the likes count on the post doc by 1
       newLikes = [...currentUser.likes, post.id];
       setCurrentUser({ ...currentUser, likes: newLikes });
-      //Update the firestore doc
+      // Update the count in local state 
       newCount = post.likeCount + 1;
       setPosts(
         posts.map((item) =>
@@ -387,6 +392,7 @@ function App() {
         )
       );
     }
+    // Update the firestore doc
     updateUserInteractions(post.id, "like", newCount, newLikes);
   };
 

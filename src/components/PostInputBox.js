@@ -30,7 +30,7 @@ const PostInputBox = (props) => {
         <Button
           onClick={async (e) => {
             await props.postMessage(e, message, "post");
-            props.setPosts(await props.getMessages());
+            props.setPosts(await props.getHomeFeed());
             setMessage("");
           }}
         >
