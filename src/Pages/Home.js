@@ -8,11 +8,12 @@ import { v4 as uuidv4 } from "uuid";
 import RePost from "../components/RePost";
 
 const Home = (props) => {
+  const getMessages = async () => {
+    const messages = await props.getHomeFeed();
+    props.setPosts(messages);
+  };
+
   useEffect(() => {
-    const getMessages = async () => {
-      const messages = await props.getHomeFeed();
-      props.setPosts(messages);
-    };
     getMessages().catch((err) => console.error(err));
   }, []);
 
@@ -60,7 +61,7 @@ const Home = (props) => {
               handleLike={props.handleLike}
               handleReply={props.handleReply}
               postMessage={props.postMessage}
-              getMessages={props.getMessages}
+              getMessages={getMessages}
             />
           );
         } else {
@@ -82,7 +83,7 @@ const Home = (props) => {
               handleLike={props.handleLike}
               handleReply={props.handleReply}
               postMessage={props.postMessage}
-              getMessages={props.getMessages}
+              getMessages={getMessages}
               setPosts={props.setPosts}
             />
           );
