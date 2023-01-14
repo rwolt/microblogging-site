@@ -21,8 +21,17 @@ import { OAuthCredential } from "firebase/auth";
 const Tweet = (props) => {
   const params = useParams();
 
-  const fetchTweetView = async () => {
+  const fetchMainTweet = async () => {
     const mainTweetRef = doc(db, "posts", params.postId);
+    const mainTweet = await getDoc(mainTweetRef).then((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    return mainTweet;
+  };
+
+  const fetchCommentFeed = async () => {
     const commentsQuery = query(
       collection(db, "posts"),
       where("type", "==", "comment"),
@@ -30,23 +39,22 @@ const Tweet = (props) => {
       orderBy("timestamp", "desc")
     );
 
+    const comments = await getDocs(commentsQuery).then((snapshot) =>
+      snapshot.forEach((doc) => ({ ...doc.data(), id: doc.id }))
+    );
+
+    return comments;
+  };
+
+  const fetchTweetView = async () => {
     const posts = [];
-
-    const commentsSnapshot = await getDocs(commentsQuery);
-    await getDoc(mainTweetRef)
-      .then((doc) => posts.push({ ...doc.data(), id: doc.id }))
-      .then(() => {
-        commentsSnapshot.forEach((doc) => {
-          posts.push({ ...doc.data(), id: doc.id });
-        });
-      });
-
+    const mainTweet = await fetchMainTweet();
+    const comments = await fetchCommentFeed();
+    posts.push([mainTweet, ...comments]);
     props.setPosts(posts);
   };
 
-  // Set the parent tweet
   useEffect(() => {
-    // Fetch posts for the view
     fetchTweetView();
   }, [params.postId]);
 
