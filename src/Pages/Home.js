@@ -58,6 +58,9 @@ const Home = (props) => {
               post={post.origDoc}
               liked={props.checkLiked(post.origPostId)}
               retweeted={props.checkRetweeted(post.origPostId)}
+              retweetCount={post.origDoc.retweetCount}
+              commentCount={post.origDoc.commentCount}
+              likeCount={post.origDoc.likeCount}
               handleLike={props.handleLike}
               handleReply={props.handleReply}
               postMessage={props.postMessage}

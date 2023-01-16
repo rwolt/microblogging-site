@@ -3,14 +3,19 @@ import { FaRetweet } from "react-icons/fa";
 import { Flex } from "./styled/Flex.styled";
 import { v4 as uuidv4 } from "uuid";
 import PostCard from "./PostCard";
+import { AiFillPropertySafety } from "react-icons/ai";
 
 const RePost = ({
   post,
   retweetDisplayName,
   liked,
   retweeted,
+  retweetCount,
+  likeCount,
+  commentCount,
   handleLike,
   handleReply,
+  postMessage,
 }) => {
   return (
     <div>
@@ -28,9 +33,12 @@ const RePost = ({
         message={post.message}
         liked={liked}
         retweeted={retweeted}
-        likeCount={post.likeCount}
+        likeCount={likeCount}
+        commentCount={commentCount}
+        retweetCount={retweetCount}
         handleLike={handleLike}
         handleReply={handleReply}
+        postMessage={postMessage}
       />
     </div>
   );
