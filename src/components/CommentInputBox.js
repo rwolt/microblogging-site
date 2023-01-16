@@ -20,8 +20,13 @@ const CommentInputBox = (props) => {
         <Button
           id="comment"
           onClick={async (e) => {
-            await props.postMessage(e, message, "comment", props.post);
-            // await props.fetchTweetView();
+            const comment = await props.postMessage(
+              e,
+              message,
+              "comment",
+              props.post
+            );
+            props.setPosts(props.posts.splice(1, 0, comment));
             setMessage("");
           }}
         >

@@ -27,7 +27,6 @@ const Tweet = (props) => {
       ...doc.data(),
       id: doc.id,
     }));
-
     return mainTweet;
   };
 
@@ -39,23 +38,22 @@ const Tweet = (props) => {
       orderBy("timestamp", "desc")
     );
 
-    const comments = await getDocs(commentsQuery).then((snapshot) =>
-      snapshot.forEach((doc) => ({ ...doc.data(), id: doc.id }))
+    const commentsSnapshot = await getDocs(commentsQuery);
+    console.log(commentsSnapshot);
+    const comments = [];
+    commentsSnapshot.forEach((doc) =>
+      comments.push({ ...doc.data(), id: doc.id })
     );
-
     return comments;
   };
 
-  const fetchTweetView = async () => {
-    const posts = [];
-    const mainTweet = await fetchMainTweet();
-    const comments = await fetchCommentFeed();
-    posts.push([mainTweet, ...comments]);
-    props.setPosts(posts);
-  };
-
   useEffect(() => {
-    fetchTweetView();
+    const fetchData = async () => {
+      const mainTweet = await fetchMainTweet();
+      const comments = await fetchCommentFeed();
+      props.setPosts([mainTweet, ...comments]);
+    };
+    fetchData().catch((err) => console.error(err));
   }, [params.postId]);
 
   return (
@@ -96,9 +94,10 @@ const Tweet = (props) => {
           user={props.user}
           handleReply={props.handleReply}
           post={props.posts[0]}
+          posts={props.posts}
+          setPosts={props.setPosts}
           postMessage={props.postMessage}
           getMessages={props.getMessages}
-          fetchTweetView={fetchTweetView}
         />
       ) : (
         ""
