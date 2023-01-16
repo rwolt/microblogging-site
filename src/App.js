@@ -12,7 +12,7 @@ import {
   orderBy,
   where,
   limit,
-  setDoc, 
+  setDoc,
 } from "firebase/firestore";
 import { db, storage, auth } from "./utils/firebase";
 import {
@@ -73,12 +73,11 @@ function App() {
   const handleLogout = async () => {
     await signOut(auth);
   };
-  
 
   // Register new user
   const handleRegister = async (e, userObject) => {
     e.preventDefault();
-  // If a new account is created, the user is signed in automatically
+    // If a new account is created, the user is signed in automatically
     try {
       await createUserWithEmailAndPassword(
         auth,
@@ -93,7 +92,7 @@ function App() {
       console.error(error.message);
     }
   };
-  
+
   // Create a document in the user collection with the specified uid
   const createUserDoc = async (uid) => {
     await setDoc(doc(db, "users", `${uid}`), {
@@ -121,7 +120,6 @@ function App() {
     const userDocSnap = await getDoc(userDocRef);
     return userDocSnap.data();
   };
-  
 
   // Check if there is a document in the users collection for the authenticated user
   const checkUserDoc = async () => {
@@ -222,8 +220,11 @@ function App() {
         // Update comments in UI
         await getDoc(messageDoc).then((doc) => {
           const newComment = { ...doc.data(), id: doc.id };
-          setPosts(posts.splice(1, 0, newComment));
+          const newPosts = posts.slice();
+          newPosts.splice(1, 0, newComment);
+          setPosts(newPosts);
         });
+
         // Calculate new comment count
         let newCommentCount;
         await getDoc(doc(db, "posts", post.id)).then((doc) => {
@@ -233,7 +234,6 @@ function App() {
         updateUserInteractions(post.id, "comment", newCommentCount);
         break;
     }
-    return messageDoc;
   };
 
   const checkLiked = (postId) => {
@@ -384,7 +384,7 @@ function App() {
       // Otherwise, add the postId to the user doc's 'liked' map & increase the likes count on the post doc by 1
       newLikes = [...currentUser.likes, post.id];
       setCurrentUser({ ...currentUser, likes: newLikes });
-      // Update the count in local state 
+      // Update the count in local state
       newCount = post.likeCount + 1;
       setPosts(
         posts.map((item) =>

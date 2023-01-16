@@ -39,11 +39,12 @@ const Tweet = (props) => {
     );
 
     const commentsSnapshot = await getDocs(commentsQuery);
-    console.log(commentsSnapshot);
+
     const comments = [];
     commentsSnapshot.forEach((doc) =>
       comments.push({ ...doc.data(), id: doc.id })
     );
+
     return comments;
   };
 

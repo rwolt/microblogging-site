@@ -26,7 +26,7 @@ const CommentInputBox = (props) => {
               "comment",
               props.post
             );
-            props.setPosts(props.posts.splice(1, 0, comment));
+            // props.setPosts(props.posts.splice(1, 0, comment));
             setMessage("");
           }}
         >
