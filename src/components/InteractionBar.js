@@ -29,7 +29,6 @@ const InteractionBar = (props) => {
         onClick={async (e) => {
           e.stopPropagation();
           await props.handleLike(props.post);
-          // .then(props.getMessages());
         }}
       >
         {props.liked ? <FaHeart /> : <FaRegHeart />}

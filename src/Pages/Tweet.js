@@ -98,7 +98,6 @@ const Tweet = (props) => {
           posts={props.posts}
           setPosts={props.setPosts}
           postMessage={props.postMessage}
-          getMessages={props.getMessages}
         />
       ) : (
         ""

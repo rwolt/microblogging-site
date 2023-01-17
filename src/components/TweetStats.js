@@ -6,7 +6,7 @@ import { StyledTweetStats } from "./styled/TweetStats.styled";
 const TweetStats = ({ commentCount, retweetCount, likeCount }) => {
   return (
     <>
-      {retweetCount > 0 || likeCount > 0 ? (
+      {retweetCount > 0 || likeCount > 0 || commentCount > 0 ? (
         <StyledTweetStats>
           <span className="counter">{commentCount}</span>
           <span>{commentCount === 1 ? "Comment" : "Comments"}</span>
