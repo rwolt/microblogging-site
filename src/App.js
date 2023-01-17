@@ -30,6 +30,7 @@ import GlobalStyles from "./components/styled/Global";
 import Home from "./Pages/Home";
 import Profile from "./Pages/Profile";
 import Tweet from "./Pages/Tweet";
+import { AiFillPropertySafety } from "react-icons/ai";
 
 const theme = {};
 
@@ -141,7 +142,6 @@ function App() {
   const updateUserInteractions = (postId, type, newCount, newArray) => {
     const postRef = doc(db, "posts", postId);
     const userRef = doc(db, "users", currentUser.uid);
-
     switch (type) {
       case "like":
         updateDoc(userRef, { likes: newArray });
@@ -217,19 +217,27 @@ function App() {
           message: message,
           timestamp: serverTimestamp(),
         });
-        // Update comments in UI
-        await getDoc(messageDoc).then((doc) => {
-          const newComment = { ...doc.data(), id: doc.id };
-          const newPosts = posts.slice();
-          newPosts.splice(1, 0, newComment);
-          setPosts(newPosts);
-        });
 
         // Calculate new comment count
         let newCommentCount;
         await getDoc(doc(db, "posts", post.id)).then((doc) => {
           newCommentCount = doc.data().commentCount + 1;
         });
+
+        // Update comments in UI
+        await getDoc(messageDoc).then((doc) => {
+          const newComment = { ...doc.data(), id: doc.id };
+          const newPosts = posts.slice();
+          newPosts.splice(1, 0, newComment);
+          setPosts(
+            newPosts.map((item) =>
+              item.id === post.id
+                ? { ...item, commentCount: newCommentCount }
+                : item
+            )
+          );
+        });
+
         // Update Comments on the server
         updateUserInteractions(post.id, "comment", newCommentCount);
         break;
@@ -367,6 +375,36 @@ function App() {
   };
 
   const handleLike = async (post) => {
+    let newCount, newLikes;
+    //Check if the post is already liked
+    if (checkLiked(post.id)) {
+      newLikes = currentUser.likes.filter((item) => item !== post.id);
+      newCount = post.likeCount - 1;
+    } else if (currentUser && !checkLiked(post.id)) {
+      // Otherwise, add the postId to the user doc's 'liked' map & increase the likes count on the post doc by 1
+      newLikes = [...currentUser.likes, post.id];
+      newCount = post.likeCount + 1;
+    }
+    // Update the firestore doc
+    await updateUserInteractions(post.id, "like", newCount, newLikes);
+
+    // Update the count in local state
+    setCurrentUser({ ...currentUser, likes: newLikes });
+    setPosts(
+      posts.map((item) => {
+        if (item.id === post.id) {
+          return { ...item, likeCount: newCount };
+        } else if (item.origPostId === post.id) {
+          const updatedDoc = { ...item.origDoc, likeCount: newCount };
+          return { ...item, origDoc: { ...updatedDoc } };
+        } else {
+          return item;
+        }
+      })
+    );
+  };
+
+  const handleComment = async (post) => {
     let newCount, newLikes;
     //Check if the post is already liked
     if (checkLiked(post.id)) {

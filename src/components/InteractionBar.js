@@ -9,7 +9,7 @@ const InteractionBar = (props) => {
     <StyledInteractionBar>
       <InteractionIcon id="comment">
         <FaRegComment />
-        <p>{props.commentCount}</p>
+        <p>{props.commentCount > 0 ? props.commentCount : ""}</p>
       </InteractionIcon>
       <InteractionIcon
         retweeted={props.retweeted}
