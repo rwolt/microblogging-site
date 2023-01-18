@@ -29,7 +29,7 @@ const Home = (props) => {
       {props.user ? (
         <PostInputBox
           user={props.user}
-          postMessage={props.postMessage}
+          handlePost={props.handlePost}
           getHomeFeed={props.getHomeFeed}
           setPosts={props.setPosts}
         />
@@ -63,8 +63,6 @@ const Home = (props) => {
               likeCount={post.origDoc.likeCount}
               handleLike={props.handleLike}
               handleReply={props.handleReply}
-              postMessage={props.postMessage}
-              getMessages={getMessages}
             />
           );
         } else {
@@ -85,9 +83,6 @@ const Home = (props) => {
               retweeted={props.checkRetweeted(post.id)}
               handleLike={props.handleLike}
               handleReply={props.handleReply}
-              postMessage={props.postMessage}
-              getMessages={getMessages}
-              setPosts={props.setPosts}
             />
           );
         }
