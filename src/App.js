@@ -370,7 +370,8 @@ function App() {
 
     const sorted = await Promise.all([getPosts, getUpdatedReposts]).then(
       ([posts, reposts]) => {
-        return [...posts, ...reposts];
+        const feed = [...posts, ...reposts];
+        return feed.sort((a, b) => a.timestamp.seconds < b.timestamp.seconds);
       }
     );
 
