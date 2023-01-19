@@ -38,11 +38,12 @@ const PostCard = ({
   message,
   post,
   liked,
-  retweeted,
+  reposted,
   likeCount,
-  retweetCount,
+  repostCount,
   commentCount,
   handleLike,
+  handleReply,
   postMessage,
   setPosts,
   getMessages,
@@ -89,11 +90,12 @@ const PostCard = ({
         <InteractionBar
           post={post}
           liked={liked}
-          retweeted={retweeted}
+          reposted={reposted}
           likeCount={likeCount}
-          retweetCount={retweetCount}
+          repostCount={repostCount}
           commentCount={commentCount}
           handleLike={handleLike}
+          handleReply={handleReply}
           postMessage={postMessage}
           setPosts={setPosts}
           getMessages={getMessages}

@@ -49,7 +49,7 @@ const Home = (props) => {
       )}
 
       {props.posts.map((post) => {
-        if (post.type === "retweet") {
+        if (post.type === "repost") {
           return (
             <RePost
               key={uuidv4()}
@@ -57,8 +57,8 @@ const Home = (props) => {
               retweetDisplayName={post.displayName}
               post={post.origDoc}
               liked={props.checkLiked(post.origPostId)}
-              retweeted={props.checkRetweeted(post.origPostId)}
-              retweetCount={post.origDoc.retweetCount}
+              reposted={props.checkReposted(post.origPostId)}
+              repostCount={post.origDoc.repostCount}
               commentCount={post.origDoc.commentCount}
               likeCount={post.origDoc.likeCount}
               handleLike={props.handleLike}
@@ -77,10 +77,10 @@ const Home = (props) => {
               timestamp={post.timestamp}
               message={post.message}
               likeCount={post.likeCount}
-              retweetCount={post.retweetCount}
+              repostCount={post.repostCount}
               commentCount={post.commentCount}
               liked={props.checkLiked(post.id)}
-              retweeted={props.checkRetweeted(post.id)}
+              reposted={props.checkReposted(post.id)}
               handleLike={props.handleLike}
               handleReply={props.handleReply}
             />

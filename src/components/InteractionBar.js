@@ -1,10 +1,12 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import { AiOutlineRetweet, AiOutlineStar, AiFillStar } from "react-icons/ai";
 import { FaRegComment, FaRetweet, FaHeart, FaRegHeart } from "react-icons/fa";
 import { InteractionIcon } from "./styled/InteractionIcon.styled";
 import { StyledInteractionBar } from "./styled/StyledInteractionBar.styled";
 
 const InteractionBar = (props) => {
+  const location = useLocation();
   return (
     <StyledInteractionBar>
       <InteractionIcon id="comment">
@@ -12,16 +14,15 @@ const InteractionBar = (props) => {
         <p>{props.commentCount > 0 ? props.commentCount : ""}</p>
       </InteractionIcon>
       <InteractionIcon
-        retweeted={props.retweeted}
+        reposted={props.reposted}
         id="retweet"
         onClick={async (e) => {
           e.stopPropagation();
-          await props.postMessage(e, null, "retweet", props.post);
-          await props.getMessages();
+          props.handleReply(e, "repost", null, props.post, location.pathname);
         }}
       >
         <FaRetweet />
-        <p>{props.post.retweetCount > 0 ? props.retweetCount : ""}</p>
+        <p>{props.post.repostCount > 0 ? props.repostCount : ""}</p>
       </InteractionIcon>
       <InteractionIcon
         liked={props.liked}

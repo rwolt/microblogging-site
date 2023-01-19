@@ -15,7 +15,7 @@ export const InteractionIcon = styled.div`
   }
 
   &#retweet {
-    color: ${({ retweeted }) => (retweeted ? "#289d8c" : "#000")};
+    color: ${({ reposted }) => (reposted ? "#289d8c" : "#000")};
   }
 
   &#like {

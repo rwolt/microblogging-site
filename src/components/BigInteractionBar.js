@@ -10,13 +10,13 @@ const BigInteractionBar = (props) => {
         <FaRegComment className="big-icon" />
       </BigInteractionIcon>
       <BigInteractionIcon
-        id="retweet"
+        id="repost"
         onClick={(e) => {
           e.stopPropagation();
-          props.postMessage(e, null, "retweet", props.post);
+          props.postMessage(e, null, "repost", props.post);
         }}
       >
-        {props.retweeted ? (
+        {props.reposted ? (
           <FaRetweet className="big-icon" style={{ color: "#289d8c" }} />
         ) : (
           <FaRetweet className="big-icon" />

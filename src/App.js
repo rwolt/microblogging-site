@@ -102,7 +102,8 @@ function App() {
       photoURL: auth.currentUser.photoURL,
       dateJoined: serverTimestamp(),
       likes: [],
-      retweets: [],
+      reposts: [],
+      comments: [],
     });
   };
 
@@ -147,14 +148,99 @@ function App() {
     });
   };
 
-  const handleReply = (e, type, message, post, view) => {};
+  const handleReply = async (e, type, message, post, view) => {
+    //Post a message
+    const postRef = await postMessage(e, type, message, post);
+    const postSnap = await getDoc(postRef);
+    const postDoc = { id: postSnap.id, ...postSnap.data() };
+    //Calculate new counts
+    const [newCount, newArray] = await updateCounts(post, 1);
+    console.log(newCount, newArray);
+    //Set the feed state
+    addPostToFeed(postDoc, view);
+    //Update counts and array on firestore
+    updateUserInteractions(post.id, type, newCount, newArray);
+  };
+
+  const postMessage = async (e, type, message, post) => {
+    let messageDocRef = null;
+    switch (type) {
+      case "post":
+        messageDocRef = await addDoc(collection(db, "posts"), {
+          user: currentUser.uid,
+          displayName: currentUser.name,
+          profilePicURL: currentUser.photoURL,
+          timestamp: serverTimestamp(),
+          message: message,
+          likeCount: 0,
+          repostCount: 0,
+          commentCount: 0,
+          type: "post",
+        });
+        break;
+
+      case "repost":
+        // Create a new doc for the retweet, with id of original post
+        messageDocRef = await addDoc(collection(db, "posts"), {
+          user: currentUser.uid,
+          displayName: currentUser.name,
+          type: "repost",
+          timestamp: serverTimestamp(),
+          origPostId: post.id,
+        });
+        break;
+
+      case "comment":
+        messageDocRef = await addDoc(collection(db, "posts"), {
+          user: currentUser.uid,
+          displayName: currentUser.name,
+          profilePicURL: currentUser.photoURL,
+          likeCount: 0,
+          repostCount: 0,
+          commentCount: 0,
+          type: "comment",
+          origPostId: post.id,
+          origPostUser: post.user,
+          origPostDisplayName: post.displayName,
+          message: message,
+          timestamp: serverTimestamp(),
+        });
+        break;
+    }
+    return messageDocRef;
+  };
+
+  const updateCounts = async (post, operation) => {
+    let newReplies;
+    let newCount;
+    console.log(post);
+    switch (operation) {
+      case 1:
+        console.log("case 1");
+        newReplies = [...currentUser.reposts, post.id];
+        newCount = post.repostCount + 1;
+        break;
+      case -1:
+        newReplies = currentUser.reposts.filter((id) => id !== post.id);
+        newCount = post.repostCount - 1;
+        break;
+    }
+
+    setCurrentUser({ ...currentUser, reposts: newReplies });
+    setPosts(
+      posts.map((item) =>
+        item.id === post.id ? { ...item, repostCount: newCount } : item
+      )
+    );
+
+    return [newCount, newReplies];
+  };
 
   const addPostToFeed = (post, view) => {
     const type = post.type;
     const newPosts = posts.slice();
     if ((type === "post" || type === "repost") && view === "/") {
       newPosts.splice(0, 0, post);
-      console.log(newPosts);
       setPosts(newPosts);
     } else if (type === "comment" && view === "/posts") {
       setPosts(newPosts.splice(1, 0, post));
@@ -200,111 +286,15 @@ function App() {
         updateDoc(userRef, { likes: newArray });
         updateDoc(postRef, { likeCount: newCount });
         break;
-      case "retweet":
-        updateDoc(userRef, { retweets: newArray });
-        updateDoc(postRef, { retweetCount: newCount });
+      case "repost":
+        updateDoc(userRef, { reposts: newArray });
+        updateDoc(postRef, { repostCount: newCount });
         break;
       case "comment":
         updateDoc(postRef, { commentCount: newCount });
         break;
     }
   };
-
-  // Post a tweet, comment, or retweet to firestore
-  const postMessage = async (e, type, message, post) => {
-    let messageDocRef = null;
-    switch (type) {
-      case "post":
-        messageDocRef = await addDoc(collection(db, "posts"), {
-          user: currentUser.uid,
-          displayName: currentUser.name,
-          profilePicURL: currentUser.photoURL,
-          timestamp: serverTimestamp(),
-          message: message,
-          likeCount: 0,
-          retweetCount: 0,
-          commentCount: 0,
-          type: "post",
-        });
-        break;
-
-      case "retweet":
-        // Create a new doc for the retweet, with id of original post
-        messageDocRef = await addDoc(collection(db, "posts"), {
-          user: currentUser.uid,
-          displayName: currentUser.name,
-          type: "retweet",
-          timestamp: serverTimestamp(),
-          origPostId: post.id,
-        });
-        break;
-
-      case "comment":
-        messageDocRef = await addDoc(collection(db, "posts"), {
-          user: currentUser.uid,
-          displayName: currentUser.name,
-          profilePicURL: currentUser.photoURL,
-          likeCount: 0,
-          retweetCount: 0,
-          commentCount: 0,
-          type: "comment",
-          origPostId: post.id,
-          origPostUser: post.user,
-          origPostDisplayName: post.displayName,
-          message: message,
-          timestamp: serverTimestamp(),
-        });
-        break;
-    }
-    return messageDocRef;
-  };
-  // // Calculate new comment count
-  // let newCommentCount;
-  // await getDoc(doc(db, "posts", post.id)).then((doc) => {
-  //   newCommentCount = doc.data().commentCount + 1;
-  // });
-
-  // // Update comments in UI
-  // await getDoc(messageDoc).then((doc) => {
-  //   const newComment = { ...doc.data(), id: doc.id };
-  //   const newPosts = posts.slice();
-  //   newPosts.splice(1, 0, newComment);
-  //   setPosts(
-  //     newPosts.map((item) =>
-  //       item.id === post.id
-  //         ? { ...item, commentCount: newCommentCount }
-  //         : item
-  //     )
-  //   );
-  // });
-  //
-  //    // Update retweets array in local state
-  //     let newRetweets = [...currentUser.retweets, post.id];
-  //     let newRetweetCount;
-  //     await getDoc(doc(db, "posts", post.id)).then((doc) => {
-  //       newRetweetCount = doc.data().retweetCount + 1;
-  //     });
-
-  //     setCurrentUser({ ...currentUser, retweets: newRetweets });
-  //     setPosts(
-  //       posts.map((item) =>
-  //         item.id === post.id
-  //           ? { ...item, retweetCount: newRetweetCount }
-  //           : item
-  //       )
-  //     );
-
-  //     // Update retweets and retweet count on the server
-  //     updateUserInteractions(
-  //       post.id,
-  //       "retweet",
-  //       newRetweetCount,
-  //       newRetweets
-  //     );
-  //     // Update Comments on the server
-  //     updateUserInteractions(post.id, "comment", newCommentCount);
-  //     break;
-  // }
 
   const checkLiked = (postId) => {
     if (currentUser && currentUser.likes.includes(postId)) {
@@ -314,8 +304,8 @@ function App() {
     }
   };
 
-  const checkRetweeted = (postId) => {
-    if (currentUser && currentUser.retweets.includes(postId)) {
+  const checkReposted = (postId) => {
+    if (currentUser && currentUser.reposts.includes(postId)) {
       return true;
     } else {
       return false;
@@ -324,46 +314,46 @@ function App() {
 
   // Get posts for the Home view
   const getHomeFeed = async () => {
-    const tweetQuery = query(
+    const postQuery = query(
       collection(db, "posts"),
       where("type", "==", "post"),
       orderBy("timestamp", "desc"),
       limit(10)
     );
-    const retweetQuery = query(
+    const repostQuery = query(
       collection(db, "posts"),
-      where("type", "==", "retweet"),
+      where("type", "==", "repost"),
       orderBy("timestamp", "desc"),
       limit(10)
     );
-    const getTweets = new Promise(async (resolve, reject) => {
+    const getPosts = new Promise(async (resolve, reject) => {
       const posts = [];
-      const snapshot = await getDocs(tweetQuery);
+      const snapshot = await getDocs(postQuery);
       snapshot.docs.forEach((doc) => posts.push({ ...doc.data(), id: doc.id }));
       resolve(posts);
     });
 
-    const getRetweets = new Promise(async (resolve, reject) => {
+    const getReposts = new Promise(async (resolve, reject) => {
       const posts = [];
-      const snapshot = await getDocs(retweetQuery);
+      const snapshot = await getDocs(repostQuery);
       snapshot.docs.forEach((doc) => posts.push({ ...doc.data(), id: doc.id }));
       resolve(posts);
     });
 
-    const fetchOriginalDoc = (retweet) => {
+    const fetchOriginalDoc = (repost) => {
       return new Promise(async (resolve, reject) => {
-        const original = await getDoc(doc(db, "posts", retweet.origPostId));
+        const original = await getDoc(doc(db, "posts", repost.origPostId));
         resolve(original.data());
       });
     };
 
-    const fetchOriginalDocs = (retweets) => {
+    const fetchOriginalDocs = (reposts) => {
       return new Promise(async (resolve, reject) => {
         const posts = [];
         let i = 0;
-        while (i < retweets.length) {
-          await fetchOriginalDoc(retweets[i]).then((doc) => {
-            posts.push({ ...retweets[i], origDoc: doc });
+        while (i < reposts.length) {
+          await fetchOriginalDoc(reposts[i]).then((doc) => {
+            posts.push({ ...reposts[i], origDoc: doc });
           });
           i++;
         }
@@ -371,16 +361,16 @@ function App() {
       });
     };
 
-    const getUpdatedRetweets = new Promise(async (resolve, reject) => {
-      const updated = await getRetweets.then((retweets) =>
-        fetchOriginalDocs(retweets)
+    const getUpdatedReposts = new Promise(async (resolve, reject) => {
+      const updated = await getReposts.then((reposts) =>
+        fetchOriginalDocs(reposts)
       );
       resolve(updated);
     });
 
-    const sorted = await Promise.all([getTweets, getUpdatedRetweets]).then(
-      ([posts, retweets]) => {
-        return [...posts, ...retweets];
+    const sorted = await Promise.all([getPosts, getUpdatedReposts]).then(
+      ([posts, reposts]) => {
+        return [...posts, ...reposts];
       }
     );
 
@@ -470,8 +460,9 @@ function App() {
                   getHomeFeed={getHomeFeed}
                   handleLike={handleLike}
                   handlePost={handlePost}
+                  handleReply={handleReply}
                   checkLiked={checkLiked}
-                  checkRetweeted={checkRetweeted}
+                  checkReposted={checkReposted}
                 />
               }
             />
@@ -491,9 +482,10 @@ function App() {
                   handleLogin={handleLogin}
                   handleRegister={handleRegister}
                   handleLogout={handleLogout}
+                  handleReply={handleReply}
                   postMessage={postMessage}
                   checkLiked={checkLiked}
-                  checkRetweeted={checkRetweeted}
+                  checkReposted={checkReposted}
                 />
               }
             />
@@ -508,6 +500,7 @@ function App() {
                   handleLogin={handleLogin}
                   handleLogout={handleLogout}
                   handleLike={handleLike}
+                  handleReply={handleReply}
                   showPopup={showPopup}
                   setShowPopup={setShowPopup}
                   showRegisterForm={showRegisterForm}
@@ -515,7 +508,7 @@ function App() {
                   handleRegister={handleRegister}
                   postMessage={postMessage}
                   checkLiked={checkLiked}
-                  checkRetweeted={checkRetweeted}
+                  checkReposted={checkReposted}
                 />
               }
             />

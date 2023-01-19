@@ -44,7 +44,7 @@ const Profile = (props) => {
         posts={props.posts}
         setPosts={props.setPosts}
         checkLiked={props.checkLiked}
-        checkRetweeted={props.checkRetweeted}
+        checkReposted={props.checkReposted}
         handleLike={props.handleLike}
         handleReply={props.handleReply}
       />
