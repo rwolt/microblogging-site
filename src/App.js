@@ -155,7 +155,6 @@ function App() {
     const postDoc = { id: postSnap.id, ...postSnap.data() };
     //Calculate new counts
     const [newCount, newArray] = await updateCounts(post, 1);
-    console.log(newCount, newArray);
     //Set the feed state
     addPostToFeed(postDoc, view);
     //Update counts and array on firestore
@@ -187,6 +186,7 @@ function App() {
           type: "repost",
           timestamp: serverTimestamp(),
           origPostId: post.id,
+          origDoc: post,
         });
         break;
 
@@ -340,35 +340,35 @@ function App() {
       resolve(posts);
     });
 
-    const fetchOriginalDoc = (repost) => {
-      return new Promise(async (resolve, reject) => {
-        const original = await getDoc(doc(db, "posts", repost.origPostId));
-        resolve(original.data());
-      });
-    };
+    // const fetchOriginalDoc = (repost) => {
+    //   return new Promise(async (resolve, reject) => {
+    //     const original = await getDoc(doc(db, "posts", repost.origPostId));
+    //     resolve(original.data());
+    //   });
+    // };
 
-    const fetchOriginalDocs = (reposts) => {
-      return new Promise(async (resolve, reject) => {
-        const posts = [];
-        let i = 0;
-        while (i < reposts.length) {
-          await fetchOriginalDoc(reposts[i]).then((doc) => {
-            posts.push({ ...reposts[i], origDoc: doc });
-          });
-          i++;
-        }
-        resolve(posts);
-      });
-    };
+    // const fetchOriginalDocs = (reposts) => {
+    //   return new Promise(async (resolve, reject) => {
+    //     const posts = [];
+    //     let i = 0;
+    //     while (i < reposts.length) {
+    //       await fetchOriginalDoc(reposts[i]).then((doc) => {
+    //         posts.push({ ...reposts[i], origDoc: doc });
+    //       });
+    //       i++;
+    //     }
+    //     resolve(posts);
+    //   });
+    // };
 
-    const getUpdatedReposts = new Promise(async (resolve, reject) => {
-      const updated = await getReposts.then((reposts) =>
-        fetchOriginalDocs(reposts)
-      );
-      resolve(updated);
-    });
+    // const getUpdatedReposts = new Promise(async (resolve, reject) => {
+    //   const updated = await getReposts.then((reposts) =>
+    //     fetchOriginalDocs(reposts)
+    //   );
+    //   resolve(updated);
+    // });
 
-    const sorted = await Promise.all([getPosts, getUpdatedReposts]).then(
+    const sorted = await Promise.all([getPosts, getReposts]).then(
       ([posts, reposts]) => {
         const feed = [...posts, ...reposts];
         return feed.sort((a, b) => a.timestamp.seconds < b.timestamp.seconds);
