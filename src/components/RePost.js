@@ -9,8 +9,8 @@ const RePost = ({
   post,
   retweetDisplayName,
   liked,
-  retweeted,
-  retweetCount,
+  reposted,
+  repostCount,
   likeCount,
   commentCount,
   handleLike,
@@ -32,10 +32,10 @@ const RePost = ({
         timestamp={post.timestamp}
         message={post.message}
         liked={liked}
-        retweeted={retweeted}
+        reposted={reposted}
         likeCount={likeCount}
         commentCount={commentCount}
-        retweetCount={retweetCount}
+        repostCount={repostCount}
         handleLike={handleLike}
         handleReply={handleReply}
         postMessage={postMessage}

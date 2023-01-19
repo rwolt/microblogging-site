@@ -154,9 +154,28 @@ function App() {
     const postSnap = await getDoc(postRef);
     const postDoc = { id: postSnap.id, ...postSnap.data() };
     //Calculate new counts
-    const [newCount, newArray] = await updateCounts(post, 1);
+    let newCount = [];
+    let newArray = [];
+    switch (type) {
+      case "repost":
+        if (checkReposted(post.id)) {
+          [newCount, newArray] = await calculateCountAndReplies(post, type, -1);
+        } else {
+          [newCount, newArray] = await calculateCountAndReplies(post, type, 1);
+        }
+        break;
+
+      case "comment":
+        if (checkReposted(post.id)) {
+          [newCount, newArray] = await calculateCountAndReplies(post, type, -1);
+        } else {
+          [newCount, newArray] = await calculateCountAndReplies(post, type, 1);
+        }
+        break;
+    }
+    updateLocalCountAndReplies(post, type, newCount, newArray);
     //Set the feed state
-    addPostToFeed(postDoc, view);
+    // addPostToFeed(postDoc, view);
     //Update counts and array on firestore
     updateUserInteractions(post.id, type, newCount, newArray);
   };
@@ -210,30 +229,63 @@ function App() {
     return messageDocRef;
   };
 
-  const updateCounts = async (post, operation) => {
+  const calculateCountAndReplies = (post, type, operation) => {
     let newReplies;
     let newCount;
-    console.log(post);
-    switch (operation) {
-      case 1:
-        console.log("case 1");
-        newReplies = [...currentUser.reposts, post.id];
-        newCount = post.repostCount + 1;
+    switch (type) {
+      case "repost":
+        if (operation === 1) {
+          newReplies = [...currentUser.reposts, post.id];
+          newCount = post.repostCount + 1;
+        } else if (operation === -1) {
+          newReplies = currentUser.reposts.filter(
+            (item) => item.id !== post.id
+          );
+          newCount = post.repostCount - 1;
+        } else {
+          console.error(`Invalid operation ${operation}`);
+        }
         break;
-      case -1:
-        newReplies = currentUser.reposts.filter((id) => id !== post.id);
-        newCount = post.repostCount - 1;
+      case "comment":
+        if (operation === 1) {
+          newReplies = [...currentUser.comments, post.id];
+          newCount = post.commentCount + 1;
+        } else if (operation === -1) {
+          newReplies = currentUser.comments.filter(
+            (item) => item.id !== post.id
+          );
+          newCount = post.commentCount - 1;
+        } else {
+          console.error(`Invalid operation ${operation}`);
+        }
+        break;
+      default:
+        console.error(`Invalid type ${type}`);
+    }
+    return [newCount, newReplies];
+  };
+
+  const updateLocalCountAndReplies = (post, type, newCount, newReplies) => {
+    console.log(newCount);
+    console.log(post.id);
+    switch (type) {
+      case "repost":
+        setCurrentUser({ ...currentUser, reposts: newReplies });
+        const newPosts = posts.map((item) =>
+          item.id === post.id ? { ...item, repostCount: newCount } : item
+        );
+        console.log(newPosts);
+        setPosts(newPosts);
+        break;
+      case "comment":
+        setCurrentUser({ ...currentUser, comments: newReplies });
+        setPosts(
+          posts.map((item) =>
+            item.id === post.id ? { ...item, commentCount: newCount } : item
+          )
+        );
         break;
     }
-
-    setCurrentUser({ ...currentUser, reposts: newReplies });
-    setPosts(
-      posts.map((item) =>
-        item.id === post.id ? { ...item, repostCount: newCount } : item
-      )
-    );
-
-    return [newCount, newReplies];
   };
 
   const addPostToFeed = (post, view) => {
