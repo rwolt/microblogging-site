@@ -144,26 +144,38 @@ function App() {
     //Set the new feed
     const postSnap = await getDoc(postRef);
     const postDoc = { id: postSnap.id, ...postSnap.data() };
-    console.log(postDoc);
     const newPosts = await addPostToFeed(posts, postDoc, view);
-    console.log(newPosts);
     setPosts([...newPosts]);
   };
 
   const handleReply = async (e, type, message, post, view) => {
-    //Post a message
-    const postRef = await postMessage(e, type, message, post);
-    const postSnap = await getDoc(postRef);
-    const postDoc = { id: postSnap.id, ...postSnap.data() };
     //Calculate new counts
     let newCount = [];
     let newArray = [];
+    let newPosts = [];
+    let postDoc = [];
     switch (type) {
       case "repost":
         if (checkReposted(post.id)) {
           [newCount, newArray] = await calculateCountAndReplies(post, type, -1);
+          const postDoc = posts.find(
+            (item) =>
+              item.origPostId === post.id && post.user === currentUser.uid
+          );
+          console.log(postDoc);
+          const docRef = doc(db, "posts", postDoc.id);
+          await deleteDoc(docRef);
+          await updateUserInteractions(post.id, type, newCount, newArray);
+          newPosts = removePostsFromFeed(posts, postDoc, view);
+          console.log(newPosts);
         } else {
           [newCount, newArray] = await calculateCountAndReplies(post, type, 1);
+          //Post a message
+          const postRef = await postMessage(e, type, message, post);
+          const postSnap = await getDoc(postRef);
+          postDoc = { id: postSnap.id, ...postSnap.data() };
+          await updateUserInteractions(post.id, type, newCount, newArray);
+          newPosts = await addPostToFeed(posts, postDoc, view);
         }
         break;
 
@@ -176,9 +188,7 @@ function App() {
         break;
     }
     // Update firestore
-    await updateUserInteractions(post.id, type, newCount, newArray);
     //Set the feed state
-    const newPosts = await addPostToFeed(posts, postDoc, view);
     updateLocalCountAndReplies(newPosts, post, type, newCount, newArray);
   };
 
@@ -199,6 +209,21 @@ function App() {
       return newPosts;
     }
   };
+
+  const removePostsFromFeed = (postsBefore, post, view) => {
+    const type = post.type;
+    // Makes a copy of whichever array is passed
+    const newPosts = postsBefore;
+    if ((type === "post" || type === "repost") && view === "/") {
+      if (type === "repost") {
+        return newPosts.filter((item) => item.id !== post.id);
+      }
+    } else if (type === "comment" && view === "/posts") {
+      setPosts(newPosts.splice(1, 0, post));
+      return newPosts;
+    }
+  };
+
   const postMessage = async (e, type, message, post) => {
     let messageDocRef = null;
     switch (type) {
@@ -256,9 +281,8 @@ function App() {
           newReplies = [...currentUser.reposts, post.id];
           newCount = post.repostCount + 1;
         } else if (operation === -1) {
-          newReplies = currentUser.reposts.filter(
-            (item) => item.id !== post.id
-          );
+          let copy = currentUser.reposts.slice();
+          newReplies = copy.filter((item) => item !== post.id);
           newCount = post.repostCount - 1;
         } else {
           console.error(`Invalid operation ${operation}`);
