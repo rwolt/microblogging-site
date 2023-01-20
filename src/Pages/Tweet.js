@@ -79,9 +79,9 @@ const Tweet = (props) => {
               replyType={item.replyType}
               message={item.message}
               liked={props.checkLiked(item.id)}
-              retweeted={props.checkRetweeted(item.id)}
+              reposted={props.checkReposted(item.id)}
               likeCount={item.likeCount}
-              retweetCount={item.retweetCount}
+              repostCount={item.repostCount}
               commentCount={item.commentCount}
               handleLike={props.handleLike}
               handleReply={props.handleReply}

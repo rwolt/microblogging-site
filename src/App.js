@@ -145,7 +145,7 @@ function App() {
     const postSnap = await getDoc(postRef);
     const postDoc = { id: postSnap.id, ...postSnap.data() };
     console.log(postDoc);
-    const newPosts = addPostToFeed(posts, postDoc, view);
+    const newPosts = await addPostToFeed(posts, postDoc, view);
     console.log(newPosts);
     setPosts([...newPosts]);
   };
@@ -175,22 +175,23 @@ function App() {
         }
         break;
     }
-
+    // Update firestore
+    await updateUserInteractions(post.id, type, newCount, newArray);
     //Set the feed state
-    const newPosts = addPostToFeed(posts, postDoc, view);
+    const newPosts = await addPostToFeed(posts, postDoc, view);
     updateLocalCountAndReplies(newPosts, post, type, newCount, newArray);
-
-    // addPostToFeed(postDoc, view);
-    //Update counts and array on firestore
-    updateUserInteractions(post.id, type, newCount, newArray);
   };
 
-  const addPostToFeed = (postsBefore, post, view) => {
+  const addPostToFeed = async (postsBefore, post, view) => {
     const type = post.type;
-    console.log(type);
     // Makes a copy of whichever array is passed
     const newPosts = postsBefore;
     if ((type === "post" || type === "repost") && view === "/") {
+      if (type === "repost") {
+        await fetchOriginalDoc(post).then((doc) => {
+          post = { ...post, origDoc: doc };
+        });
+      }
       newPosts.splice(0, 0, post);
       return newPosts;
     } else if (type === "comment" && view === "/posts") {
@@ -223,7 +224,6 @@ function App() {
           type: "repost",
           timestamp: serverTimestamp(),
           origPostId: post.id,
-          origDoc: post,
         });
         break;
 
@@ -341,20 +341,20 @@ function App() {
   };
 
   // Update documents with new counts on firestore
-  const updateUserInteractions = (postId, type, newCount, newArray) => {
+  const updateUserInteractions = async (postId, type, newCount, newArray) => {
     const postRef = doc(db, "posts", postId);
     const userRef = doc(db, "users", currentUser.uid);
     switch (type) {
       case "like":
-        updateDoc(userRef, { likes: newArray });
-        updateDoc(postRef, { likeCount: newCount });
+        await updateDoc(userRef, { likes: newArray });
+        await updateDoc(postRef, { likeCount: newCount });
         break;
       case "repost":
-        updateDoc(userRef, { reposts: newArray });
-        updateDoc(postRef, { repostCount: newCount });
+        await updateDoc(userRef, { reposts: newArray });
+        await updateDoc(postRef, { repostCount: newCount });
         break;
       case "comment":
-        updateDoc(postRef, { commentCount: newCount });
+        await updateDoc(postRef, { commentCount: newCount });
         break;
     }
   };
@@ -403,35 +403,28 @@ function App() {
       resolve(posts);
     });
 
-    // const fetchOriginalDoc = (repost) => {
-    //   return new Promise(async (resolve, reject) => {
-    //     const original = await getDoc(doc(db, "posts", repost.origPostId));
-    //     resolve(original.data());
-    //   });
-    // };
+    const fetchOriginalDocs = (reposts) => {
+      return new Promise(async (resolve, reject) => {
+        const posts = [];
+        let i = 0;
+        while (i < reposts.length) {
+          await fetchOriginalDoc(reposts[i]).then((doc) => {
+            posts.push({ ...reposts[i], origDoc: doc });
+          });
+          i++;
+        }
+        resolve(posts);
+      });
+    };
 
-    // const fetchOriginalDocs = (reposts) => {
-    //   return new Promise(async (resolve, reject) => {
-    //     const posts = [];
-    //     let i = 0;
-    //     while (i < reposts.length) {
-    //       await fetchOriginalDoc(reposts[i]).then((doc) => {
-    //         posts.push({ ...reposts[i], origDoc: doc });
-    //       });
-    //       i++;
-    //     }
-    //     resolve(posts);
-    //   });
-    // };
+    const getUpdatedReposts = new Promise(async (resolve, reject) => {
+      const updated = await getReposts.then((reposts) =>
+        fetchOriginalDocs(reposts)
+      );
+      resolve(updated);
+    });
 
-    // const getUpdatedReposts = new Promise(async (resolve, reject) => {
-    //   const updated = await getReposts.then((reposts) =>
-    //     fetchOriginalDocs(reposts)
-    //   );
-    //   resolve(updated);
-    // });
-
-    const sorted = await Promise.all([getPosts, getReposts]).then(
+    const sorted = await Promise.all([getPosts, getUpdatedReposts]).then(
       ([posts, reposts]) => {
         const feed = [...posts, ...reposts];
         return feed.sort((a, b) => a.timestamp.seconds < b.timestamp.seconds);
@@ -439,6 +432,13 @@ function App() {
     );
 
     return sorted;
+  };
+
+  const fetchOriginalDoc = (repost) => {
+    return new Promise(async (resolve, reject) => {
+      const original = await getDoc(doc(db, "posts", repost.origPostId));
+      resolve({ id: original.id, ...original.data() });
+    });
   };
 
   const getProfilePosts = async (feedType, userId) => {
