@@ -142,10 +142,12 @@ function App() {
   const handlePost = async (e, type, message, view) => {
     const postRef = await postMessage(e, type, message);
     //Set the new feed
-    await getDoc(postRef).then((doc) => {
-      const postDoc = { id: doc.id, ...doc.data() };
-      addPostToFeed(postDoc, view);
-    });
+    const postSnap = await getDoc(postRef);
+    const postDoc = { id: postSnap.id, ...postSnap.data() };
+    console.log(postDoc);
+    const newPosts = addPostToFeed(posts, postDoc, view);
+    console.log(newPosts);
+    setPosts([...newPosts]);
   };
 
   const handleReply = async (e, type, message, post, view) => {
@@ -173,13 +175,29 @@ function App() {
         }
         break;
     }
-    updateLocalCountAndReplies(post, type, newCount, newArray);
+
     //Set the feed state
+    const newPosts = addPostToFeed(posts, postDoc, view);
+    updateLocalCountAndReplies(newPosts, post, type, newCount, newArray);
+
     // addPostToFeed(postDoc, view);
     //Update counts and array on firestore
     updateUserInteractions(post.id, type, newCount, newArray);
   };
 
+  const addPostToFeed = (postsBefore, post, view) => {
+    const type = post.type;
+    console.log(type);
+    // Makes a copy of whichever array is passed
+    const newPosts = postsBefore;
+    if ((type === "post" || type === "repost") && view === "/") {
+      newPosts.splice(0, 0, post);
+      return newPosts;
+    } else if (type === "comment" && view === "/posts") {
+      setPosts(newPosts.splice(1, 0, post));
+      return newPosts;
+    }
+  };
   const postMessage = async (e, type, message, post) => {
     let messageDocRef = null;
     switch (type) {
@@ -265,37 +283,30 @@ function App() {
     return [newCount, newReplies];
   };
 
-  const updateLocalCountAndReplies = (post, type, newCount, newReplies) => {
-    console.log(newCount);
-    console.log(post.id);
+  const updateLocalCountAndReplies = (
+    newPosts,
+    post,
+    type,
+    newCount,
+    newReplies
+  ) => {
     switch (type) {
       case "repost":
         setCurrentUser({ ...currentUser, reposts: newReplies });
-        const newPosts = posts.map((item) =>
-          item.id === post.id ? { ...item, repostCount: newCount } : item
+        setPosts(
+          newPosts.map((item) =>
+            item.id === post.id ? { ...item, repostCount: newCount } : item
+          )
         );
-        console.log(newPosts);
-        setPosts(newPosts);
         break;
       case "comment":
         setCurrentUser({ ...currentUser, comments: newReplies });
         setPosts(
-          posts.map((item) =>
+          newPosts.map((item) =>
             item.id === post.id ? { ...item, commentCount: newCount } : item
           )
         );
         break;
-    }
-  };
-
-  const addPostToFeed = (post, view) => {
-    const type = post.type;
-    const newPosts = posts.slice();
-    if ((type === "post" || type === "repost") && view === "/") {
-      newPosts.splice(0, 0, post);
-      setPosts(newPosts);
-    } else if (type === "comment" && view === "/posts") {
-      setPosts(newPosts.splice(1, 0, post));
     }
   };
 
@@ -462,7 +473,7 @@ function App() {
         userRef = doc(db, "users", userId);
         await getDoc(userRef).then(async (doc) => {
           if (doc.data().retweets.length > 0) {
-            q = query(postsRef, where("__name__", "in", doc.data().retweets));
+            q = query(postsRef, where("__name__", "in", doc.data().reposts));
           } else {
             q = "";
           }
