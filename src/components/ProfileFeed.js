@@ -32,7 +32,7 @@ const ProfileFeed = (props) => {
             if (props.profileFeed === "posts-replies") {
               return (
                 <RePost
-                  retweetDisplayName={user.name}
+                  repostDisplayName={user.name}
                   // post={post}
                   // key={post.id}
                   // user={post.user}
@@ -51,7 +51,7 @@ const ProfileFeed = (props) => {
                   timestamp={post.timestamp}
                   message={post.message}
                   liked={props.checkLiked(post.id)}
-                  retweeted={props.checkRetweeted(post.id)}
+                  reposted={props.checkReposted(post.id)}
                   likeCount={post.likeCount}
                   handleLike={props.handleLike}
                   handleReply={props.handleReply}
@@ -68,7 +68,7 @@ const ProfileFeed = (props) => {
                   timestamp={post.timestamp}
                   message={post.message}
                   liked={props.checkLiked(post.id)}
-                  retweeted={props.checkRetweeted(post.id)}
+                  reposted={props.checkReposted(post.id)}
                   likeCount={post.likeCount}
                   handleLike={props.handleLike}
                   handleReply={props.handleReply}
@@ -89,7 +89,7 @@ const ProfileFeed = (props) => {
         posts={props.posts}
         profileFeed={props.profileFeed}
         checkLiked={props.checkLiked}
-        checkRetweeted={props.checkRetweeted}
+        checkReposted={props.checkReposted}
         handleLike={props.handleLike}
         handleReply={props.handleReply}
       />

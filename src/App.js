@@ -52,8 +52,8 @@ function App() {
 
   const pageTitles = {
     "/": "home",
-    "/users:uid": "profile",
-    "/posts:postId": "post",
+    "/users/:uid": "profile",
+    "/posts/:postId": "post",
   };
 
   const getPageTitleFromUrl = (pathname) => {
@@ -174,12 +174,14 @@ function App() {
     setPosts([...newPosts]);
   };
 
-  const handleReply = async (e, type, message, post, view) => {
+  const handleReply = async (e, type, message, post, pathname) => {
     //Calculate new counts
     let newCount = [];
     let newArray = [];
     let newPosts = [];
     let postDoc = [];
+    const view = getPageTitleFromUrl(pathname);
+    console.log(view);
     if (
       (type === "repost" && checkReposted(post.id)) ||
       (type === "comment" && checkCommented(post.id))
@@ -196,7 +198,6 @@ function App() {
       console.log(newPosts);
     } else {
       [newCount, newArray] = await calculateCountAndReplies(post, type, 1);
-      //Post a message
       const postRef = await postMessage(e, type, message, post);
       const postSnap = await getDoc(postRef);
       postDoc = { id: postSnap.id, ...postSnap.data() };
@@ -208,7 +209,6 @@ function App() {
   };
 
   const addPostToFeed = async (postsBefore, post, view) => {
-    console.log(postsBefore, post, view);
     const type = post.type;
     // Makes a copy of whichever array is passed
     const newPosts = postsBefore;

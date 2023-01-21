@@ -7,7 +7,7 @@ import { AiFillPropertySafety } from "react-icons/ai";
 
 const RePost = ({
   post,
-  retweetDisplayName,
+  repostDisplayName,
   liked,
   reposted,
   repostCount,
@@ -21,7 +21,7 @@ const RePost = ({
     <div>
       <Flex alignItems="center" justifyContent="flex-start">
         <FaRetweet />
-        {retweetDisplayName} reposted
+        {repostDisplayName} reposted
       </Flex>
       <PostCard
         // id={post.id}
