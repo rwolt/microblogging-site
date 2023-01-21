@@ -85,7 +85,6 @@ const Tweet = (props) => {
               commentCount={item.commentCount}
               handleLike={props.handleLike}
               handleReply={props.handleReply}
-              postMessage={props.postMessage}
             />
           );
         }
@@ -98,7 +97,6 @@ const Tweet = (props) => {
           post={props.posts[0]}
           posts={props.posts}
           setPosts={props.setPosts}
-          postMessage={props.postMessage}
         />
       ) : (
         ""
@@ -132,7 +130,6 @@ const Tweet = (props) => {
               repostCount={item.repostCount}
               handleLike={props.handleLike}
               handleReply={props.handleReply}
-              postMessage={props.postMessage}
             />
           );
         }

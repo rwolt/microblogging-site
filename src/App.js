@@ -25,12 +25,18 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { ThemeProvider } from "styled-components";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  matchPath,
+} from "react-router-dom";
 import GlobalStyles from "./components/styled/Global";
 import Home from "./Pages/Home";
 import Profile from "./Pages/Profile";
 import Tweet from "./Pages/Tweet";
 import { AiFillPropertySafety } from "react-icons/ai";
+import { FaLessThanEqual } from "react-icons/fa";
 
 const theme = {};
 
@@ -43,6 +49,24 @@ function App() {
   useEffect(() => {
     initFirebaseAuth();
   }, []);
+
+  const pageTitles = {
+    "/": "home",
+    "/users:uid": "profile",
+    "/posts:postId": "post",
+  };
+
+  const getPageTitleFromUrl = (pathname) => {
+    const currentPageTitle = Object.keys(pageTitles).find((key) => {
+      if (matchPath({ path: key, exact: true }, pathname)) {
+        return true;
+      }
+
+      return false;
+    });
+
+    return pageTitles[currentPageTitle];
+  };
 
   // Call authStateObserver on auth state change
   const initFirebaseAuth = () => onAuthStateChanged(auth, authStateObserver);
@@ -139,7 +163,9 @@ function App() {
     }
   };
 
-  const handlePost = async (e, type, message, view) => {
+  const handlePost = async (e, type, message, pathname) => {
+    const view = getPageTitleFromUrl(pathname);
+    console.log(view);
     const postRef = await postMessage(e, type, message);
     //Set the new feed
     const postSnap = await getDoc(postRef);
@@ -154,49 +180,39 @@ function App() {
     let newArray = [];
     let newPosts = [];
     let postDoc = [];
-    switch (type) {
-      case "repost":
-        if (checkReposted(post.id)) {
-          [newCount, newArray] = await calculateCountAndReplies(post, type, -1);
-          const postDoc = posts.find(
-            (item) =>
-              item.origPostId === post.id && post.user === currentUser.uid
-          );
-          console.log(postDoc);
-          const docRef = doc(db, "posts", postDoc.id);
-          await deleteDoc(docRef);
-          await updateUserInteractions(post.id, type, newCount, newArray);
-          newPosts = removePostsFromFeed(posts, postDoc, view);
-          console.log(newPosts);
-        } else {
-          [newCount, newArray] = await calculateCountAndReplies(post, type, 1);
-          //Post a message
-          const postRef = await postMessage(e, type, message, post);
-          const postSnap = await getDoc(postRef);
-          postDoc = { id: postSnap.id, ...postSnap.data() };
-          await updateUserInteractions(post.id, type, newCount, newArray);
-          newPosts = await addPostToFeed(posts, postDoc, view);
-        }
-        break;
-
-      case "comment":
-        if (checkReposted(post.id)) {
-          [newCount, newArray] = await calculateCountAndReplies(post, type, -1);
-        } else {
-          [newCount, newArray] = await calculateCountAndReplies(post, type, 1);
-        }
-        break;
+    if (
+      (type === "repost" && checkReposted(post.id)) ||
+      (type === "comment" && checkCommented(post.id))
+    ) {
+      [newCount, newArray] = await calculateCountAndReplies(post, type, -1);
+      const postDoc = posts.find(
+        (item) => item.origPostId === post.id && post.user === currentUser.uid
+      );
+      console.log(postDoc);
+      const docRef = doc(db, "posts", postDoc.id);
+      await deleteDoc(docRef);
+      await updateUserInteractions(post.id, type, newCount, newArray);
+      newPosts = removePostsFromFeed(posts, postDoc, view);
+      console.log(newPosts);
+    } else {
+      [newCount, newArray] = await calculateCountAndReplies(post, type, 1);
+      //Post a message
+      const postRef = await postMessage(e, type, message, post);
+      const postSnap = await getDoc(postRef);
+      postDoc = { id: postSnap.id, ...postSnap.data() };
+      await updateUserInteractions(post.id, type, newCount, newArray);
+      newPosts = await addPostToFeed(posts, postDoc, view);
     }
-    // Update firestore
-    //Set the feed state
+
     updateLocalCountAndReplies(newPosts, post, type, newCount, newArray);
   };
 
   const addPostToFeed = async (postsBefore, post, view) => {
+    console.log(postsBefore, post, view);
     const type = post.type;
     // Makes a copy of whichever array is passed
     const newPosts = postsBefore;
-    if ((type === "post" || type === "repost") && view === "/") {
+    if ((type === "post" || type === "repost") && view === "home") {
       if (type === "repost") {
         await fetchOriginalDoc(post).then((doc) => {
           post = { ...post, origDoc: doc };
@@ -204,7 +220,7 @@ function App() {
       }
       newPosts.splice(0, 0, post);
       return newPosts;
-    } else if (type === "comment" && view === "/posts") {
+    } else if (type === "comment" && view === "post") {
       setPosts(newPosts.splice(1, 0, post));
       return newPosts;
     }
@@ -214,11 +230,11 @@ function App() {
     const type = post.type;
     // Makes a copy of whichever array is passed
     const newPosts = postsBefore;
-    if ((type === "post" || type === "repost") && view === "/") {
+    if ((type === "post" || type === "repost") && view === "home") {
       if (type === "repost") {
         return newPosts.filter((item) => item.id !== post.id);
       }
-    } else if (type === "comment" && view === "/posts") {
+    } else if (type === "comment" && view === "post") {
       setPosts(newPosts.splice(1, 0, post));
       return newPosts;
     }
@@ -399,6 +415,14 @@ function App() {
     }
   };
 
+  const checkCommented = (postId) => {
+    if (currentUser && currentUser.comments.includes(postId)) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   // Get posts for the Home view
   const getHomeFeed = async () => {
     const postQuery = query(
@@ -544,7 +568,6 @@ function App() {
                   handleLogin={handleLogin}
                   handleRegister={handleRegister}
                   handleLogout={handleLogout}
-                  postMessage={postMessage}
                   getHomeFeed={getHomeFeed}
                   handleLike={handleLike}
                   handlePost={handlePost}
@@ -571,7 +594,6 @@ function App() {
                   handleRegister={handleRegister}
                   handleLogout={handleLogout}
                   handleReply={handleReply}
-                  postMessage={postMessage}
                   checkLiked={checkLiked}
                   checkReposted={checkReposted}
                 />
@@ -594,7 +616,6 @@ function App() {
                   showRegisterForm={showRegisterForm}
                   setShowRegisterForm={setShowRegisterForm}
                   handleRegister={handleRegister}
-                  postMessage={postMessage}
                   checkLiked={checkLiked}
                   checkReposted={checkReposted}
                 />
