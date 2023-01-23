@@ -33,17 +33,7 @@ const ProfileFeed = (props) => {
               return (
                 <RePost
                   repostDisplayName={user.name}
-                  // post={post}
-                  // key={post.id}
-                  // user={post.user}
-                  // profilePicURL={post.data.profilePicURL}
-                  // displayName={post.data.displayName}
-                  // timestamp={post.data.timestamp}
-                  // message={post.data.message}
-                  // likeCount={post.data.likeCount}
-                  // liked={props.checkLiked(post.data.id)}
-                  // handleLike={props.handleLike}
-                  // handleReply={props.handleReply}
+                  profileFeed={props.profileFeed}
                   post={post}
                   profilePicURL={post.profilePicURL}
                   user={post.user}
@@ -53,6 +43,8 @@ const ProfileFeed = (props) => {
                   liked={props.checkLiked(post.id)}
                   reposted={props.checkReposted(post.id)}
                   likeCount={post.likeCount}
+                  repostCount={post.repostCount}
+                  commentCount={post.commentCount}
                   handleLike={props.handleLike}
                   handleReply={props.handleReply}
                 />
@@ -61,6 +53,7 @@ const ProfileFeed = (props) => {
               return (
                 <PostCard
                   key={post.id}
+                  profileFeed={props.profileFeed}
                   post={post}
                   profilePicURL={post.profilePicURL}
                   user={post.user}
@@ -69,7 +62,10 @@ const ProfileFeed = (props) => {
                   message={post.message}
                   liked={props.checkLiked(post.id)}
                   reposted={props.checkReposted(post.id)}
+                  commented={props.checkCommented(post.id)}
                   likeCount={post.likeCount}
+                  repostCount={post.repostCount}
+                  commentCount={post.commentCount}
                   handleLike={props.handleLike}
                   handleReply={props.handleReply}
                 />
@@ -90,6 +86,7 @@ const ProfileFeed = (props) => {
         profileFeed={props.profileFeed}
         checkLiked={props.checkLiked}
         checkReposted={props.checkReposted}
+        checkCommented={props.checkCommented}
         handleLike={props.handleLike}
         handleReply={props.handleReply}
       />

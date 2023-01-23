@@ -197,12 +197,11 @@ function App() {
       const querySnapshot = await getDocs(q);
       const ids = [];
       querySnapshot.forEach((doc) => ids.push({ id: doc.id, ...doc.data() }));
-      console.log(ids);
       await deleteDoc(doc(db, "posts", ids[0].id));
 
       await updateUserInteractions(post.id, type, newCount, newArray);
       if (
-        (view !== "post" && type === "repost") ||
+        (view === "home" && type === "repost") ||
         (view === "post" && type === "comment")
       ) {
         newPosts = removePostsFromFeed(posts, ids[0], view);
@@ -217,7 +216,7 @@ function App() {
       postDoc = { id: postSnap.id, ...postSnap.data() };
       await updateUserInteractions(post.id, type, newCount, newArray);
       if (
-        (view !== "post" && type === "repost") ||
+        (view === "home" && type === "repost") ||
         (view === "post" && type === "comment")
       ) {
         newPosts = await addPostToFeed(posts, postDoc, view);
@@ -510,7 +509,6 @@ function App() {
 
   const getProfilePosts = async (feedType, userId) => {
     const postsRef = collection(db, "posts");
-    const repliesRef = collection(db, "replies");
     let q = "";
     let userRef = "";
     let posts = [];
@@ -614,6 +612,7 @@ function App() {
                   handleRegister={handleRegister}
                   handleLogout={handleLogout}
                   handleReply={handleReply}
+                  handleLike={handleLike}
                   checkLiked={checkLiked}
                   checkReposted={checkReposted}
                   checkCommented={checkCommented}
