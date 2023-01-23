@@ -174,37 +174,55 @@ function App() {
     setPosts([...newPosts]);
   };
 
-  const handleReply = async (e, type, message, post, pathname) => {
+  const handleReply = async (e, type, message, post, pathname, id) => {
     //Calculate new counts
     let newCount = [];
     let newArray = [];
-    let newPosts = [];
+    let newPosts = [...posts];
     let postDoc = [];
     const view = getPageTitleFromUrl(pathname);
-    console.log(view);
     if (
-      (type === "repost" && checkReposted(post.id)) ||
-      (type === "comment" && checkCommented(post.id))
+      type === "repost" &&
+      checkReposted(post.id)
+      // (type === "comment" && checkCommented(post.id))
     ) {
       [newCount, newArray] = await calculateCountAndReplies(post, type, -1);
-      const postDoc = posts.find(
-        (item) => item.origPostId === post.id && post.user === currentUser.uid
+
+      const q = query(
+        collection(db, "posts"),
+        where("origPostId", "==", post.id),
+        where("user", "==", currentUser.uid)
       );
-      console.log(postDoc);
-      const docRef = doc(db, "posts", postDoc.id);
-      await deleteDoc(docRef);
+
+      const querySnapshot = await getDocs(q);
+      const ids = [];
+      querySnapshot.forEach((doc) => ids.push({ id: doc.id, ...doc.data() }));
+      console.log(ids);
+      await deleteDoc(doc(db, "posts", ids[0].id));
+
       await updateUserInteractions(post.id, type, newCount, newArray);
-      newPosts = removePostsFromFeed(posts, postDoc, view);
-      console.log(newPosts);
-    } else {
+      if (
+        (view !== "post" && type === "repost") ||
+        (view === "post" && type === "comment")
+      ) {
+        newPosts = removePostsFromFeed(posts, ids[0], view);
+      }
+    } else if (
+      (type === "repost" && !checkReposted(post.id)) ||
+      (type === "comment" && !checkCommented(post.id))
+    ) {
       [newCount, newArray] = await calculateCountAndReplies(post, type, 1);
       const postRef = await postMessage(e, type, message, post);
       const postSnap = await getDoc(postRef);
       postDoc = { id: postSnap.id, ...postSnap.data() };
       await updateUserInteractions(post.id, type, newCount, newArray);
-      newPosts = await addPostToFeed(posts, postDoc, view);
+      if (
+        (view !== "post" && type === "repost") ||
+        (view === "post" && type === "comment")
+      ) {
+        newPosts = await addPostToFeed(posts, postDoc, view);
+      }
     }
-
     updateLocalCountAndReplies(newPosts, post, type, newCount, newArray);
   };
 
@@ -394,6 +412,7 @@ function App() {
         await updateDoc(postRef, { repostCount: newCount });
         break;
       case "comment":
+        await updateDoc(userRef, { comments: newArray });
         await updateDoc(postRef, { commentCount: newCount });
         break;
     }
@@ -574,6 +593,7 @@ function App() {
                   handleReply={handleReply}
                   checkLiked={checkLiked}
                   checkReposted={checkReposted}
+                  checkCommented={checkCommented}
                 />
               }
             />
@@ -596,6 +616,7 @@ function App() {
                   handleReply={handleReply}
                   checkLiked={checkLiked}
                   checkReposted={checkReposted}
+                  checkCommented={checkCommented}
                 />
               }
             />
@@ -618,6 +639,7 @@ function App() {
                   handleRegister={handleRegister}
                   checkLiked={checkLiked}
                   checkReposted={checkReposted}
+                  checkCommented={checkCommented}
                 />
               }
             />

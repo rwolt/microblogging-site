@@ -6,10 +6,12 @@ import PostCard from "./PostCard";
 import { AiFillPropertySafety } from "react-icons/ai";
 
 const RePost = ({
+  id,
   post,
   repostDisplayName,
   liked,
   reposted,
+  commented,
   repostCount,
   likeCount,
   commentCount,
@@ -24,7 +26,7 @@ const RePost = ({
         {repostDisplayName} reposted
       </Flex>
       <PostCard
-        // id={post.id}
+        id={id}
         post={post}
         profilePicURL={post.profilePicURL}
         user={post.user}
@@ -33,6 +35,7 @@ const RePost = ({
         message={post.message}
         liked={liked}
         reposted={reposted}
+        commented={commented}
         likeCount={likeCount}
         commentCount={commentCount}
         repostCount={repostCount}

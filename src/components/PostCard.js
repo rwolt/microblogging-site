@@ -30,6 +30,7 @@ export const formatTimestamp = (timestamp) => {
 };
 
 const PostCard = ({
+  id,
   timestamp,
   replyType,
   profilePicURL,
@@ -39,6 +40,7 @@ const PostCard = ({
   post,
   liked,
   reposted,
+  commented,
   likeCount,
   repostCount,
   commentCount,
@@ -88,9 +90,11 @@ const PostCard = ({
           <p>{message}</p>
         </Flex>
         <InteractionBar
+          id={id}
           post={post}
           liked={liked}
           reposted={reposted}
+          commented={commented}
           likeCount={likeCount}
           repostCount={repostCount}
           commentCount={commentCount}

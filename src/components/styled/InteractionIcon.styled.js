@@ -21,4 +21,8 @@ export const InteractionIcon = styled.div`
   &#like {
     color: ${({ liked }) => (liked ? "#289d8c" : "#000")};
   }
+
+  &#comment {
+    color: ${({ commented }) => (commented ? "#289d8c" : "#000")};
+  }
 `;

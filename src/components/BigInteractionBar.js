@@ -1,19 +1,37 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import { StyledBigInteractionBar } from "./styled/BigInteractionBar.styled";
 import { BigInteractionIcon } from "./styled/BigInteractionIcon.styled";
-import { FaRegComment, FaRetweet, FaHeart, FaRegHeart } from "react-icons/fa";
+import {
+  FaRegComment,
+  FaRetweet,
+  FaHeart,
+  FaRegHeart,
+  FaComment,
+} from "react-icons/fa";
 
 const BigInteractionBar = (props) => {
+  const location = useLocation();
   return (
     <StyledBigInteractionBar>
       <BigInteractionIcon id="comment">
-        <FaRegComment className="big-icon" />
+        {props.commented ? (
+          <FaComment className="big-icon" style={{ color: "#289d8c" }} />
+        ) : (
+          <FaRegComment className="big-icon" />
+        )}
       </BigInteractionIcon>
       <BigInteractionIcon
         id="repost"
-        onClick={(e) => {
+        onClick={async (e) => {
           e.stopPropagation();
-          props.postMessage(e, null, "repost", props.post);
+          await props.handleReply(
+            e,
+            "repost",
+            null,
+            props.post,
+            location.pathname
+          );
         }}
       >
         {props.reposted ? (

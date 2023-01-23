@@ -16,12 +16,13 @@ const ParentTweet = ({
   message,
   post,
   liked,
-  retweeted,
+  reposted,
+  commented,
   likeCount,
-  retweetCount,
+  repostCount,
   commentCount,
   handleLike,
-  postMessage,
+  handleReply,
 }) => {
   const navigate = useNavigate();
   return (
@@ -55,14 +56,15 @@ const ParentTweet = ({
       </Flex>
       <TweetStats
         commentCount={commentCount}
-        retweetCount={retweetCount}
+        repostCount={repostCount}
         likeCount={likeCount}
       />
       <BigInteractionBar
         handleLike={handleLike}
-        postMessage={postMessage}
+        handleReply={handleReply}
         liked={liked}
-        retweeted={retweeted}
+        reposted={reposted}
+        commented={commented}
         post={post}
       />
     </StyledParentTweet>

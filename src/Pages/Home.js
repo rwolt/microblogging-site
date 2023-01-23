@@ -54,10 +54,11 @@ const Home = (props) => {
             <RePost
               key={uuidv4()}
               id={post.id}
-              retweetDisplayName={post.displayName}
+              repostDisplayName={post.displayName}
               post={post.origDoc}
               liked={props.checkLiked(post.origPostId)}
               reposted={props.checkReposted(post.origPostId)}
+              commented={props.checkCommented(post.origPostId)}
               repostCount={post.origDoc.repostCount}
               commentCount={post.origDoc.commentCount}
               likeCount={post.origDoc.likeCount}
@@ -81,6 +82,7 @@ const Home = (props) => {
               commentCount={post.commentCount}
               liked={props.checkLiked(post.id)}
               reposted={props.checkReposted(post.id)}
+              commented={props.checkCommented(post.id)}
               handleLike={props.handleLike}
               handleReply={props.handleReply}
             />
