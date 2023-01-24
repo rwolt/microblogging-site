@@ -165,7 +165,6 @@ function App() {
 
   const handlePost = async (e, type, message, pathname) => {
     const view = getPageTitleFromUrl(pathname);
-    console.log(view);
     const postRef = await postMessage(e, type, message);
     //Set the new feed
     const postSnap = await getDoc(postRef);
@@ -175,17 +174,12 @@ function App() {
   };
 
   const handleReply = async (e, type, message, post, pathname, id) => {
-    //Calculate new counts
     let newCount = [];
     let newArray = [];
     let newPosts = [...posts];
     let postDoc = [];
     const view = getPageTitleFromUrl(pathname);
-    if (
-      type === "repost" &&
-      checkReposted(post.id)
-      // (type === "comment" && checkCommented(post.id))
-    ) {
+    if (type === "repost" && checkReposted(post.id)) {
       [newCount, newArray] = await calculateCountAndReplies(post, type, -1);
 
       const q = query(
@@ -208,7 +202,7 @@ function App() {
       }
     } else if (
       (type === "repost" && !checkReposted(post.id)) ||
-      (type === "comment" && !checkCommented(post.id))
+      type === "comment"
     ) {
       [newCount, newArray] = await calculateCountAndReplies(post, type, 1);
       const postRef = await postMessage(e, type, message, post);
@@ -305,7 +299,7 @@ function App() {
     return messageDocRef;
   };
 
-  const calculateCountAndReplies = (post, type, operation) => {
+  const calculateCountAndReplies = async (post, type, operation) => {
     let newReplies;
     let newCount;
     switch (type) {
@@ -322,14 +316,31 @@ function App() {
         }
         break;
       case "comment":
-        if (operation === 1) {
+        const q = query(
+          collection(db, "posts"),
+          where("type", "==", "comment"),
+          where("origPostId", "==", post.id),
+          where("user", "==", currentUser.uid)
+        );
+
+        const querySnapshot = await getDocs(q);
+        const ids = [];
+        querySnapshot.forEach((doc) => ids.push(doc.id));
+
+        if (operation === 1 && ids.length === 0) {
           newReplies = [...currentUser.comments, post.id];
-          newCount = post.commentCount + 1;
-        } else if (operation === -1) {
+          newCount = +post.commentCount + 1;
+        } else if (operation === 1 && ids.length > 0) {
+          newReplies = [...currentUser.comments];
+          newCount = +post.commentCount + 1;
+        } else if (operation === -1 && ids.length === 1) {
           newReplies = currentUser.comments.filter(
             (item) => item.id !== post.id
           );
-          newCount = post.commentCount - 1;
+          newCount = +post.commentCount - 1;
+        } else if (operation === -1 && ids.length > 1) {
+          newReplies = [...currentUser.comments];
+          newCount = +post.commentCount - 1;
         } else {
           console.error(`Invalid operation ${operation}`);
         }
@@ -469,20 +480,6 @@ function App() {
       resolve(posts);
     });
 
-    const fetchOriginalDocs = (reposts) => {
-      return new Promise(async (resolve, reject) => {
-        const posts = [];
-        let i = 0;
-        while (i < reposts.length) {
-          await fetchOriginalDoc(reposts[i]).then((doc) => {
-            posts.push({ ...reposts[i], origDoc: doc });
-          });
-          i++;
-        }
-        resolve(posts);
-      });
-    };
-
     const getUpdatedReposts = new Promise(async (resolve, reject) => {
       const updated = await getReposts.then((reposts) =>
         fetchOriginalDocs(reposts)
@@ -504,6 +501,24 @@ function App() {
     return new Promise(async (resolve, reject) => {
       const original = await getDoc(doc(db, "posts", repost.origPostId));
       resolve({ id: original.id, ...original.data() });
+    });
+  };
+
+  const fetchOriginalDocs = (docs) => {
+    return new Promise(async (resolve, reject) => {
+      const updated = [];
+      let i = 0;
+      while (i < docs.length) {
+        if (docs[i].type === "repost") {
+          await fetchOriginalDoc(docs[i]).then((doc) => {
+            updated.push({ ...docs[i], origDoc: doc });
+          });
+        } else {
+          updated.push(docs[i]);
+        }
+        i++;
+      }
+      resolve(updated);
     });
   };
 
@@ -537,21 +552,28 @@ function App() {
       case "posts-replies":
         userRef = doc(db, "users", userId);
         await getDoc(userRef).then(async (doc) => {
-          if (doc.data().retweets.length > 0) {
-            q = query(postsRef, where("__name__", "in", doc.data().reposts));
+          if (doc.data().reposts.length > 0 || doc.data().comments > 0) {
+            q = query(
+              postsRef,
+              where("user", "==", currentUser.uid),
+              where("type", "in", ["comment", "repost"]),
+              orderBy("timestamp", "desc"),
+              limit(10)
+            );
           } else {
             q = "";
           }
         });
     }
-
     if (q !== "") {
       const snapshot = await getDocs(q);
       snapshot.forEach((doc) => {
         posts.push({ ...doc.data(), id: doc.id });
       });
     }
-    return posts;
+
+    const updated = await fetchOriginalDocs(posts);
+    return updated.sort((a, b) => a.timestamp.seconds < b.timestamp.seconds);
   };
 
   const authStateObserver = async (user) => {

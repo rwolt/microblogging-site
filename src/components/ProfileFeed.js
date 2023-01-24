@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Flex } from "./styled/Flex.styled";
 import PostCard from "./PostCard";
 import RePost from "./RePost";
+import { v4 as uuidv4 } from "uuid";
 
 const ProfileFeed = (props) => {
   const { profileFeed, user, getProfilePosts, setPosts } = props;
@@ -29,22 +30,19 @@ const ProfileFeed = (props) => {
       <div>
         {props.posts.length > 0 ? (
           props.posts.map((post) => {
-            if (props.profileFeed === "posts-replies") {
+            if (post.type == "repost") {
               return (
                 <RePost
-                  repostDisplayName={user.name}
-                  profileFeed={props.profileFeed}
-                  post={post}
-                  profilePicURL={post.profilePicURL}
-                  user={post.user}
-                  displayName={post.displayName}
-                  timestamp={post.timestamp}
-                  message={post.message}
-                  liked={props.checkLiked(post.id)}
-                  reposted={props.checkReposted(post.id)}
-                  likeCount={post.likeCount}
-                  repostCount={post.repostCount}
-                  commentCount={post.commentCount}
+                  key={uuidv4()}
+                  id={post.id}
+                  repostDisplayName={post.displayName}
+                  post={post.origDoc}
+                  liked={props.checkLiked(post.origPostId)}
+                  reposted={props.checkReposted(post.origPostId)}
+                  commented={props.checkCommented(post.origPostId)}
+                  repostCount={post.origDoc.repostCount}
+                  commentCount={post.origDoc.commentCount}
+                  likeCount={post.origDoc.likeCount}
                   handleLike={props.handleLike}
                   handleReply={props.handleReply}
                 />
