@@ -552,11 +552,12 @@ function App() {
       case "posts-replies":
         userRef = doc(db, "users", userId);
         await getDoc(userRef).then(async (doc) => {
-          if (doc.data().reposts.length > 0 || doc.data().comments > 0) {
+          console.log(doc.data());
+          if (doc.data().reposts.length > 0 || doc.data().comments.length > 0) {
             q = query(
               postsRef,
-              where("user", "==", currentUser.uid),
-              where("type", "in", ["comment", "repost"]),
+              where("user", "==", doc.data().uid),
+              where("type", "==", "comment"),
               orderBy("timestamp", "desc"),
               limit(10)
             );
@@ -564,6 +565,7 @@ function App() {
             q = "";
           }
         });
+        break;
     }
     if (q !== "") {
       const snapshot = await getDocs(q);
