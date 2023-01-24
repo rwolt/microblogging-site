@@ -60,7 +60,7 @@ const Tweet = (props) => {
   return (
     <Container>
       <Header
-        pageTitle="Tweet"
+        pageTitle="Post"
         setShowPopup={props.setShowPopup}
         setShowRegisterForm={props.setShowRegisterForm}
         handleLogout={props.handleLogout}

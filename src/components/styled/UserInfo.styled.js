@@ -14,6 +14,7 @@ export const UserInfo = styled.div`
 
   & > a:hover {
     text-decoration: underline;
+    cursor: pointer;
   }
 
   p,
