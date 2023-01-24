@@ -557,7 +557,7 @@ function App() {
             q = query(
               postsRef,
               where("user", "==", doc.data().uid),
-              where("type", "==", "comment"),
+              where("type", "in", ["comment", "repost"]),
               orderBy("timestamp", "desc"),
               limit(10)
             );
