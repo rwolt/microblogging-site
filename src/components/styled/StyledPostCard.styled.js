@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { devices } from "./devices";
 
 export const StyledPostCard = styled.div`
   display: flex;

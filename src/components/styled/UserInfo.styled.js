@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { devices } from "./devices";
 
 export const UserInfo = styled.div`
   width: 100%;
@@ -33,5 +34,13 @@ export const UserInfo = styled.div`
   & > #user-handle {
     font-weight: normal;
     color: #289d8c;
+  }
+
+  @media ${devices.mobileS} {
+    flex-flow: row wrap;
+
+    #dot-spacer {
+      display: none;
+    }
   }
 `;

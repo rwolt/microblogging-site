@@ -92,7 +92,7 @@ const PostCard = ({
           </a>
           {/* <NavLink to={`/users/${user}`}> {displayName}</NavLink> */}
           <span>
-            <BsDot />
+            <BsDot id="dot-spacer" />
             <p>{postDate}</p>
           </span>
         </UserInfo>
