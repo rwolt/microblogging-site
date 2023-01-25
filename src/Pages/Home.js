@@ -75,6 +75,7 @@ const Home = (props) => {
               profilePicURL={post.profilePicURL}
               user={post.user}
               displayName={post.displayName}
+              userHandle={post.userHandle}
               timestamp={post.timestamp}
               message={post.message}
               likeCount={post.likeCount}

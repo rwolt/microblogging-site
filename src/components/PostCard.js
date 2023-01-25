@@ -36,6 +36,7 @@ const PostCard = ({
   profilePicURL,
   user,
   displayName,
+  userHandle,
   message,
   post,
   liked,
@@ -79,6 +80,15 @@ const PostCard = ({
             }}
           >
             {displayName}
+          </a>
+          <a
+            id="user-handle"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/users/${user}`);
+            }}
+          >
+            {userHandle}
           </a>
           {/* <NavLink to={`/users/${user}`}> {displayName}</NavLink> */}
           <span>

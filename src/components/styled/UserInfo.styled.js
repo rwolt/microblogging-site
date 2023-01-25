@@ -29,4 +29,9 @@ export const UserInfo = styled.div`
     align-items: center;
     color: #555;
   }
+
+  & > #user-handle {
+    font-weight: normal;
+    color: #289d8c;
+  }
 `;

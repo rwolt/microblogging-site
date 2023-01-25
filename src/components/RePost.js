@@ -3,6 +3,7 @@ import { FaRetweet } from "react-icons/fa";
 import { Flex } from "./styled/Flex.styled";
 import { v4 as uuidv4 } from "uuid";
 import PostCard from "./PostCard";
+import { StyledRepost } from "./styled/StyledRepost.styled";
 import { AiFillPropertySafety } from "react-icons/ai";
 
 const RePost = ({
@@ -20,9 +21,9 @@ const RePost = ({
   postMessage,
 }) => {
   return (
-    <div>
+    <StyledRepost>
       <Flex alignItems="center" justifyContent="flex-start">
-        <FaRetweet />
+        <FaRetweet id="repost-icon" />
         {repostDisplayName} reposted
       </Flex>
       <PostCard
@@ -30,6 +31,7 @@ const RePost = ({
         post={post}
         profilePicURL={post.profilePicURL}
         user={post.user}
+        userHandle={post.userHandle}
         displayName={post.displayName}
         timestamp={post.timestamp}
         message={post.message}
@@ -43,7 +45,7 @@ const RePost = ({
         handleReply={handleReply}
         postMessage={postMessage}
       />
-    </div>
+    </StyledRepost>
   );
 };
 

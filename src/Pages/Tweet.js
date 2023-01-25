@@ -74,6 +74,7 @@ const Tweet = (props) => {
               post={item}
               profilePicURL={item.profilePicURL}
               user={item.user}
+              userHandle={item.userHandle}
               displayName={item.displayName}
               timestamp={item.timestamp}
               replyType={item.replyType}
@@ -121,6 +122,7 @@ const Tweet = (props) => {
               post={item}
               profilePicURL={item.profilePicURL}
               user={item.user}
+              userHandle={item.userHandle}
               displayName={item.displayName}
               timestamp={item.timestamp}
               replyType={item.replyType}

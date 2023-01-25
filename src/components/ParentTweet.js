@@ -12,6 +12,7 @@ const ParentTweet = ({
   timestamp,
   profilePicURL,
   user,
+  userHandle,
   displayName,
   message,
   post,
@@ -43,6 +44,15 @@ const ParentTweet = ({
             }}
           >
             {displayName}
+          </a>
+          <a
+            id="user-handle"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/users/${user}`);
+            }}
+          >
+            {userHandle}
           </a>
         </UserInfo>
       </Flex>

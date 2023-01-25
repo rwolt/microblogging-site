@@ -24,8 +24,9 @@ const ProfileHeader = (props) => {
         flexDirection="column"
       >
         <h2>{props.user.name}</h2>
+        <p>{props.user.userHandle}</p>
         <Flex justifyContent="flex-start" padding="0">
-          <FaCalendar />
+          <FaCalendar id="calendar-icon" />
           <p>{`Joined ${props.user.dateJoined}
           `}</p>
         </Flex>

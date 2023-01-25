@@ -55,6 +55,7 @@ const ProfileFeed = (props) => {
                   post={post}
                   profilePicURL={post.profilePicURL}
                   user={post.user}
+                  userHandle={post.userHandle}
                   displayName={post.displayName}
                   timestamp={post.timestamp}
                   message={post.message}

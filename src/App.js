@@ -24,6 +24,7 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { ThemeProvider } from "styled-components";
 import {
   BrowserRouter as Router,
@@ -83,11 +84,14 @@ function App() {
       // If the login button is clicked, try to authenticate using email and password from the form
       e.preventDefault();
       try {
-        const currentUser = await signInWithEmailAndPassword(
+        await signInWithEmailAndPassword(
           auth,
           userObject.email,
           userObject.password
-        );
+        ).then(async () => {
+          const userInfo = await getUserInfo(auth.currentUser.uid);
+          setCurrentUser(userInfo);
+        });
       } catch (error) {
         console.error(error.message);
       }
@@ -108,22 +112,33 @@ function App() {
         auth,
         userObject.email,
         userObject.password
-      ).then(() => {
-        updateProfile(auth.currentUser, {
-          displayName: userObject.displayName,
+      )
+        .then(() => {
+          updateProfile(auth.currentUser, {
+            displayName: userObject.displayName,
+            photoURL: `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`,
+          });
+        })
+        .then(() => {
+          createUserDoc(auth.currentUser.uid, userObject).then(async () => {
+            const userInfo = await getUserInfo(auth.currentUser.uid);
+            setCurrentUser(userInfo);
+          });
         });
-      });
     } catch (error) {
       console.error(error.message);
     }
   };
 
   // Create a document in the user collection with the specified uid
-  const createUserDoc = async (uid) => {
+  const createUserDoc = async (uid, userObject) => {
     await setDoc(doc(db, "users", `${uid}`), {
       uid: uid,
-      name: auth.currentUser.displayName,
-      photoURL: auth.currentUser.photoURL,
+      userHandle: userObject.userHandle,
+      name: userObject.displayName,
+      photoURL:
+        userObject.photoURL ||
+        `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`,
       dateJoined: serverTimestamp(),
       likes: [],
       reposts: [],
@@ -149,17 +164,12 @@ function App() {
 
   // Check if there is a document in the users collection for the authenticated user
   const checkUserDoc = async () => {
+    console.log("Checking...");
     const docRef = doc(db, "users", auth.currentUser.uid);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       setCurrentUser(docSnap.data());
-      // If there is no document, create a new user doc and set that doc as the current user for the view
-    } else {
-      createUserDoc(auth.currentUser.uid).then(async () => {
-        const userInfo = await getUserInfo(auth.currentUser.uid);
-        setCurrentUser(userInfo);
-      });
     }
   };
 
@@ -258,6 +268,7 @@ function App() {
         messageDocRef = await addDoc(collection(db, "posts"), {
           user: currentUser.uid,
           displayName: currentUser.name,
+          userHandle: currentUser.userHandle,
           profilePicURL: currentUser.photoURL,
           timestamp: serverTimestamp(),
           message: message,
@@ -273,6 +284,7 @@ function App() {
         messageDocRef = await addDoc(collection(db, "posts"), {
           user: currentUser.uid,
           displayName: currentUser.name,
+          userHandle: currentUser.userHandle,
           type: "repost",
           timestamp: serverTimestamp(),
           origPostId: post.id,
@@ -283,6 +295,7 @@ function App() {
         messageDocRef = await addDoc(collection(db, "posts"), {
           user: currentUser.uid,
           displayName: currentUser.name,
+          userHandle: currentUser.userHandle,
           profilePicURL: currentUser.photoURL,
           likeCount: 0,
           repostCount: 0,
@@ -581,9 +594,9 @@ function App() {
   const authStateObserver = async (user) => {
     if (user) {
       setShowPopup(false);
-      await getProfilePic().then(() => {
-        checkUserDoc();
-      });
+      // await getProfilePic().then(() => {
+      //   checkUserDoc();
+      // });
     } else {
       setCurrentUser("");
     }
