@@ -11,7 +11,7 @@ const LoginForm = (props) => {
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
   const [userHandle, setUserHandle] = useState("");
-  // const [profilePicture, setProfilePicture] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
 
   const clearForm = () => {
     setLoginEmail("");
@@ -20,7 +20,7 @@ const LoginForm = (props) => {
     setRegisterPassword("");
     setDisplayName("");
     setUserHandle("");
-    // setProfilePicture("");
+    setProfilePicture("");
   };
 
   useEffect(() => {
@@ -33,13 +33,13 @@ const LoginForm = (props) => {
       {props.showRegisterForm ? (
         <>
           <h2>Create your account</h2>
-          {/* <label for="register-profile-picture">Choose a Profile Picture</label> */}
-          {/* <input
+          <label for="register-profile-picture">Choose a Profile Picture</label>
+          <input
             name="register-profile-picture"
             placeholder="Choose File"
             type="file"
             onChange={(e) => setProfilePicture(e.target.files[0])}
-          /> */}
+          />
           <input
             name="register-handle"
             placeholder="Handle"
@@ -78,6 +78,7 @@ const LoginForm = (props) => {
                   password: registerPassword,
                   displayName: displayName,
                   userHandle: userHandle,
+                  profilePicture: profilePicture,
                 };
                 props.handleRegister(e, userObject);
               }}

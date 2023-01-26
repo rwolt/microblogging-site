@@ -106,24 +106,48 @@ function App() {
   // Register new user
   const handleRegister = async (e, userObject) => {
     e.preventDefault();
+
     // If a new account is created, the user is signed in automatically
+
     try {
       await createUserWithEmailAndPassword(
         auth,
         userObject.email,
         userObject.password
       )
-        .then(() => {
+        .then(async () => {
+          if (userObject.profilePicture) {
+            const photoRef = ref(
+              storage,
+              `profile-pictures/${auth.currentUser.uid}.jpg`
+            );
+            const photoURL = await uploadBytes(
+              photoRef,
+              userObject.profilePicture
+            ).then(() => {
+              const url = getDownloadURL(photoRef);
+              return url;
+            });
+            return photoURL;
+          } else {
+            return `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`;
+          }
+        })
+        .then((url) => {
+          console.log(url);
           updateProfile(auth.currentUser, {
             displayName: userObject.displayName,
-            photoURL: `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`,
+            photoURL: url,
           });
+          return url;
         })
-        .then(() => {
-          createUserDoc(auth.currentUser.uid, userObject).then(async () => {
-            const userInfo = await getUserInfo(auth.currentUser.uid);
-            setCurrentUser(userInfo);
-          });
+        .then((url) => {
+          createUserDoc(auth.currentUser.uid, userObject, url).then(
+            async () => {
+              const userInfo = await getUserInfo(auth.currentUser.uid);
+              setCurrentUser(userInfo);
+            }
+          );
         });
     } catch (error) {
       console.error(error.message);
@@ -131,14 +155,12 @@ function App() {
   };
 
   // Create a document in the user collection with the specified uid
-  const createUserDoc = async (uid, userObject) => {
+  const createUserDoc = async (uid, userObject, url) => {
     await setDoc(doc(db, "users", `${uid}`), {
       uid: uid,
       userHandle: userObject.userHandle,
       name: userObject.displayName,
-      photoURL:
-        userObject.photoURL ||
-        `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`,
+      photoURL: url,
       dateJoined: serverTimestamp(),
       likes: [],
       reposts: [],
@@ -147,13 +169,13 @@ function App() {
   };
 
   // Assign the user a gravatar if no profile pictures is defined
-  const getProfilePic = async () => {
-    if (!auth.currentUser.photoURL) {
-      await updateProfile(auth.currentUser, {
-        photoURL: `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`,
-      });
-    }
-  };
+  // const getProfilePic = async () => {
+  //   if (!auth.currentUser.photoURL) {
+  //     await updateProfile(auth.currentUser, {
+  //       photoURL: `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`,
+  //     });
+  //   }
+  // };
 
   // Get a user document from firestore
   const getUserInfo = async (uid) => {
