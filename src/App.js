@@ -24,7 +24,12 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  ref,
+  uploadBytes,
+  uploadString,
+  getDownloadURL,
+} from "firebase/storage";
 import { ThemeProvider } from "styled-components";
 import {
   BrowserRouter as Router,
@@ -106,7 +111,7 @@ function App() {
   // Register new user
   const handleRegister = async (e, userObject) => {
     e.preventDefault();
-
+    console.log(userObject);
     // If a new account is created, the user is signed in automatically
 
     try {
@@ -121,9 +126,10 @@ function App() {
               storage,
               `profile-pictures/${auth.currentUser.uid}.jpg`
             );
-            const photoURL = await uploadBytes(
+            const photoURL = await uploadString(
               photoRef,
-              userObject.profilePicture
+              userObject.profilePicture,
+              "data_url"
             ).then(() => {
               const url = getDownloadURL(photoRef);
               return url;

@@ -20,12 +20,55 @@ const LoginForm = (props) => {
     setRegisterPassword("");
     setDisplayName("");
     setUserHandle("");
-    setProfilePicture("");
+    setProfilePicture(null);
   };
 
   useEffect(() => {
     return () => clearForm();
   }, []);
+
+  const resizeImage = (image, width) => {
+    return new Promise((resolve, reject) => {
+      console.log("resize image");
+      let canvas = document.createElement("canvas");
+      let canvasContext = canvas.getContext("2d");
+
+      let reader = new FileReader();
+
+      reader.readAsDataURL(image);
+
+      reader.onload = () => {
+        let dummyImg = new Image(0, 0);
+
+        dummyImg.src = reader.result;
+
+        dummyImg.onload = () => {
+          const origWidth = dummyImg.naturalWidth;
+          const origHeight = dummyImg.naturalHeight;
+
+          const desiredWidth = width;
+
+          const ratio = desiredWidth / origWidth;
+
+          const correspondingHeight = ratio * origHeight;
+
+          canvas.width = desiredWidth;
+          canvas.height = correspondingHeight;
+
+          canvasContext.drawImage(
+            dummyImg,
+            0,
+            0,
+            desiredWidth,
+            correspondingHeight
+          );
+
+          const resizedImage = canvas.toDataURL(image.type, 1.0);
+          resolve(resizedImage);
+        };
+      };
+    });
+  };
 
   return (
     // Show login form or registration form
@@ -33,12 +76,18 @@ const LoginForm = (props) => {
       {props.showRegisterForm ? (
         <>
           <h2>Create your account</h2>
-          <label for="register-profile-picture">Choose a Profile Picture</label>
+          <label htmlFor="register-profile-picture">
+            Choose a Profile Picture
+          </label>
           <input
             name="register-profile-picture"
             placeholder="Choose File"
             type="file"
-            onChange={(e) => setProfilePicture(e.target.files[0])}
+            onChange={(e) => {
+              resizeImage(e.target.files[0], 100).then((image) =>
+                setProfilePicture(image)
+              );
+            }}
           />
           <input
             name="register-handle"
