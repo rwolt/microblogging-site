@@ -86,7 +86,10 @@ function App() {
     // If the Sign in with Google button is clicked, show a google sign-in popup
     if (id === "google-login") {
       e.preventDefault();
-      await signInWithPopup(auth, provider);
+      await signInWithPopup(auth, provider).then(async () => {
+        const userInfo = await getUserInfo(auth.currentUser.uid);
+        setCurrentUser(userInfo);
+      });
     } else if (id === "email-login") {
       // If the login button is clicked, try to authenticate using email and password from the form
       e.preventDefault();
@@ -126,9 +129,9 @@ function App() {
           const userInfo = await getUserInfo(auth.currentUser.uid);
           setCurrentUser(userInfo);
         });
-        if (userObject.profilePicture) {
-          handleImageChange("profile", userObject.profilePicture);
-        }
+        // if (userObject.profilePicture) {
+        //   handleImageChange("profile", userObject.profilePicture);
+        // }
       });
     }
     try {
@@ -139,7 +142,19 @@ function App() {
       )
         .then(async () => {
           if (userObject.profilePicture) {
-            handleImageChange("profile", userObject.profilePicture);
+            const photoRef = ref(
+              storage,
+              `profile-pictures/${auth.currentUser.uid}.jpg`
+            );
+            const photoURL = await uploadString(
+              photoRef,
+              userObject.profilePicture,
+              "data_url"
+            ).then(() => {
+              const url = getDownloadURL(photoRef);
+              return url;
+            });
+            return photoURL;
           } else {
             return `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`;
           }
@@ -174,10 +189,13 @@ function App() {
       case "header":
         photoRef = ref(storage, `header-images/${uuidv4()}.jpg`);
         break;
+      case "post":
+        photoRef = ref(storage, `post-images/${uuidv4()}`);
     }
 
+    let url;
     await uploadString(photoRef, image, "data_url").then(async () => {
-      const url = await getDownloadURL(photoRef);
+      url = await getDownloadURL(photoRef);
       const userRef = doc(db, "users", currentUser.uid);
 
       switch (type) {
@@ -198,6 +216,7 @@ function App() {
           break;
       }
     });
+    return url;
   };
 
   // Create a document in the user collection with the specified uid
@@ -241,9 +260,9 @@ function App() {
     }
   };
 
-  const handlePost = async (e, type, message, pathname) => {
+  const handlePost = async (e, type, message, pathname, image) => {
     const view = getPageTitleFromUrl(pathname);
-    const postRef = await postMessage(e, type, message);
+    const postRef = await postMessage(e, type, message, null, image);
     //Set the new feed
     const postSnap = await getDoc(postRef);
     const postDoc = { id: postSnap.id, ...postSnap.data() };
@@ -329,8 +348,9 @@ function App() {
     }
   };
 
-  const postMessage = async (e, type, message, post) => {
+  const postMessage = async (e, type, message, post, image) => {
     let messageDocRef = null;
+
     switch (type) {
       case "post":
         messageDocRef = await addDoc(collection(db, "posts"), {
@@ -376,6 +396,14 @@ function App() {
           timestamp: serverTimestamp(),
         });
         break;
+    }
+
+    if (image) {
+      const url = await handleImageChange("post", image);
+
+      await updateDoc(doc(db, "posts", messageDocRef.id), {
+        image: url,
+      });
     }
     return messageDocRef;
   };

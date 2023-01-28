@@ -25,4 +25,15 @@ export const InteractionIcon = styled.div`
   &#comment {
     color: ${({ commented }) => (commented ? "#289d8c" : "#000")};
   }
+
+  &#add-photo-button {
+    width: 24px;
+    font-size: 24px;
+    margin: 0 10px;
+  }
+
+  &#add-photo-button:hover {
+    color: #289d8c;
+    cursor: pointer;
+  }
 `;

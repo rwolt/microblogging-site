@@ -78,6 +78,7 @@ const Home = (props) => {
               userHandle={post.userHandle}
               timestamp={post.timestamp}
               message={post.message}
+              image={post.image}
               likeCount={post.likeCount}
               repostCount={post.repostCount}
               commentCount={post.commentCount}

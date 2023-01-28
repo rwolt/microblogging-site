@@ -5,9 +5,14 @@ import { Input } from "./styled/Input.styled";
 import { Button } from "./styled/Button.styled";
 import { ProfileImage } from "./styled/ProfileImage.styled";
 import { UserInfo } from "./styled/UserInfo.styled";
+import { InteractionIcon } from "./styled/InteractionIcon.styled";
+import { MdAddPhotoAlternate } from "react-icons/md";
+import { resizeImage } from "../utils/resizeImage";
 
 const PostInputBox = (props) => {
   const [message, setMessage] = useState("");
+  const [image, setImage] = useState("");
+
   const location = useLocation();
   const navigate = useNavigate();
   return (
@@ -27,12 +32,32 @@ const PostInputBox = (props) => {
           placeholder="What's happening?"
         />
       </Flex>
-      <Flex justifyContent="flex-end">
+      <Flex justifyContent="flex-end" alignItems="center">
+        <label>
+          <input
+            type="file"
+            style={{ display: "none" }}
+            onChange={(e) => {
+              resizeImage(e.target.files[0], 500).then((image) => {
+                setImage(image);
+              });
+            }}
+          />
+          <InteractionIcon id="add-photo-button">
+            <MdAddPhotoAlternate />
+          </InteractionIcon>
+        </label>
         <Button
           onClick={async (e) => {
             e.stopPropagation();
             setMessage("");
-            await props.handlePost(e, "post", message, location.pathname);
+            await props.handlePost(
+              e,
+              "post",
+              message,
+              location.pathname,
+              image
+            );
           }}
         >
           Post

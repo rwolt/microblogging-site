@@ -38,6 +38,7 @@ const PostCard = ({
   displayName,
   userHandle,
   message,
+  image,
   post,
   liked,
   reposted,
@@ -96,8 +97,14 @@ const PostCard = ({
             <p>{postDate}</p>
           </span>
         </UserInfo>
-        <Flex justifyContent="flex-start" padding="0px">
+        <Flex
+          justifyContent="flex-start"
+          padding="0px"
+          flexDirection="column"
+          alignItems="flex-start"
+        >
           <p>{message}</p>
+          {image ? <img src={image} /> : ""}
         </Flex>
         <InteractionBar
           id={id}
