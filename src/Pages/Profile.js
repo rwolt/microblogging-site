@@ -20,7 +20,7 @@ const Profile = (props) => {
       });
     };
     getUserInfo(params.uid);
-  }, [params.uid]);
+  }, [params.uid, props.currentUser.headerImage]);
 
   return (
     <Container>
@@ -29,9 +29,11 @@ const Profile = (props) => {
         setShowPopup={props.setShowPopup}
         setShowRegisterForm={props.setShowRegisterForm}
         handleLogout={props.handleLogout}
-        user={props.user}
+        user={props.currentUser}
       />
       <ProfileHeader
+        handleImageChange={props.handleImageChange}
+        currentUser={props.currentUser}
         user={user}
         profileFeed={profileFeed}
         setProfileFeed={setProfileFeed}

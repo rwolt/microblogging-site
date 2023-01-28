@@ -1,16 +1,34 @@
 import React from "react";
 import format from "date-fns/format";
 import { FaCalendar } from "react-icons/fa";
+import { MdAddPhotoAlternate } from "react-icons/md";
 import { Flex } from "./styled/Flex.styled";
 import { StyledProfileHeader } from "./styled/StyledProfileHeader.styled";
 import { ProfileHeaderImage } from "./styled/ProfileHeaderImage.styled";
 import { ProfileImage } from "./styled/ProfileImage.styled";
 import ProfileBar from "./ProfileBar";
+import { resizeImage } from "../utils/resizeImage";
 
 const ProfileHeader = (props) => {
   return (
     <StyledProfileHeader>
-      <ProfileHeaderImage />
+      <ProfileHeaderImage headerImage={props.user.headerImage}>
+        {props.currentUser.uid === props.user.uid ? (
+          <label className="custom-file-upload">
+            <input
+              type="file"
+              onChange={(e) => {
+                resizeImage(e.target.files[0], 700).then((resized) =>
+                  props.handleImageChange("header", resized)
+                );
+              }}
+            />
+            <MdAddPhotoAlternate id="add-photo-icon" />
+          </label>
+        ) : (
+          ""
+        )}
+      </ProfileHeaderImage>
       <ProfileImage
         src={props.user.photoURL}
         position="relative"

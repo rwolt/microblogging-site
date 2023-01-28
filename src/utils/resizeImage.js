@@ -34,7 +34,8 @@ export const resizeImage = (image, width) => {
           correspondingHeight
         );
 
-        const resizedImage = canvas.toDataURL(image.type, 1.0);
+        const resizedImage = canvas.toDataURL(image.type, 0.98);
+
         resolve(resizedImage);
       };
     };

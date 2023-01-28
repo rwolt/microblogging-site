@@ -37,6 +37,7 @@ import {
   Route,
   matchPath,
 } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 import GlobalStyles from "./components/styled/Global";
 import Home from "./Pages/Home";
 import Profile from "./Pages/Profile";
@@ -158,6 +159,41 @@ function App() {
     } catch (error) {
       console.error(error.message);
     }
+  };
+
+  const handleImageChange = async (type, image) => {
+    let photoRef;
+    switch (type) {
+      case "profile":
+        photoRef = (storage, `profile-pictures/${auth.currentUser.uid}.jpg`);
+        break;
+      case "header":
+        photoRef = ref(storage, `header-images/${uuidv4()}.jpg`);
+        break;
+    }
+
+    await uploadString(photoRef, image, "data_url").then(async () => {
+      const url = await getDownloadURL(photoRef);
+      const userRef = doc(db, "users", currentUser.uid);
+
+      switch (type) {
+        case "header":
+          setCurrentUser({ ...currentUser, headerImage: url });
+          updateDoc(userRef, {
+            headerImage: url,
+          });
+          break;
+        case "profile":
+          setCurrentUser({ ...currentUser, photoURL: url });
+          updateDoc(userRef, {
+            photoURL: url,
+          });
+          updateProfile(auth.currentUser, {
+            photoURL: url,
+          });
+          break;
+      }
+    });
   };
 
   // Create a document in the user collection with the specified uid
@@ -664,7 +700,8 @@ function App() {
               path="/users/:uid"
               element={
                 <Profile
-                  user={currentUser}
+                  handleImageChange={handleImageChange}
+                  currentUser={currentUser}
                   posts={posts}
                   setPosts={setPosts}
                   getUserInfo={getUserInfo}
