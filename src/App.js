@@ -44,8 +44,10 @@ import Profile from "./Pages/Profile";
 import Tweet from "./Pages/Tweet";
 import { AiFillPropertySafety } from "react-icons/ai";
 import { FaLessThanEqual } from "react-icons/fa";
+import { resizeImage } from "./utils/resizeImage";
 
 const theme = {};
+const provider = new GoogleAuthProvider();
 
 function App() {
   const [currentUser, setCurrentUser] = useState();
@@ -84,7 +86,6 @@ function App() {
     // If the Sign in with Google button is clicked, show a google sign-in popup
     if (id === "google-login") {
       e.preventDefault();
-      const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
     } else if (id === "email-login") {
       // If the login button is clicked, try to authenticate using email and password from the form
@@ -112,9 +113,24 @@ function App() {
   // Register new user
   const handleRegister = async (e, userObject) => {
     e.preventDefault();
+    const { id } = e.target;
     console.log(userObject);
     // If a new account is created, the user is signed in automatically
-
+    if (id === "google-login") {
+      signInWithPopup(auth, provider).then(() => {
+        createUserDoc(
+          auth.currentUser.uid,
+          userObject,
+          auth.currentUser.photoURL
+        ).then(async () => {
+          const userInfo = await getUserInfo(auth.currentUser.uid);
+          setCurrentUser(userInfo);
+        });
+        if (userObject.profilePicture) {
+          handleImageChange("profile", userObject.profilePicture);
+        }
+      });
+    }
     try {
       await createUserWithEmailAndPassword(
         auth,
@@ -123,19 +139,7 @@ function App() {
       )
         .then(async () => {
           if (userObject.profilePicture) {
-            const photoRef = ref(
-              storage,
-              `profile-pictures/${auth.currentUser.uid}.jpg`
-            );
-            const photoURL = await uploadString(
-              photoRef,
-              userObject.profilePicture,
-              "data_url"
-            ).then(() => {
-              const url = getDownloadURL(photoRef);
-              return url;
-            });
-            return photoURL;
+            handleImageChange("profile", userObject.profilePicture);
           } else {
             return `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`;
           }

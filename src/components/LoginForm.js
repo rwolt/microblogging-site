@@ -48,6 +48,7 @@ const LoginForm = (props) => {
             }}
           />
           <input
+            required
             name="register-handle"
             placeholder="Handle"
             type="text"
@@ -85,6 +86,7 @@ const LoginForm = (props) => {
           />
           <Flex justifyContent="flex-end">
             <Button
+              id="email-login"
               onClick={(e) => {
                 const userObject = {
                   email: registerEmail,
@@ -102,8 +104,16 @@ const LoginForm = (props) => {
           <Flex flexDirection="column">
             <p> or </p>
             <GoogleLoginButton
+              id="google-login"
               onClick={(e) => {
-                props.handleLogin(e);
+                const userObject = {
+                  email: registerEmail,
+                  password: registerPassword,
+                  displayName: displayName,
+                  userHandle: userHandle,
+                  profilePicture: profilePicture,
+                };
+                props.handleRegister(e, userObject);
               }}
             />
           </Flex>
