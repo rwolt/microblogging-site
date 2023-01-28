@@ -18,7 +18,7 @@ const ProfileHeader = (props) => {
             <input
               type="file"
               onChange={(e) => {
-                resizeImage(e.target.files[0], 700).then((resized) =>
+                resizeImage(e.target.files[0], 600).then((resized) =>
                   props.handleImageChange("header", resized)
                 );
               }}

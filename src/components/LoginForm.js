@@ -52,7 +52,13 @@ const LoginForm = (props) => {
             placeholder="Handle"
             type="text"
             value={userHandle}
-            onChange={(e) => setUserHandle(e.target.value)}
+            onChange={(e) =>
+              setUserHandle(
+                e.target.value.length == 1 && e.target.value[0] !== "@"
+                  ? `@${e.target.value}`
+                  : e.target.value
+              )
+            }
           />
           <input
             name="display-name"

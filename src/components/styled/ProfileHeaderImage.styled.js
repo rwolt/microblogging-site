@@ -3,7 +3,11 @@ import styled from "styled-components";
 export const ProfileHeaderImage = styled.div`
   width: 100%;
   height: 200px;
-  background: center url(${({ headerImage }) => headerImage});
+  background-color: lightsteelblue;
+  background-image: url(${({ headerImage }) => headerImage});
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   position: relative;
 
   input[type="file"] {
