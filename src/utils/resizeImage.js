@@ -1,40 +1,42 @@
 export const resizeImage = (image, width) => {
-  console.log("resize image");
-  let canvas = document.createElement("canvas");
-  let canvasContext = canvas.getContext("2d");
+  return new Promise((resolve, reject) => {
+    console.log("resize image");
+    let canvas = document.createElement("canvas");
+    let canvasContext = canvas.getContext("2d");
 
-  let reader = new FileReader();
+    let reader = new FileReader();
 
-  reader.readAsDataURL(image);
+    reader.readAsDataURL(image);
 
-  reader.onload = () => {
-    let dummyImg = new Image(0, 0);
+    reader.onload = () => {
+      let dummyImg = new Image(0, 0);
 
-    dummyImg.src = reader.result;
+      dummyImg.src = reader.result;
 
-    dummyImg.onload = () => {
-      const origWidth = dummyImg.naturalWidth;
-      const origHeight = dummyImg.naturalHeight;
+      dummyImg.onload = () => {
+        const origWidth = dummyImg.naturalWidth;
+        const origHeight = dummyImg.naturalHeight;
 
-      const desiredWidth = width;
+        const desiredWidth = width;
 
-      const ratio = desiredWidth / origWidth;
+        const ratio = desiredWidth / origWidth;
 
-      const correspondingHeight = ratio * origHeight;
+        const correspondingHeight = ratio * origHeight;
 
-      canvas.width = desiredWidth;
-      canvas.height = correspondingHeight;
+        canvas.width = desiredWidth;
+        canvas.height = correspondingHeight;
 
-      canvasContext.drawImage(
-        dummyImg,
-        0,
-        0,
-        desiredWidth,
-        correspondingHeight
-      );
+        canvasContext.drawImage(
+          dummyImg,
+          0,
+          0,
+          desiredWidth,
+          correspondingHeight
+        );
 
-      const resizedImage = canvas.toDataURL(image.type, 1.0);
-      return resizedImage;
+        const resizedImage = canvas.toDataURL(image.type, 1.0);
+        resolve(resizedImage);
+      };
     };
-  };
+  });
 };
