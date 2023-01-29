@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { devices } from "./devices";
 
 export const StyledParentTweet = styled.div`
   p {
@@ -11,5 +12,11 @@ export const StyledParentTweet = styled.div`
     color: #7e7e7e;
     display: flex;
     align-items: center;
+  }
+
+  @media ${devices.tablet} {
+    span#post-time {
+      display: none;
+    }
   }
 `;

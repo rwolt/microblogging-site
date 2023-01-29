@@ -104,7 +104,7 @@ const PostCard = ({
           alignItems="flex-start"
         >
           <p>{message}</p>
-          {image ? <img src={image} /> : ""}
+          {image ? <img src={image} style={{ width: "90%" }} /> : ""}
         </Flex>
         <InteractionBar
           id={id}

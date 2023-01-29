@@ -79,6 +79,7 @@ const Tweet = (props) => {
               timestamp={item.timestamp}
               replyType={item.replyType}
               message={item.message}
+              image={item.image}
               liked={props.checkLiked(item.id)}
               commented={props.checkCommented(item.id)}
               reposted={props.checkReposted(item.id)}
@@ -127,6 +128,7 @@ const Tweet = (props) => {
               timestamp={item.timestamp}
               replyType={item.replyType}
               message={item.message}
+              image={item.image}
               liked={props.checkLiked(item.id)}
               reposted={props.checkReposted(item.id)}
               commented={props.checkCommented(item.id)}

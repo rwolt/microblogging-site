@@ -15,6 +15,7 @@ const ParentTweet = ({
   userHandle,
   displayName,
   message,
+  image,
   post,
   liked,
   reposted,
@@ -28,9 +29,18 @@ const ParentTweet = ({
   const navigate = useNavigate();
   return (
     <StyledParentTweet>
-      <Flex flexDirection="row" padding="10px 10px 0 10px">
+      <Flex
+        flexDirection="row"
+        width="100%"
+        margin="auto"
+        padding="5px"
+        alignItems="flex-start"
+        height="30px"
+        style={{ overflow: "visible" }}
+      >
         <ProfileImage
           src={profilePicURL}
+          padding="5px"
           onClick={(e) => {
             e.stopPropagation();
             navigate(`/users/${user}`);
@@ -55,14 +65,43 @@ const ParentTweet = ({
             {userHandle}
           </a>
         </UserInfo>
+        <Flex
+          justifyContent="flex-end"
+          padding="5px 10px"
+          alignItems="flex-start"
+        >
+          <span id="post-time">
+            {format(timestamp.toDate(), "h:mm b")}
+            <BsDot />
+          </span>
+          <span id="post-full-date">
+            {format(timestamp.toDate(), "MMM do yyyy")}
+          </span>
+          <span id="post-short-date" style={{ display: "none" }}>
+            {format(timestamp.toDate(), "MMM do")}
+          </span>
+        </Flex>
       </Flex>
-      <p>{message}</p>
-      <Flex justifyContent="flex-start" padding=" 5px 19px">
-        <span>
-          {format(timestamp.toDate(), "h:mm b")}
-          <BsDot />
-          {format(timestamp.toDate(), "MMM do yyyy")}
-        </span>
+      <Flex
+        margin="0 0 0 60px"
+        padding="0 10px 10px 10px"
+        flexDirection="column"
+        width="calc(100% - 60px)"
+        alignItems="flex-start"
+      >
+        <p style={{ padding: "0" }}>{message}</p>
+        {image ? (
+          <img
+            src={image}
+            style={{
+              alignSelf: "flex-end",
+              paddingRight: "5px",
+              width: "100%",
+            }}
+          />
+        ) : (
+          ""
+        )}
       </Flex>
       <TweetStats
         commentCount={commentCount}
