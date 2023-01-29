@@ -30,6 +30,7 @@ const ParentTweet = ({
   return (
     <StyledParentTweet>
       <Flex
+        id="parent-tweet-header"
         flexDirection="row"
         width="100%"
         margin="auto"
@@ -70,15 +71,17 @@ const ParentTweet = ({
           padding="5px 10px"
           alignItems="flex-start"
         >
-          <span id="post-time">
-            {format(timestamp.toDate(), "h:mm b")}
-            <BsDot />
-          </span>
-          <span id="post-full-date">
-            {format(timestamp.toDate(), "MMM do yyyy")}
-          </span>
-          <span id="post-short-date" style={{ display: "none" }}>
-            {format(timestamp.toDate(), "MMM do")}
+          <span id="post-timestamp">
+            <span id="post-time">{format(timestamp.toDate(), "h:mm b")}</span>
+            <span id="decoration">
+              <BsDot />
+            </span>
+            <span id="post-full-date">
+              {format(timestamp.toDate(), "MMM do yyyy")}
+            </span>
+            <span id="post-short-date">
+              {format(timestamp.toDate(), "MMM do")}
+            </span>
           </span>
         </Flex>
       </Flex>
@@ -95,7 +98,7 @@ const ParentTweet = ({
             src={image}
             style={{
               alignSelf: "flex-end",
-              paddingRight: "5px",
+              padding: "10px 5px 0 0",
               width: "100%",
             }}
           />

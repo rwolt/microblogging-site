@@ -71,7 +71,6 @@ const PostCard = ({
         flexDirection="column"
         alignItems="flex-start"
         padding="0"
-        margin=" 0 0 0 10px"
       >
         <UserInfo>
           <a
@@ -91,19 +90,18 @@ const PostCard = ({
           >
             {userHandle}
           </a>
-          {/* <NavLink to={`/users/${user}`}> {displayName}</NavLink> */}
-          <span>
+          <span id="postcard-date">
             <BsDot id="dot-spacer" />
-            <p>{postDate}</p>
+            <span>{postDate}</span>
           </span>
         </UserInfo>
         <Flex
           justifyContent="flex-start"
-          padding="0px"
+          padding="0"
           flexDirection="column"
           alignItems="flex-start"
         >
-          <p>{message}</p>
+          <p style={{ padding: "0 5px" }}>{message}</p>
           {image ? <img src={image} style={{ width: "90%" }} /> : ""}
         </Flex>
         <InteractionBar

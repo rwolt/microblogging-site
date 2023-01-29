@@ -37,10 +37,23 @@ export const UserInfo = styled.div`
   }
 
   @media ${devices.mobileS} {
-    flex-flow: row wrap;
+      flex-direction: column;
+      align-items: flex-start;
+    
+      & > #user-handle {
+        padding-top: 0;
+      }
+      
+      }
+    }
 
-    #dot-spacer {
-      display: none;
+    @media ${devices.mobileL} {
+      flex-direction: row;
+      align-items: center;
+      
+      & > #user-handle {
+        padding-top: 5px;
+      }
     }
   }
 `;

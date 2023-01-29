@@ -1,6 +1,5 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { AiOutlineRetweet, AiOutlineStar, AiFillStar } from "react-icons/ai";
 import {
   FaRegComment,
   FaRetweet,

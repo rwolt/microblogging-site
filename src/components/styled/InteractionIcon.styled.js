@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const InteractionIcon = styled.div`
   display: flex;
   width: 30%;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
 
   &:hover {

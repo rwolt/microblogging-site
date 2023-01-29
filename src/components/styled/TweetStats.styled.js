@@ -1,8 +1,10 @@
 import styled from "styled-components";
+import { devices } from "./devices";
 
 export const StyledTweetStats = styled.div`
   display: flex;
-  padding: 10px 0 10px 19px;
+  justify-content: space-around;
+  padding: 10px 15px 10px 70px;
   margin-top: 1ch;
   border-top: 1px solid #e5e5e5;
   border-bottom: 1px solid #e5e5e5;
@@ -14,7 +16,18 @@ export const StyledTweetStats = styled.div`
   }
 
   span {
-    margin-right: 3ch;
     font-size: 1.1rem;
+  }
+
+  @media ${devices.mobileS} {
+    span {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media ${devices.mobileL} {
+    span {
+      font-size: 1.1rem;
+    }
   }
 `;

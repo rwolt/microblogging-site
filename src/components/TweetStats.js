@@ -8,12 +8,18 @@ const TweetStats = ({ commentCount, repostCount, likeCount }) => {
     <>
       {repostCount > 0 || likeCount > 0 || commentCount > 0 ? (
         <StyledTweetStats>
-          <span className="counter">{commentCount}</span>
-          <span>{commentCount === 1 ? "Comment" : "Comments"}</span>
-          <span className="counter">{repostCount}</span>
-          <span>{repostCount === 1 ? "Retweet" : "Retweets"}</span>
-          <span className="counter">{likeCount}</span>
-          <span> {likeCount === 1 ? "Like" : "Likes"}</span>
+          <div>
+            <span className="counter">{commentCount}</span>
+            <span>{commentCount === 1 ? "Comment" : "Comments"}</span>
+          </div>
+          <div>
+            <span className="counter">{repostCount}</span>
+            <span>{repostCount === 1 ? "Repost" : "Reposts"}</span>
+          </div>
+          <div>
+            <span className="counter">{likeCount}</span>
+            <span> {likeCount === 1 ? "Like" : "Likes"}</span>
+          </div>
         </StyledTweetStats>
       ) : (
         ""

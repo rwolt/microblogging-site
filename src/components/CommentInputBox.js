@@ -4,20 +4,21 @@ import { Flex } from "./styled/Flex.styled";
 import { Input } from "./styled/Input.styled";
 import { Button } from "./styled/Button.styled";
 import { ProfileImage } from "./styled/ProfileImage.styled";
+import { StyledCommentInputBox } from "./styled/StyledCommentInputBox.styled";
 import { UserInfo } from "./styled/UserInfo.styled";
 
 const CommentInputBox = (props) => {
   const [message, setMessage] = useState("");
   const location = useLocation();
   return (
-    <div style={{ borderBottom: "1px solid #e5e5e5" }}>
-      <Flex justifyContent="flex-start">
+    <StyledCommentInputBox>
+      <Flex justifyContent="flex-start" padding="5px">
         <ProfileImage src={props.user.photoURL} />
         <Input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Tweet your reply"
+          placeholder="Type your reply"
         />
         <Button
           id="comment"
@@ -35,7 +36,7 @@ const CommentInputBox = (props) => {
           Reply
         </Button>
       </Flex>
-    </div>
+    </StyledCommentInputBox>
   );
 };
 export default CommentInputBox;

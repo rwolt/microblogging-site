@@ -41,7 +41,7 @@ import { v4 as uuidv4 } from "uuid";
 import GlobalStyles from "./components/styled/Global";
 import Home from "./Pages/Home";
 import Profile from "./Pages/Profile";
-import Tweet from "./Pages/Tweet";
+import Post from "./Pages/Post";
 import { AiFillPropertySafety } from "react-icons/ai";
 import { FaLessThanEqual } from "react-icons/fa";
 import { resizeImage } from "./utils/resizeImage";
@@ -757,7 +757,7 @@ function App() {
             <Route
               path="/posts/:postId"
               element={
-                <Tweet
+                <Post
                   user={currentUser}
                   posts={posts}
                   setPosts={setPosts}
