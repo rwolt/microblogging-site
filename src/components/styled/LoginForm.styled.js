@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const StyledLoginForm = styled.form`
   display: flex;
   flex-direction: column;
+  z-index: 100;
 
   & > input {
     height: 50px;

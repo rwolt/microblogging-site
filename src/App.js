@@ -121,6 +121,12 @@ function App() {
     // If a new account is created, the user is signed in automatically
     if (id === "google-login") {
       signInWithPopup(auth, provider).then(() => {
+        if (!userObject.displayName) {
+          userObject = {
+            ...userObject,
+            displayName: auth.currentUser.displayName,
+          };
+        }
         createUserDoc(
           auth.currentUser.uid,
           userObject,

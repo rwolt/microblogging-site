@@ -10,4 +10,5 @@ export const Popup = styled.div`
   position: absolute;
   left: 15%;
   top: 15%;
+  z-index: 100;
 `;

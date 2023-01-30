@@ -35,6 +35,7 @@ const RePost = ({
         displayName={post.displayName}
         timestamp={post.timestamp}
         message={post.message}
+        image={post.image}
         liked={liked}
         reposted={reposted}
         commented={commented}

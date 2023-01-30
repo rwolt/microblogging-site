@@ -62,6 +62,7 @@ const LoginForm = (props) => {
             }
           />
           <input
+            required
             name="display-name"
             placeholder="Display Name"
             type="text"
