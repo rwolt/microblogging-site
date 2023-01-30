@@ -56,7 +56,11 @@ const PostCard = ({
   const { uid } = useParams();
   const postDate = formatTimestamp(timestamp);
   return (
-    <StyledPostCard>
+    <StyledPostCard
+      onClick={(e) => {
+        navigate(`/posts/${post.id}`);
+      }}
+    >
       <ProfileImage
         src={profilePicURL}
         onClick={(e) => {
@@ -64,14 +68,7 @@ const PostCard = ({
           navigate(`/users/${user}`);
         }}
       />
-      <Flex
-        onClick={(e) => {
-          navigate(`/posts/${post.id}`);
-        }}
-        flexDirection="column"
-        alignItems="flex-start"
-        padding="0"
-      >
+      <Flex flexDirection="column" alignItems="flex-start" padding="0">
         <UserInfo>
           <a
             onClick={(e) => {
@@ -101,7 +98,7 @@ const PostCard = ({
           flexDirection="column"
           alignItems="flex-start"
         >
-          <p style={{ padding: "0 5px" }}>{message}</p>
+          <p style={{ padding: "0 5px 0 0" }}>{message}</p>
           {image ? (
             <img
               src={image}

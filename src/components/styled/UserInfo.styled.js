@@ -22,6 +22,7 @@ export const UserInfo = styled.div`
   & > a {
     margin: 0;
     padding: 5px;
+    padding-left: 0;
   }
 
   & > span {
@@ -34,6 +35,7 @@ export const UserInfo = styled.div`
   & > #user-handle {
     font-weight: normal;
     color: #289d8c;
+    padding-left: 0;
   }
 
 

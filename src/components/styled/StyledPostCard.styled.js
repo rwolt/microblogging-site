@@ -20,7 +20,7 @@ export const StyledPostCard = styled.div`
 
     #postcard-date {
       position: absolute;
-      top: 10px;
+      top: 15px;
       right: 15px;
     }
   }
