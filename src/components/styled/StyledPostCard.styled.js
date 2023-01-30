@@ -3,7 +3,7 @@ import { devices } from "./devices";
 
 export const StyledPostCard = styled.div`
   display: flex;
-  padding: 5px;
+  padding: 10px;
   align-items: flex-start;
   border-bottom: 1px solid #e5e5e5;
   position: relative;

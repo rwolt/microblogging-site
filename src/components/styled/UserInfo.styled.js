@@ -36,6 +36,7 @@ export const UserInfo = styled.div`
     color: #289d8c;
   }
 
+
   @media ${devices.mobileS} {
       flex-direction: column;
       align-items: flex-start;

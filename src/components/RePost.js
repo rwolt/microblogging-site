@@ -22,7 +22,11 @@ const RePost = ({
 }) => {
   return (
     <StyledRepost>
-      <Flex alignItems="center" justifyContent="flex-start">
+      <Flex
+        alignItems="center"
+        justifyContent="flex-start"
+        padding="10px 11px 0 11px"
+      >
         <FaRetweet id="repost-icon" />
         {repostDisplayName} reposted
       </Flex>
