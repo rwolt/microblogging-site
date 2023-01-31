@@ -6,6 +6,11 @@ export const StyledLoginForm = styled.form`
   flex-direction: column;
   z-index: 100;
 
+  .error-message {
+    color: #ff5555;
+    font-size: 14px;
+  }
+
   @media ${devices.mobileS} {
     & > input {
       height: 2.5em;

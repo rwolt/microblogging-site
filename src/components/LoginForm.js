@@ -13,6 +13,7 @@ const LoginForm = (props) => {
   const [registerPassword, setRegisterPassword] = useState("");
   const [userHandle, setUserHandle] = useState("");
   const [profilePicture, setProfilePicture] = useState("");
+  const [formValidation, setFormValidation] = useState({});
 
   const clearForm = () => {
     setLoginEmail("");
@@ -24,9 +25,39 @@ const LoginForm = (props) => {
     setProfilePicture(null);
   };
 
-  useEffect(() => {
-    return () => clearForm();
-  }, []);
+  // useEffect(() => {
+  //   return () => clearForm();
+  // }, []);
+
+  const validateForm = (e, userObject) => {
+    const { id } = e.target;
+    let error = {};
+    if (!userObject.userHandle) {
+      error = { ...error, handle: "User handle is required" };
+    }
+    if (id === "email-login") {
+      if (!userObject.email) {
+        error = {
+          ...error,
+          email: "Email address is required for email/password authentication",
+        };
+      }
+      if (!userObject.password) {
+        error = {
+          ...error,
+          password: "Password is required for email/password authentication",
+        };
+      }
+      // if (!userObject.displayName) {
+      //   error = {
+      //     ...error,
+      //     displayName:
+      //       "Display name is required for email/password registration",
+      //   };
+      // }
+    }
+    return error;
+  };
 
   return (
     // Show login form or registration form
@@ -35,7 +66,7 @@ const LoginForm = (props) => {
         <>
           <h2>Create your account</h2>
           <label htmlFor="register-profile-picture">
-            Choose a Profile Picture
+            Choose a Profile Picture (optional)
           </label>
           <input
             name="register-profile-picture"
@@ -47,28 +78,41 @@ const LoginForm = (props) => {
               );
             }}
           />
+          {formValidation.handle ? (
+            <p className="error-message">{formValidation.handle}</p>
+          ) : (
+            ""
+          )}
           <input
-            required
             name="register-handle"
             placeholder="Handle"
             type="text"
             value={userHandle}
             onChange={(e) =>
               setUserHandle(
-                e.target.value.length == 1 && e.target.value[0] !== "@"
+                e.target.value.length === 1 && e.target.value[0] !== "@"
                   ? `@${e.target.value}`
                   : e.target.value
               )
             }
           />
+          {formValidation.displayName ? (
+            <p className="error-message">{formValidation.displayName}</p>
+          ) : (
+            ""
+          )}
           <input
-            required
             name="display-name"
             placeholder="Display Name"
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
           />
+          {formValidation.email ? (
+            <p className="error-message">{formValidation.email}</p>
+          ) : (
+            ""
+          )}
           <input
             name="register-email"
             placeholder="Email"
@@ -76,6 +120,11 @@ const LoginForm = (props) => {
             value={registerEmail}
             onChange={(e) => setRegisterEmail(e.target.value)}
           />
+          {formValidation.password ? (
+            <p className="error-message">{formValidation.password}</p>
+          ) : (
+            ""
+          )}
           <input
             name="register-password"
             placeholder="Password"
@@ -89,6 +138,7 @@ const LoginForm = (props) => {
             <Button
               id="email-login"
               onClick={(e) => {
+                e.preventDefault();
                 const userObject = {
                   email: registerEmail,
                   password: registerPassword,
@@ -96,7 +146,13 @@ const LoginForm = (props) => {
                   userHandle: userHandle,
                   profilePicture: profilePicture,
                 };
-                props.handleRegister(e, userObject);
+                const error = validateForm(e, userObject);
+                if (!Object.keys(error).length) {
+                  setFormValidation("");
+                  props.handleRegister(e, userObject);
+                } else {
+                  setFormValidation(error);
+                }
               }}
             >
               Register
@@ -107,6 +163,7 @@ const LoginForm = (props) => {
             <GoogleLoginButton
               id="google-login"
               onClick={(e) => {
+                e.preventDefault();
                 const userObject = {
                   email: registerEmail,
                   password: registerPassword,
@@ -114,7 +171,13 @@ const LoginForm = (props) => {
                   userHandle: userHandle,
                   profilePicture: profilePicture,
                 };
-                props.handleRegister(e, userObject);
+                const error = validateForm(e, userObject);
+                if (!Object.keys(error).length) {
+                  setFormValidation("");
+                  props.handleRegister(e, userObject);
+                } else {
+                  setFormValidation(error);
+                }
               }}
             />
           </Flex>
@@ -122,6 +185,11 @@ const LoginForm = (props) => {
       ) : (
         <>
           <h2>Sign In</h2>
+          {formValidation.email ? (
+            <p className="error-message">{formValidation.email}</p>
+          ) : (
+            ""
+          )}
           <input
             name="sign-in-email"
             placeholder="Email"
@@ -129,6 +197,11 @@ const LoginForm = (props) => {
             value={loginEmail}
             onChange={(e) => setLoginEmail(e.target.value)}
           />
+          {formValidation.password ? (
+            <p className="error-message">{formValidation.password}</p>
+          ) : (
+            ""
+          )}
           <input
             name="sign-in-password"
             placeholder="Password"
@@ -141,11 +214,19 @@ const LoginForm = (props) => {
               id="email-login"
               //Create an object with login information and pass to the login event handler
               onClick={(e) => {
+                e.preventDefault();
                 const userObject = {
                   email: loginEmail,
                   password: loginPassword,
                 };
-                props.handleLogin(e, userObject);
+                const error = validateForm(e, userObject);
+                if (!Object.keys(error).length) {
+                  props.handleLogin(e, userObject);
+                  setFormValidation("");
+                  console.log("login");
+                } else {
+                  setFormValidation(error);
+                }
               }}
             >
               Login

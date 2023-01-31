@@ -80,7 +80,6 @@ function App() {
   // Call authStateObserver on auth state change
   const initFirebaseAuth = () => onAuthStateChanged(auth, authStateObserver);
 
-  // Login
   const handleLogin = async (e, userObject) => {
     const { id } = e.target;
     // If the Sign in with Google button is clicked, show a google sign-in popup
@@ -115,9 +114,8 @@ function App() {
 
   // Register new user
   const handleRegister = async (e, userObject) => {
-    e.preventDefault();
     const { id } = e.target;
-    console.log(userObject);
+    console.log(id, userObject);
     // If a new account is created, the user is signed in automatically
     if (id === "google-login") {
       signInWithPopup(auth, provider).then(() => {
@@ -139,50 +137,51 @@ function App() {
         //   handleImageChange("profile", userObject.profilePicture);
         // }
       });
-    }
-    try {
-      await createUserWithEmailAndPassword(
-        auth,
-        userObject.email,
-        userObject.password
-      )
-        .then(async () => {
-          if (userObject.profilePicture) {
-            const photoRef = ref(
-              storage,
-              `profile-pictures/${auth.currentUser.uid}.jpg`
-            );
-            const photoURL = await uploadString(
-              photoRef,
-              userObject.profilePicture,
-              "data_url"
-            ).then(() => {
-              const url = getDownloadURL(photoRef);
-              return url;
-            });
-            return photoURL;
-          } else {
-            return `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`;
-          }
-        })
-        .then((url) => {
-          console.log(url);
-          updateProfile(auth.currentUser, {
-            displayName: userObject.displayName,
-            photoURL: url,
-          });
-          return url;
-        })
-        .then((url) => {
-          createUserDoc(auth.currentUser.uid, userObject, url).then(
-            async () => {
-              const userInfo = await getUserInfo(auth.currentUser.uid);
-              setCurrentUser(userInfo);
+    } else {
+      try {
+        await createUserWithEmailAndPassword(
+          auth,
+          userObject.email,
+          userObject.password
+        )
+          .then(async () => {
+            if (userObject.profilePicture) {
+              const photoRef = ref(
+                storage,
+                `profile-pictures/${auth.currentUser.uid}.jpg`
+              );
+              const photoURL = await uploadString(
+                photoRef,
+                userObject.profilePicture,
+                "data_url"
+              ).then(() => {
+                const url = getDownloadURL(photoRef);
+                return url;
+              });
+              return photoURL;
+            } else {
+              return `https://avatars.dicebear.com/api/identicon/${auth.currentUser.uid}.svg`;
             }
-          );
-        });
-    } catch (error) {
-      console.error(error.message);
+          })
+          .then((url) => {
+            console.log(url);
+            updateProfile(auth.currentUser, {
+              displayName: userObject.displayName,
+              photoURL: url,
+            });
+            return url;
+          })
+          .then((url) => {
+            createUserDoc(auth.currentUser.uid, userObject, url).then(
+              async () => {
+                const userInfo = await getUserInfo(auth.currentUser.uid);
+                setCurrentUser(userInfo);
+              }
+            );
+          });
+      } catch (error) {
+        console.error(error.message);
+      }
     }
   };
 
@@ -706,9 +705,6 @@ function App() {
   const authStateObserver = async (user) => {
     if (user) {
       setShowPopup(false);
-      // await getProfilePic().then(() => {
-      //   checkUserDoc();
-      // });
     } else {
       setCurrentUser("");
     }
