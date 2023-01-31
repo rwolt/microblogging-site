@@ -82,6 +82,7 @@ function App() {
 
   const handleLogin = async (e, userObject) => {
     const { id } = e.target;
+    console.log(id, userObject);
     // If the Sign in with Google button is clicked, show a google sign-in popup
     if (id === "google-login") {
       e.preventDefault();
@@ -117,7 +118,7 @@ function App() {
     const { id } = e.target;
     console.log(id, userObject);
     // If a new account is created, the user is signed in automatically
-    if (id === "google-login") {
+    if (id === "google-register") {
       signInWithPopup(auth, provider).then(() => {
         if (!userObject.displayName) {
           userObject = {

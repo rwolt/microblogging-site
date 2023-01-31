@@ -31,30 +31,44 @@ const LoginForm = (props) => {
 
   const validateForm = (e, userObject) => {
     const { id } = e.target;
+    console.log(id);
     let error = {};
-    if (!userObject.userHandle) {
-      error = { ...error, handle: "User handle is required" };
-    }
-    if (id === "email-login") {
-      if (!userObject.email) {
-        error = {
-          ...error,
-          email: "Email address is required for email/password authentication",
-        };
-      }
-      if (!userObject.password) {
-        error = {
-          ...error,
-          password: "Password is required for email/password authentication",
-        };
-      }
-      // if (!userObject.displayName) {
-      //   error = {
-      //     ...error,
-      //     displayName:
-      //       "Display name is required for email/password registration",
-      //   };
-      // }
+    switch (id) {
+      case "email-register":
+        if (!userObject.displayName) {
+          error = {
+            ...error,
+            displayName:
+              "Display name is required for email/password registration",
+          };
+        }
+
+        if (!userObject.userHandle) {
+          error = { ...error, handle: "User handle is required" };
+        }
+
+      case "email-login":
+        if (!userObject.email) {
+          error = {
+            ...error,
+            email:
+              "Email address is required for email/password authentication",
+          };
+        }
+
+        if (!userObject.password) {
+          error = {
+            ...error,
+            password: "Password is required for email/password authentication",
+          };
+        }
+
+        break;
+      case "google-register":
+        if (!userObject.userHandle) {
+          error = { ...error, handle: "User handle is required" };
+        }
+        break;
     }
     return error;
   };
@@ -136,7 +150,7 @@ const LoginForm = (props) => {
           />
           <Flex justifyContent="flex-end">
             <Button
-              id="email-login"
+              id="email-register"
               onClick={(e) => {
                 e.preventDefault();
                 const userObject = {
@@ -161,7 +175,7 @@ const LoginForm = (props) => {
           <Flex flexDirection="column">
             <p> or </p>
             <GoogleLoginButton
-              id="google-login"
+              id="google-register"
               onClick={(e) => {
                 e.preventDefault();
                 const userObject = {
@@ -220,10 +234,10 @@ const LoginForm = (props) => {
                   password: loginPassword,
                 };
                 const error = validateForm(e, userObject);
+                console.log(error);
                 if (!Object.keys(error).length) {
-                  props.handleLogin(e, userObject);
                   setFormValidation("");
-                  console.log("login");
+                  props.handleLogin(e, userObject);
                 } else {
                   setFormValidation(error);
                 }
