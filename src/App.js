@@ -667,7 +667,6 @@ function App() {
       case "posts-replies":
         userRef = doc(db, "users", userId);
         await getDoc(userRef).then(async (doc) => {
-          console.log(doc.data());
           if (doc.data().reposts.length > 0 || doc.data().comments.length > 0) {
             q = query(
               postsRef,
@@ -681,6 +680,17 @@ function App() {
           }
         });
         break;
+      case "media":
+        userRef = doc(db, "users", userId);
+        await getDoc(userRef).then(async (doc) => {
+          q = query(
+            postsRef,
+            where("user", "==", doc.data().uid),
+            where("type", "==", "post"),
+            orderBy("image"),
+            limit(10)
+          );
+        });
     }
     if (q !== "") {
       const snapshot = await getDocs(q);

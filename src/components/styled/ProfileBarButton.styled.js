@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { devices } from "./devices";
 
 export const ProfileBarButton = styled.div`
   color: #555;
@@ -15,5 +16,17 @@ export const ProfileBarButton = styled.div`
   &#active {
     color: black;
     border-bottom: 3px solid mediumaquamarine;
+  }
+
+  @media ${devices.mobileS} {
+    font-size: 0.65em;
+  }
+
+  @media (min-width: 365px) {
+    font-size: 0.75em;
+  }
+
+  @media ${devices.mobileL} {
+    font-size: 0.9em;
   }
 `;

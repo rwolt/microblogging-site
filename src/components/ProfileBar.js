@@ -4,7 +4,7 @@ import { ProfileBarButton } from "./styled/ProfileBarButton.styled";
 
 const ProfileBar = ({ profileFeed, setProfileFeed }) => {
   return (
-    <Flex>
+    <Flex style={{ padding: "10px 15px 10px 16px" }}>
       <ProfileBarButton
         onClick={() => {
           setProfileFeed("posts");

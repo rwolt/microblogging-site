@@ -59,6 +59,7 @@ const ProfileFeed = (props) => {
                   displayName={post.displayName}
                   timestamp={post.timestamp}
                   message={post.message}
+                  image={post.image}
                   liked={props.checkLiked(post.id)}
                   reposted={props.checkReposted(post.id)}
                   commented={props.checkCommented(post.id)}

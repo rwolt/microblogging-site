@@ -30,13 +30,13 @@ const ProfileHeader = (props) => {
         )}
       </ProfileHeaderImage>
       <ProfileImage
+        id="profile-image"
         src={props.user.photoURL}
         position="relative"
-        width="100px"
-        height="100px"
         margin="0 0 -60px 0"
       />
       <Flex
+        id="user-bio"
         alignItems="flex-start"
         justifyContent="flex-start"
         flexDirection="column"
