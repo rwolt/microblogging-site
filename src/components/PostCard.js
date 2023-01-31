@@ -62,6 +62,10 @@ const PostCard = ({
       }}
     >
       <ProfileImage
+        style={{
+          border: "2px solid transparent",
+          backgroundColor: "transparent",
+        }}
         src={profilePicURL}
         onClick={(e) => {
           e.stopPropagation();

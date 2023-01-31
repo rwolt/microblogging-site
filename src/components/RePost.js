@@ -25,7 +25,7 @@ const RePost = ({
       <Flex
         alignItems="center"
         justifyContent="flex-start"
-        padding="10px 11px 0 11px"
+        padding="10px 11px 0 17px"
       >
         <FaRetweet id="repost-icon" />
         {repostDisplayName} reposted
