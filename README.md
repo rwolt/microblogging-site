@@ -1,17 +1,19 @@
-# Microblogging Service
+# Microblogging Site
 
-This is a proof-of-concept for a social networking site that allows users to post and interact with messages.
+A social networking site that allows users to post and interact with messages.
 
 ## Technologies Used
 
 - React
-- React Router
-- Firebase Firestore
-- Firebase Cloud Storage
+- React Router v6
+- Firebase (Authentication, Database, Cloud Storage)
 - Styled Components
-- date-fns
-- gravatars
+- date-fns for timestamp formatting
+- Dicebear avatars for generated profile pictures
 
 ## Features
 
-- Users can post, and that post gets added to their profile
+- 3 Views (reponsive): Home, Profile, and Post
+- Posts (including image posts), Reposts, Likes, and Comments
+- 4 different Profile Feeds (Posts, Replies, Media, Likes)
+- Profile Pictures and header images
