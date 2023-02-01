@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/microblog-service/static/js/main.841f67e8.js",
+    "index.html": "/microblog-service/index.html",
+    "main.841f67e8.js.map": "/microblog-service/static/js/main.841f67e8.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.841f67e8.js"
+  ]
+}
