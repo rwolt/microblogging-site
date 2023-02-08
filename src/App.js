@@ -32,7 +32,7 @@ import {
 } from "firebase/storage";
 import { ThemeProvider } from "styled-components";
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Routes,
   Route,
   matchPath,
