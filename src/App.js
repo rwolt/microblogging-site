@@ -50,7 +50,7 @@ const theme = {};
 const provider = new GoogleAuthProvider();
 
 function App() {
-  const [currentUser, setCurrentUser] = useState();
+  const [currentUser, setCurrentUser] = useState({});
   const [posts, setPosts] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
