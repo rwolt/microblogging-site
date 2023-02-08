@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/microblog-service/static/js/main.b5593f83.js",
+    "main.js": "/microblog-service/static/js/main.acd32a56.js",
     "index.html": "/microblog-service/index.html",
-    "main.b5593f83.js.map": "/microblog-service/static/js/main.b5593f83.js.map"
+    "main.acd32a56.js.map": "/microblog-service/static/js/main.acd32a56.js.map"
   },
   "entrypoints": [
-    "static/js/main.b5593f83.js"
+    "static/js/main.acd32a56.js"
   ]
 }
