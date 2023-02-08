@@ -12,7 +12,7 @@ const CommentInputBox = (props) => {
   const location = useLocation();
   return (
     <StyledCommentInputBox>
-      <Flex justifyContent="flex-start" padding="5px">
+      <Flex justifyContent="flex-start" padding="10px">
         <ProfileImage src={props.user.photoURL} />
         <Input
           type="text"
