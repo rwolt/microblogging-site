@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/microblogging-site/static/js/main.fa2c90fa.js",
+    "main.js": "/microblogging-site/static/js/main.cd28a78b.js",
     "index.html": "/microblogging-site/index.html",
-    "main.fa2c90fa.js.map": "/microblogging-site/static/js/main.fa2c90fa.js.map"
+    "main.cd28a78b.js.map": "/microblogging-site/static/js/main.cd28a78b.js.map"
   },
   "entrypoints": [
-    "static/js/main.fa2c90fa.js"
+    "static/js/main.cd28a78b.js"
   ]
 }
