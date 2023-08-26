@@ -18,4 +18,4 @@ A social networking site that allows users to post and interact with messages.
 - 4 different Profile Feeds (Posts, Replies, Media, Likes)
 - Profile Pictures and header images
 
-[Live Preview](https://rwolt.github.io/microblog-service/)
+[Live Preview](https://rwolt.github.io/microblog-site/)
