@@ -24,12 +24,7 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import {
-  ref,
-  uploadBytes,
-  uploadString,
-  getDownloadURL,
-} from "firebase/storage";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import { ThemeProvider } from "styled-components";
 import {
   HashRouter as Router,
@@ -42,9 +37,6 @@ import GlobalStyles from "./components/styled/Global";
 import Home from "./Pages/Home";
 import Profile from "./Pages/Profile";
 import Post from "./Pages/Post";
-import { AiFillPropertySafety } from "react-icons/ai";
-import { FaLessThanEqual } from "react-icons/fa";
-import { resizeImage } from "./utils/resizeImage";
 
 const theme = {};
 const provider = new GoogleAuthProvider();
