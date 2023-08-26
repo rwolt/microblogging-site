@@ -709,9 +709,9 @@ function App() {
       if (!userInfo) {
         await signOut(auth);
         setShowRegisterForm(true);
+      } else {
+        setShowPopup(false);
       }
-    } else if (user) {
-      setShowPopup(false);
     } else {
       setCurrentUser("");
     }
