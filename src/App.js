@@ -86,10 +86,18 @@ function App() {
     // If the Sign in with Google button is clicked, show a google sign-in popup
     if (id === "google-login") {
       e.preventDefault();
-      await signInWithPopup(auth, provider).then(async () => {
-        const userInfo = await getUserInfo(auth.currentUser.uid);
-        setCurrentUser(userInfo);
-      });
+      try {
+        await signInWithPopup(auth, provider).then(async () => {
+          console.log("Signed In");
+          console.log("Current User ID: " + auth.currentUser.uid);
+          console.log("getting user info");
+          const userInfo = await getUserInfo(auth.currentUser.uid);
+          console.log("User Info: " + userInfo);
+          setCurrentUser(userInfo);
+        });
+      } catch (err) {
+        console.error(err);
+      }
     } else if (id === "email-login") {
       // If the login button is clicked, try to authenticate using email and password from the form
       e.preventDefault();
@@ -704,7 +712,11 @@ function App() {
   };
 
   const authStateObserver = async (user) => {
-    if (user) {
+    const userInfo = await getUserInfo(auth.currentUser.uid);
+    if (user && !userInfo) {
+      await signOut(auth);
+      setShowRegisterForm(true);
+    } else if (user) {
       setShowPopup(false);
     } else {
       setCurrentUser("");
