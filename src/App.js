@@ -42,7 +42,7 @@ const theme = {};
 const provider = new GoogleAuthProvider();
 
 function App() {
-  const [currentUser, setCurrentUser] = useState({});
+  const [currentUser, setCurrentUser] = useState("");
   const [posts, setPosts] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
@@ -704,10 +704,12 @@ function App() {
   };
 
   const authStateObserver = async (user) => {
-    const userInfo = await getUserInfo(auth.currentUser.uid);
-    if (user && !userInfo) {
-      await signOut(auth);
-      setShowRegisterForm(true);
+    if (user) {
+      const userInfo = await getUserInfo(auth.currentUser.uid);
+      if (!userInfo) {
+        await signOut(auth);
+        setShowRegisterForm(true);
+      }
     } else if (user) {
       setShowPopup(false);
     } else {
